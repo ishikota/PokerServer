@@ -8,13 +8,13 @@ gem 'puma', '3.4.0'
 gem 'bcrypt', '3.1.7'
 
 group :development, :test do
+  gem 'rspec-rails', '3.1'
   gem 'pry-rails', '0.3.4'
   gem 'pry-byebug', '3.3'
   gem 'pry-stack_explorer', '~> 0.4.9.2'
 end
 
 group :test do
-  gem 'rspec-rails', '3.1'
   gem 'factory_girl_rails', '4.2.1'
 end
 
