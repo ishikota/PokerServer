@@ -1,5 +1,13 @@
 import websocket
 
+# json parameter
+identifier = r'"identifier":"{\"channel\":\"RoomChannel\"}"'
+cma = ' , '
+command = '"command" : '
+data = '"data" : '
+action = r'\"action\" : '
+auth_params = r'\"room_id\" : 1, \"user_id\" : 1, \"credencial\": \"fugafuga\"'
+
 def on_message(ws, message):
     print message
 
@@ -11,11 +19,15 @@ def on_close(ws):
 
 def on_open(ws):
   while True:
-    f = raw_input("s: subscribe, m: send message, other: go listening loop")
+    f = raw_input("s: subscribe, e: enter_room, m: send message, other: go listening loop")
     if f == 's':
-      ws.send(r'{"identifier":"{\"channel\":\"RoomChannel\"}", "command": "subscribe"}')
+      ws.send('{' + identifier + cma + command + '"subscribe"' + cma + data + '"{'+ auth_params +'}"'+ '}')
+    elif f == 'e':
+      ws.send('{' + identifier + cma + command + '"message"'   + cma + data + '"{'+ auth_params + cma + action + r'\"enter_room\"' + '}"' + '}')
+    elif f == 'm':
+      ws.send('{' + identifier + cma + command + '"message"'   + cma + data + '"{'+ auth_params + cma + action + r'\"speak_in_room\"' + cma +  r'\"message\" : \"hoge\"' + '}"' + '}')
     else:
-      ws.send(r'{"identifier" : "{\"channel\":\"RoomChannel\"}", "command": "message", "data": "{\"message\" : \"hoge\", \"action\" : \"declare_action\" }"}')
+      break
 
 
 if __name__ == "__main__":
