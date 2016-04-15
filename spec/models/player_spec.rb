@@ -20,4 +20,17 @@ RSpec.describe Player, :type => :model do
       end
     end
   end
+
+  describe "association" do
+
+    describe "with room" do
+      let!(:room) { FactoryGirl.create(:room) }
+      before { EnterRoomRelationship.create(room_id: room.id, player_id: player.id) }
+
+      it "should belong" do
+        expect(player.current_room).to eq room
+      end
+    end
+
+  end
 end

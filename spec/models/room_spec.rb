@@ -39,4 +39,18 @@ RSpec.describe Room, :type => :model do
     end
 
   end
+
+  describe "association" do
+
+    describe "with player" do
+      let(:player) { FactoryGirl.create(:player) }
+      before { EnterRoomRelationship.create(room_id: room.id, player_id: player.id) }
+
+      it "should has_many player" do
+        expect(room.players).to include player
+      end
+    end
+
+  end
+
 end
