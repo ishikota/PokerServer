@@ -53,4 +53,16 @@ RSpec.describe Room, :type => :model do
 
   end
 
+  describe "dependency" do
+
+    let(:player) { FactoryGirl.create(:player) }
+    before { EnterRoomRelationship.create(room_id: room.id, player_id: player.id) }
+
+    describe "enter room relationship" do
+      it "should be destroyed when room is destroyed" do
+        expect { room.destroy }.to change { EnterRoomRelationship.count }.to(0)
+      end
+    end
+  end
+
 end

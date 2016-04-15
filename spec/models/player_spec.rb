@@ -33,4 +33,5 @@ RSpec.describe Player, :type => :model do
     end
 
   end
+
 end
