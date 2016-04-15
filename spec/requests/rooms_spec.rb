@@ -25,7 +25,16 @@ RSpec.describe "rooms", :type => :request do
   end
 
   describe 'DELETE api/v1/rooms/:id' do
-    it "should success"
+    let!(:room) { FactoryGirl.create(:room) }
+    it "should success" do
+      delete "/api/v1/rooms/#{room.id}", headers: headers
+      expect(response.status).to eq 200
+      json = JSON.parse(response.body)
+      expect(json['msg_type']).to eq 'resource_management'
+      expect(json['action']).to eq 'destroy_room'
+      expect(json['status']).to eq 'success'
+      expect(json['message']).to eq "room [ #{room.name} ] is destroyed"
+    end
   end
 
 end

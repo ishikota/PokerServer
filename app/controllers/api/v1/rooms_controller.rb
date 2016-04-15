@@ -16,6 +16,14 @@ module Api
       end
 
       def destroy
+        @room = Room.find(params[:id]).destroy
+        res = {}\
+          .merge!(msg_type: "resource_management")
+          .merge!(action: "destroy_room")
+          .merge!(status: "success")
+          .merge!(message: "room [ #{@room.name} ] is destroyed")
+
+          render text: res.to_json
       end
 
       private

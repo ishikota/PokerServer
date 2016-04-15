@@ -15,7 +15,13 @@ RSpec.describe Api::V1::RoomsController, :type => :controller do
   end
 
   describe '#destroy' do
-    it "should destroy the room"
+
+    let!(:room) { FactoryGirl.create(:room) }
+
+    it "should destroy the room" do
+      delete :destroy, id: room
+      expect(Room.count).to eq 0
+    end
   end
 
 end
