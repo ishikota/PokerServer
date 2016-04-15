@@ -24,6 +24,45 @@ RSpec.describe "rooms", :type => :request do
     end
   end
 
+  describe 'GET /api/v1/rooms' do
+
+    describe "with status parameter" do
+      let!(:player1) { FactoryGirl.create(:player1) }
+      let!(:player2) { FactoryGirl.create(:player2) }
+      let!(:room1) { FactoryGirl.create(:room1) }
+      let!(:room2) { FactoryGirl.create(:room2) }
+
+      before "fill room1 capacity" do
+        room1.players << player1 << player2
+        room1.save
+      end
+
+      context "when status is not specified" do
+        it "should return all registered room" do
+          get '/api/v1/rooms', headers: headers
+          json = JSON.parse(response.body)
+          expect(response.status).to eq 200
+          expect(json.size).to eq 2
+        end
+      end
+
+      context "when status is available" do
+        let(:params) {
+          { status: "available" }
+        }
+
+        it "should return only rooms which does not reach its capacity" do
+          get '/api/v1/rooms', params: params, headers: headers
+          json = JSON.parse(response.body).map { |j| JSON.parse(j) }
+          expect(response.status).to eq 200
+          expect(json.size).to eq 1
+          expect(json[0]["name"]).to eq room2.name
+        end
+      end
+
+    end
+  end
+
   describe 'DELETE api/v1/rooms/:id' do
     let!(:room) { FactoryGirl.create(:room) }
     it "should success" do

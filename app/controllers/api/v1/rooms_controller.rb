@@ -5,6 +5,16 @@ module Api
 
       PRIVATE_CONTENT_KEYS = ["created_at", "updated_at"]
 
+      def index
+        status = params["status"]
+        @rooms = Room.all
+        @rooms = @rooms.select { |room| room.available? } if status == "available"
+        processed_rooms = @rooms.map { |room|
+          room.attributes.reject! { |k,v| PRIVATE_CONTENT_KEYS.include?(k) }.to_json
+        }
+        render text: processed_rooms
+      end
+
       def create
         @room = Room.new(room_params)
         if @room.save
