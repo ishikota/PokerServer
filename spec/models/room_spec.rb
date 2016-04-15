@@ -65,4 +65,32 @@ RSpec.describe Room, :type => :model do
     end
   end
 
+  describe "logic" do
+    describe "available?" do
+
+      context "when room has capacity" do
+        it "should be available" do
+          expect(room.available?).to be_truthy
+        end
+      end
+
+      context "when room has no more capacity" do
+        let!(:room1) { FactoryGirl.create(:room1) }
+        let!(:player1) { FactoryGirl.create(:player1) }
+        let!(:player2) { FactoryGirl.create(:player2) }
+
+        before {
+          room1.players << player1 << player2
+          room1.save
+        }
+
+        it "should be unavailable" do
+          expect(room1.available?).to be_falsy
+        end
+      end
+
+    end
+
+  end
+
 end
