@@ -14,4 +14,13 @@ RSpec.describe Api::V1::PlayersController, :type => :controller do
     end
   end
 
+  describe "#destroy" do
+    let(:player) { FactoryGirl.create(:player) }
+
+    it "shuold destroy player" do
+      delete :destroy, id: player
+      expect(Player.count).to eq 0
+    end
+  end
+
 end

@@ -28,6 +28,11 @@ RSpec.describe "players", :type => :request do
     it "should success" do
       delete "/api/v1/players/#{player.id}", headers: headers
       expect(response.status).to eq 200
+      json = JSON.parse(response.body)
+      expect(json['msg_type']).to eq 'resource_management'
+      expect(json['action']).to eq 'destroy_user'
+      expect(json['status']).to eq 'success'
+      expect(json['message']).to eq "player [ #{player.name} ] is destroyed"
     end
   end
 end

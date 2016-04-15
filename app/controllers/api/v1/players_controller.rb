@@ -16,6 +16,14 @@ module Api
       end
 
       def destroy
+        player = Player.find(params[:id]).destroy
+        res = {}\
+          .merge!(msg_type: "resource_management")
+          .merge!(action: "destroy_user")
+          .merge!(status: "success")
+          .merge!(message: "player [ #{player.name} ] is destroyed")
+
+        render text: res.to_json
       end
 
       private
