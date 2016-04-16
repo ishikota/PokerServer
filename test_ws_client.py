@@ -1,4 +1,6 @@
 import websocket
+import json
+import time
 
 # const
 host = "ws://localhost:3000/cable"
@@ -6,8 +8,38 @@ room_id = 1
 user_id = 1
 credencial = "fugafuga"
 
+# state
+CONNECTING = 0
+WAITING_DOOR_OPEN = 1
+WAITING_PLAYER_ARRIVAL = 2
+
+
+state = CONNECTING
+
 def on_message(ws, message):
-    print message
+  global state
+  msg = json.loads(message)
+
+  if state == CONNECTING:
+    if msg['identifier'] == '_ping': return
+    if msg['identifier'] == '{"channel":"RoomChannel"}' and msg['type'] == 'confirm_subscription':
+      print '[onMessage] your subscription request is accepted!!'
+      print '[onMessage] So move to OPENING_DOOR state'
+      print '[onMessage] now trying to enter poker room...'
+      ws.send(build_message_params("enter_room"))
+      state += 1
+  elif state == WAITING_DOOR_OPEN:
+    msg = msg['message']
+    if msg['phase'] == 'member_wanted' and msg['type'] == 'welcome':
+      print '[onMessage] you are in the room !! please wait for other player\'s arrival.'
+      state += 1
+  elif state == WAITING_PLAYER_ARRIVAL:
+    if msg['identifier'] == '_ping': return
+    msg = msg['message']
+    if msg['phase'] == 'member_wanted' and msg['type'] == 'arrival':
+      print '[onMessage] Player arrived!! ' + msg['message']
+    if msg['phase'] == 'member_wanted' and msg['type'] == 'ready':
+      print '[onMessage] Hey!! Everything is ready!! Let\'s poker!!'
 
 def on_error(ws, error):
     print error
@@ -16,18 +48,7 @@ def on_close(ws):
     print "### closed ###"
 
 def on_open(ws):
-  while True:
-    f = raw_input("s: subscribe, e: enter_room, m: send message, other: go listening loop")
-    params = ''
-    if f == 's':
-      params = build_subscribe_params()
-    elif f == 'e':
-      params = build_message_params("enter_room")
-    elif f == 'm':
-      params = build_message_params("speak_in_room", { "message" : "hoge" })
-    else:
-      break
-    ws.send(params)
+  ws.send(build_subscribe_params())
 
 def build_subscribe_params():
   return build_my_params("subscribe")
