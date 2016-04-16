@@ -1,8 +1,7 @@
 import websocket
-import json
-import time
 
 from params_builder import ParamsBuilder
+from message_handler import MessageHandler
 
 # const
 host = "ws://localhost:3000/cable"
@@ -10,48 +9,16 @@ room_id = 1
 user_id = 1
 credential = "fugafuga"
 
-# state
-CONNECTING = 0
-WAITING_DOOR_OPEN = 1
-WAITING_PLAYER_ARRIVAL = 2
-
 # helper
 pb = ParamsBuilder(user_id, room_id, credential)
+msg_handler = MessageHandler(pb)
 
-state = CONNECTING
+# global
+state = MessageHandler.CONNECTING
 
 def on_message(ws, message):
   global state
-  msg = json.loads(message)
-
-  # resend if required response does not come
-  # TODO do not just resend but should rollback state before resend
-  if msg['identifier'] == '_ping':
-    if state == WAITING_DOOR_OPEN:
-      ws.send(pb.build_message_params("enter_room"))
-      time.sleep(1)
-    return
-
-  if state == CONNECTING:
-    if msg['identifier'] == '_ping': return
-    if msg['identifier'] == '{"channel":"RoomChannel"}' and msg['type'] == 'confirm_subscription':
-      print '[onMessage] your subscription request is accepted!!'
-      print '[onMessage] So move to OPENING_DOOR state'
-      print '[onMessage] now trying to enter poker room...'
-      ws.send(pb.build_message_params("enter_room"))
-      state += 1
-  elif state == WAITING_DOOR_OPEN:
-    msg = msg['message']
-    if msg['phase'] == 'member_wanted' and msg['type'] == 'welcome':
-      print '[onMessage] you are in the room !! please wait for other player\'s arrival.'
-      state += 1
-  elif state == WAITING_PLAYER_ARRIVAL:
-    if msg['identifier'] == '_ping': return
-    msg = msg['message']
-    if msg['phase'] == 'member_wanted' and msg['type'] == 'arrival':
-      print '[onMessage] Player arrived!! ' + msg['message']
-    if msg['phase'] == 'member_wanted' and msg['type'] == 'ready':
-      print '[onMessage] Hey!! Everything is ready!! Let\'s poker!!'
+  state = msg_handler.on_message(state, ws, message)
 
 def on_error(ws, error):
     print error
