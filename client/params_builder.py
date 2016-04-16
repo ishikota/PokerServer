@@ -25,7 +25,7 @@ class ParamsBuilder:
             self.build_action(action) + \
             self.build_data(data) + \
             r'\"room_id\"    : ' + str(room_id)    + ' , ' + \
-            r'\"user_id\"    : ' + str(player_id)    + ' , ' + \
+            r'\"player_id\"    : ' + str(player_id)    + ' , ' + \
             r'\"credential\" : \"' + credential +  r'\"'\
           r'}"' + \
         '}'

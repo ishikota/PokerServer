@@ -10,9 +10,9 @@ class RoomChannel < ApplicationCable::Channel
 
   def enter_room(data)
     stream_from "room:#{data['room_id']}"
-    stream_from "room:#{data['room_id']}:#{data['user_id']}"
+    stream_from "room:#{data['room_id']}:#{data['player_id']}"
     ActionCable.server.broadcast "room:#{data['room_id']}", enter_room_message
-    ActionCable.server.broadcast "room:#{data['room_id']}:#{data['user_id']}", welcome_message
+    ActionCable.server.broadcast "room:#{data['room_id']}:#{data['player_id']}", welcome_message
     # check if member is gathered
     # if so send ready message
   end
