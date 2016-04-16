@@ -36,7 +36,7 @@ class MessageHandler:
       if msg['phase'] == 'member_wanted' and msg['type'] == 'welcome':
         print '[onMessage] you are in the room !! please wait for other player\'s arrival.'
         state += 1
-    elif state == self.AITING_PLAYER_ARRIVAL:
+    elif state == self.WAITING_PLAYER_ARRIVAL:
       if msg['identifier'] == '_ping': return
       msg = msg['message']
       if msg['phase'] == 'member_wanted' and msg['type'] == 'arrival':
