@@ -20,6 +20,14 @@ def on_message(ws, message):
   global state
   msg = json.loads(message)
 
+  # resend if required response does not come
+  # TODO do not just resend but should rollback state before resend
+  if msg['identifier'] == '_ping':
+    if state == WAITING_DOOR_OPEN:
+      ws.send(build_message_params("enter_room"))
+      time.sleep(1)
+    return
+
   if state == CONNECTING:
     if msg['identifier'] == '_ping': return
     if msg['identifier'] == '{"channel":"RoomChannel"}' and msg['type'] == 'confirm_subscription':
