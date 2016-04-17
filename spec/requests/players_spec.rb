@@ -7,7 +7,7 @@ RSpec.describe "players", :type => :request do
     { 'Content-Type': 'application/json', "Accept": "application/json" }
   }
 
-  describe 'GET api/v1/players' do
+  describe 'POST api/v1/players' do
     let(:params) { '{ "player" : { "name" : "kota" } }' }
 
     it "should success" do
