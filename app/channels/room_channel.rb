@@ -26,14 +26,6 @@ class RoomChannel < ApplicationCable::Channel
     end
   end
 
-  def speak_in_room(data)
-    ActionCable.server.broadcast "room:#{data['room_id']}", message: data['message']
-  end
-
-  def declare_action(data)
-    ActionCable.server.broadcast 'room_channel', message: data['message']
-  end
-
   private
 
     def welcome_message
