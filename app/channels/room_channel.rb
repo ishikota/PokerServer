@@ -1,5 +1,8 @@
 # Be sure to restart your server when you modify this file. Action Cable runs in an EventMachine loop that does not support auto reloading.
 class RoomChannel < ApplicationCable::Channel
+  unloadable
+  include RoomChannelHelper
+
   def subscribed
     # stream_from "some_channel"
   end
@@ -9,12 +12,18 @@ class RoomChannel < ApplicationCable::Channel
   end
 
   def enter_room(data)
-    stream_from "room:#{data['room_id']}"
-    stream_from "room:#{data['room_id']}:#{data['player_id']}"
-    ActionCable.server.broadcast "room:#{data['room_id']}", enter_room_message
-    ActionCable.server.broadcast "room:#{data['room_id']}:#{data['player_id']}", welcome_message
-    # check if member is gathered
-    # if so send ready message
+    room = Room.find(data['room_id'])
+    player = Player.find(data['player_id'])
+    player.take_a_seat(room)
+
+    stream_from "room:#{room.id}"
+    stream_from "room:#{room.id}:#{player.id}"
+    ActionCable.server.broadcast "room:#{room.id}", enter_room_message(room, player)
+    ActionCable.server.broadcast "room:#{room.id}:#{player.id}", welcome_message
+
+    if room.reload.filled_to_capacity?
+      ActionCable.server.broadcast "room:#{room.id}", ready_message
+    end
   end
 
   def speak_in_room(data)
@@ -32,9 +41,16 @@ class RoomChannel < ApplicationCable::Channel
         .merge!(type: "welcome")
     end
 
-    def enter_room_message
+    def enter_room_message(room, player)
       {}.merge!(phase: "member_wanted")\
         .merge!(type: "arrival")\
-        .merge!(message: "TODO")
+        .merge!(message: generate_arrival_message(room, player))
     end
+
+    def ready_message
+      {}.merge!(phase: "member_wanted")\
+        .merge!(type: "ready")\
+        .merge!(message: "All player sit the table. Start the game!!")
+    end
+
 end
