@@ -57,7 +57,7 @@ class RoomChannel < ApplicationCable::Channel
     def ready_message
       {}.merge!(phase: "member_wanted")\
         .merge!(type: "ready")\
-        .merge!(message: "All player sit the table. Start the game!!")
+        .merge!(message: generate_game_info(room))
     end
 
 end
