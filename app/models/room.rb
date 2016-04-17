@@ -5,7 +5,7 @@ class Room < ApplicationRecord
   validates :max_round, numericality: { greater_than: 0 }
   validates :player_num, numericality: { greater_than: 0 }
 
-  def available?
-    player_num != players.size
+  def filled_to_capacity?
+    player_num == players.size
   end
 end

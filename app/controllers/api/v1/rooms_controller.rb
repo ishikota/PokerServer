@@ -8,7 +8,7 @@ module Api
       def index
         status = params["status"]
         @rooms = Room.all
-        @rooms = @rooms.select { |room| room.available? } if status == "available"
+        @rooms = @rooms.select { |room| !room.filled_to_capacity? } if status == "available"
         processed_rooms = @rooms.map { |room|
           room.attributes.reject! { |k,v| PRIVATE_CONTENT_KEYS.include?(k) }.to_json
         }
