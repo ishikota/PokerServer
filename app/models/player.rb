@@ -7,4 +7,13 @@ class Player < ApplicationRecord
     my_rooms_id = EnterRoomRelationship.where(player_id: id).pluck(:id)
     Room.where(id: my_rooms_id).order(created_at: :desc).first
   end
+
+  def take_a_seat(room)
+    EnterRoomRelationship.where(player_id: id, room_id: room.id).first_or_create.touch
+  end
+
+  def leave_a_seat(room)
+    EnterRoomRelationship.where(player_id: id, room_id: room.id).destroy_all
+  end
+
 end

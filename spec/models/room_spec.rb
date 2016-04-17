@@ -66,11 +66,11 @@ RSpec.describe Room, :type => :model do
   end
 
   describe "logic" do
-    describe "available?" do
+    describe "filled_to_capacity?" do
 
       context "when room has capacity" do
-        it "should be available" do
-          expect(room.available?).to be_truthy
+        it "should return false" do
+          expect(room.filled_to_capacity?).to be_falsy
         end
       end
 
@@ -84,8 +84,8 @@ RSpec.describe Room, :type => :model do
           room1.save
         }
 
-        it "should be unavailable" do
-          expect(room1.available?).to be_falsy
+        it "should return true" do
+          expect(room1.filled_to_capacity?).to be_truthy
         end
       end
 
