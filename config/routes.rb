@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   namespace :api, format: 'json' do
     namespace :v1 do
-      resources :players, only: [:create, :destroy]
+      resources :players, only: [:show, :create, :destroy]
       resources :rooms, only: [:index, :create, :destroy]
     end
   end
