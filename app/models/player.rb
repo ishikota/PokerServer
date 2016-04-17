@@ -9,7 +9,7 @@ class Player < ApplicationRecord
   end
 
   def take_a_seat(room)
-    EnterRoomRelationship.first_or_create(player_id: id, room_id: room.id)
+    EnterRoomRelationship.where(player_id: id, room_id: room.id).first_or_create
   end
 
 end
