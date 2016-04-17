@@ -40,7 +40,6 @@ RSpec.describe RoomChannelHelper, :type => :helper do
 
     it "should contain game rule and players info" do
       msg = helper.generate_game_info(room)
-      binding.pry
       expect(msg).to match(/#{room1.max_round}/)
       expect(msg).to match(/#{room1.player_num}/)
       expect(msg).to match(/#{player1.name}/)
