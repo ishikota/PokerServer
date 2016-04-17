@@ -49,8 +49,22 @@ RSpec.describe Player, :type => :model do
     context "when already in the room" do
       before { EnterRoomRelationship.create(room_id: room.id, player_id: player.id) }
 
-      it "should do nothing" do
+      it "should not create new relation" do
         expect { player.take_a_seat(room) }.not_to change { EnterRoomRelationship.count }
+      end
+
+    end
+
+    # TODO refactor
+    describe "update latest relation" do
+      let!(:someone) { FactoryGirl.create(:player1) }
+      let!(:old_relation) { EnterRoomRelationship.create(room_id: room.id, player_id: player.id, updated_at: 1.day.ago) }
+      let!(:new_relation) { EnterRoomRelationship.create(room_id: room.id, player_id: someone.id, updated_at: 1.hour.ago) }
+
+      it "should make relation latest in the room" do
+        expect(old_relation.updated_at).to be < new_relation.updated_at
+        player.take_a_seat(room)
+        expect(old_relation.reload.updated_at).to be > new_relation.updated_at
       end
     end
 
