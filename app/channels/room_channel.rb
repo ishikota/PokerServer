@@ -26,6 +26,15 @@ class RoomChannel < ApplicationCable::Channel
     end
   end
 
+  def exit_room(data)
+    room = Room.find(data['room_id'])
+    player = Player.find(data['player_id'])
+    player.leave_a_seat(room)
+    room.reload
+
+    ActionCable.server.broadcast "room:#{room.id}", exit_room_message(room, player)
+  end
+
   private
 
     def welcome_message
@@ -37,6 +46,12 @@ class RoomChannel < ApplicationCable::Channel
       {}.merge!(phase: "member_wanted")\
         .merge!(type: "arrival")\
         .merge!(message: generate_arrival_message(room, player))
+    end
+
+    def exit_room_message(room, player)
+      {}.merge!(phase: "member_wanted")\
+        .merge!(type: "leave")\
+        .merge!(message: generate_leave_message(room, player))
     end
 
     def ready_message

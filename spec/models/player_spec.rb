@@ -70,4 +70,22 @@ RSpec.describe Player, :type => :model do
 
   end
 
+  describe "leave_a_seat" do
+    let!(:room) { FactoryGirl.create(:room) }
+
+    context "when not entering the room" do
+      it "should do nothing" do
+        expect { player.leave_a_seat(room) }.not_to change { EnterRoomRelationship.count }
+      end
+    end
+
+    context "when player was sitting the table" do
+      before { EnterRoomRelationship.create(room_id: room.id, player_id: player.id) }
+
+      it "should destroy EnterRoomRelationship" do
+        expect { player.leave_a_seat(room) }.to change { EnterRoomRelationship.count}.to(0)
+      end
+    end
+  end
+
 end

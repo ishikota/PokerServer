@@ -18,4 +18,14 @@ RSpec.describe RoomChannelHelper, :type => :helper do
     end
   end
 
+  describe "generate_leave_message" do
+
+    it "should include player name and vacant seats count" do
+      msg = helper.generate_leave_message(room, player)
+      expect(msg).to match(/3/)
+      expect(msg).to match(/#{player.name}/)
+    end
+
+  end
+
 end

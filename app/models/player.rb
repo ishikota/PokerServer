@@ -12,4 +12,8 @@ class Player < ApplicationRecord
     EnterRoomRelationship.where(player_id: id, room_id: room.id).first_or_create.touch
   end
 
+  def leave_a_seat(room)
+    EnterRoomRelationship.where(player_id: id, room_id: room.id).destroy_all
+  end
+
 end

@@ -6,4 +6,10 @@ module RoomChannelHelper
     #{need_player_num} more players are needed to start the game."
   end
 
+  def generate_leave_message(room, player)
+    need_player_num = room.player_num - room.players.size
+    "player [#{player.name}] left the room ...\
+    #{need_player_num} more players are needed to start the game."
+  end
+
 end
