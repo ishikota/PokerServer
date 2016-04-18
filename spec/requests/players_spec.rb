@@ -7,7 +7,7 @@ RSpec.describe "players", :type => :request do
     { 'Content-Type': 'application/json', "Accept": "application/json" }
   }
 
-  describe 'GET api/v1/players' do
+  describe 'POST api/v1/players' do
     let(:params) { '{ "player" : { "name" : "kota" } }' }
 
     it "should success" do
@@ -19,6 +19,29 @@ RSpec.describe "players", :type => :request do
       expect(json['credential']).to be_nil
       expect(json['created_at']).to be_nil
       expect(json['updated_at']).to be_nil
+    end
+  end
+
+  describe 'GET /api/v1/players/:id' do
+
+    context "when player exists" do
+      let!(:player) { FactoryGirl.create(:player) }
+
+      it "should return player info without credential" do
+        get "/api/v1/players/#{player.id}", headers: headers
+        json = JSON.parse(response.body)
+        expect(response.status).to eq 200
+        expect(json["id"]).to eq player.id
+        expect(json["name"]).to eq player.name
+        expect(json["credential"]).to be_nil
+      end
+    end
+
+    context "when player does not exist" do
+      it "should return 404 not found response" do
+        get "/api/v1/players/53", headers: headers
+        expect(response.status).to eq 404
+      end
     end
   end
 

@@ -15,6 +15,16 @@ module Api
         end
       end
 
+      def show
+        @player = Player.find_by_id(params[:id])
+        if @player.present?
+          render text: @player.attributes.reject!\
+            { |k,v| PRIVATE_CONTENT_KEYS.include?(k) }.to_json
+        else
+          render text: "404 Not found", status: 404
+        end
+      end
+
       def destroy
         player = Player.find(params[:id]).destroy
         res = {}\
