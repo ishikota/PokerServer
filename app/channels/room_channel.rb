@@ -38,7 +38,7 @@ class RoomChannel < ApplicationCable::Channel
   def declare_action(data)
     room = Room.find(data['room_id'])
     player = Player.find(data['player_id'])
-    # TODO pass data to PokerEngine
+    # TODO fetch dealer from hash and resume_round with passed data
     ActionCable.server.broadcast "room:#{room.id}:#{player.id}", action_accept_message
   end
 
