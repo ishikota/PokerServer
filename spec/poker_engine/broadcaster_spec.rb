@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe ServerInterface do
+RSpec.describe Broadcaster do
 
   let!(:room) { FactoryGirl.create(:room) }
   let!(:server) { double('Actioncable.server') }
-  let!(:server_interface) { ServerInterface.new(server, room) }
+  let!(:broadcaster) { Broadcaster.new(server, room) }
 
   before {
     allow(server).to receive(:broadcast)
@@ -17,7 +17,7 @@ RSpec.describe ServerInterface do
 
       expect(server).to receive(:broadcast).with(channel, params)
 
-      server_interface.notification("hoge")
+      broadcaster.notification("hoge")
     end
   end
 
@@ -30,7 +30,7 @@ RSpec.describe ServerInterface do
 
       expect(server).to receive(:broadcast).with(channel, params)
 
-      server_interface.ask(player_id, "hoge")
+      broadcaster.ask(player_id, "hoge")
     end
   end
 

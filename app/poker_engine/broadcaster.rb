@@ -1,4 +1,4 @@
-class ServerInterface
+class Broadcaster
 
   def initialize(server, room)
     @server = server
