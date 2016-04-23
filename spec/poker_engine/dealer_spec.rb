@@ -38,11 +38,13 @@ RSpec.describe Dealer do
 
     it "should pass received action to round_manager and resume game"
 
-    context "when round was finished" do
+  end
 
-      it "should start teardown round"
+  describe "#finish_round" do
 
-    end
+    it "should notify game result"
+
+    it "should call teardown_round"
 
   end
 
