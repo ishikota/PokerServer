@@ -1,4 +1,10 @@
 class Card
+  attr_reader :suit
+
+  # custom attr_reader
+  def rank
+    return @rank == 14 ? 1 : @rank
+  end
 
   CLUB = 2
   DIAMOND = 4
