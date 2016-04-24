@@ -9,5 +9,9 @@ class Seats
     @players << player
   end
 
+  def size
+    @players.size
+  end
+
 end
 

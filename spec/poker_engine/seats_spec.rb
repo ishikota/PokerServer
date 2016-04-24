@@ -3,9 +3,9 @@ require 'rails_helper'
 RSpec.describe Seats do
 
   let(:seats) { Seats.new }
+  let(:player) { double("player") }
 
   describe "#sit_down" do
-    let(:player) { double("player") }
 
     it "should set player" do
       seats.sitdown(player)
@@ -16,7 +16,13 @@ RSpec.describe Seats do
 
   describe "#size" do
 
-    it "should return the number of players who sit on"
+    before {
+      seats.sitdown(player)
+    }
+
+    it "should return the number of players who sit on" do
+      expect(seats.size).to eq 1
+    end
 
   end
 
