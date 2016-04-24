@@ -42,6 +42,20 @@ RSpec.describe RoundManager do
       end
     end
 
+    describe "forward next street" do
+
+      before {
+        round_manager.start_new_round(table)
+      }
+
+      it "should forward to flop" do
+        expect(broadcaster).to receive(:ask).with(table.dealer_btn, "TODO")
+        expect {
+          round_manager.apply_action(table, 'call', 10)
+        }.to change { round_manager.street }.to(RoundManager::FLOP)
+      end
+    end
+
   end
 
 end

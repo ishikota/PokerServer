@@ -66,6 +66,7 @@ class RoundManager
 
   def preflop(table)
     2.times { shift_next_player(table.seats) }
+    @agree_num = 1  # big blind already agreed
     @broadcaster.ask(@next_player, "TODO")
   end
 
