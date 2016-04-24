@@ -85,7 +85,17 @@ RSpec.describe RoundManager do
 
     context "when all players have agreed" do
 
-      it "should start next street"
+      before {
+        round_manager.increment_agree_num
+      }
+
+      it "should start next street" do
+        expect {
+          round_manager.apply_action(table, 'call', 5)
+        }.to change {
+          round_manager.street
+        }.by(1)
+      end
 
     end
 

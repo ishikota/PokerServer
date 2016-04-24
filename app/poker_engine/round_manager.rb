@@ -1,5 +1,5 @@
 class RoundManager
-  attr_reader :next_player, :agree_num
+  attr_reader :next_player, :agree_num, :street
 
   def initialize(broadcaster, finish_callback)
     @broadcaster = broadcaster
@@ -23,11 +23,15 @@ class RoundManager
     end
 
     if everyone_agree?(table.seats)
-      # start next street
+      @street += 1
+      start_street(@street)
     else
       shift_next_player(table.seats)
       @broadcaster.ask(@next_player, "TODO")
     end
+  end
+
+  def start_street(street)
   end
 
   def shift_next_player(seats)
