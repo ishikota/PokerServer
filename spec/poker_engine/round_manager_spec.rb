@@ -12,6 +12,7 @@ RSpec.describe RoundManager do
 
     before {
       allow(seats).to receive(:collect_bet)
+      allow(seats).to receive(:size).and_return(2)
       allow(table).to receive(:seats).and_return(seats)
       allow(table).to receive(:dealer_btn).and_return(0)
       allow(broadcaster).to receive(:ask)
@@ -36,6 +37,7 @@ RSpec.describe RoundManager do
     before {
       allow(pot).to receive(:add_chip)
       allow(seats).to receive(:collect_bet)
+      allow(seats).to receive(:count_active_player)
       allow(seats).to receive(:size).and_return(2)
       allow(table).to receive(:pot).and_return(pot)
       allow(table).to receive(:seats).and_return(seats)
@@ -63,6 +65,7 @@ RSpec.describe RoundManager do
       context "when passed action is FOLD" do
         before {
           allow(seats).to receive(:deactivate)
+          allow(seats).to receive(:count_active_player)
         }
 
         it "should deactivate player" do
@@ -129,6 +132,12 @@ RSpec.describe RoundManager do
 
   describe "#preflop" do
     let(:table) { double("table") }
+    let(:seats) { double("seats") }
+
+    before {
+      allow(seats).to receive(:size).and_return(3)
+      allow(table).to receive(:seats).and_return(seats)
+    }
 
     it "should ask action to player who sits next to blind player" do
       expect(broadcaster).to receive(:ask).with(2, anything)
@@ -235,6 +244,7 @@ RSpec.describe RoundManager do
     let(:seats) { double("seats") }
     before {
       allow(seats).to receive(:size).and_return(2)
+      allow(seats).to receive(:count_active_player)
     }
 
     context "when next player is active" do
@@ -271,6 +281,7 @@ RSpec.describe RoundManager do
 
     before {
       allow(seats).to receive(:size).and_return(2)
+      allow(seats).to receive(:count_active_player)
     }
 
     context "when a player does not agree" do

@@ -30,6 +30,18 @@ RSpec.describe RoundManager do
       round_manager.start_new_round(table)
     end
 
+    context "when finished in PREFLOP" do
+
+      before {
+        round_manager.start_new_round(table)
+        round_manager.apply_action(table, 'fold', nil)
+      }
+
+      it "should reach showoff without asking" do
+        expect(round_manager.street).to eq RoundManager::SHOWDOWN
+      end
+    end
+
   end
 
 end

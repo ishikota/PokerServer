@@ -5,6 +5,7 @@ class RoundManager
   FLOP = 1
   TURN = 2
   RIVER = 3
+  SHOWDOWN = 4
 
   def initialize(broadcaster, finish_callback)
     @broadcaster = broadcaster
@@ -41,6 +42,9 @@ class RoundManager
     if everyone_agree?(table.seats)
       @street += 1
       start_street(@street, table)
+    elsif table.seats.count_active_player == 1
+      @street = SHOWDOWN
+      start_street(@street, table)
     else
       shift_next_player(table.seats)
       @broadcaster.ask(@next_player, "TODO")
@@ -48,6 +52,7 @@ class RoundManager
   end
 
   def start_street(street, table)
+
     if street == PREFLOP
       preflop(table)
     elsif street == FLOP
