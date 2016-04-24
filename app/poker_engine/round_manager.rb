@@ -16,6 +16,10 @@ class RoundManager
       increment_agree_num
     elsif action == 'fold'
       table.seats.deactivate(@next_player)
+    elsif action =='raise'
+      table.seats.collect_bet(@next_player, bet_amount)
+      table.pot.add_chip(bet_amount)
+      @agree_num = 1
     end
   end
 

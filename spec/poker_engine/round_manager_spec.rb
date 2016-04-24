@@ -56,6 +56,20 @@ RSpec.describe RoundManager do
         end
       end
 
+      context "when passed action is RAISE" do
+
+        it "should execute chip transaction" do
+          expect(seats).to receive(:collect_bet).with(0, 5)
+          expect(pot).to receive(:add_chip).with(5)
+
+          round_manager.apply_action(table, 'raise', 5)
+        end
+
+        it "should reset agree_num" do
+          round_manager.apply_action(table, 'raise', 5)
+          expect(round_manager.agree_num).to eq 1
+        end
+      end
 
       context "when passed action is illegal" do
 
