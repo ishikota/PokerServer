@@ -14,6 +14,7 @@ RSpec.describe RoundManager do
     before {
       table.seats.sitdown(player1)
       table.seats.sitdown(player2)
+      allow(broadcaster).to receive(:ask)
     }
 
     it "should collect blind" do
@@ -21,6 +22,12 @@ RSpec.describe RoundManager do
         round_manager.start_new_round(table)
       }.to change { player1.stack }.by(-5)
        .and change { player2.stack }.by(-10)
+    end
+
+    it "should not ask blind player in preflop" do
+      expect(broadcaster).to receive(:ask).with(0, "TODO")
+
+      round_manager.start_new_round(table)
     end
 
   end

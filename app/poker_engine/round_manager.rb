@@ -60,7 +60,7 @@ class RoundManager
   end
 
   def preflop(table)
-    @next_player += 2  # skip blind player
+    2.times { shift_next_player(table.seats) }
     @broadcaster.ask(@next_player, "TODO")
   end
 
