@@ -2,6 +2,7 @@ class RoundManager
   attr_reader :next_player, :agree_num, :street
 
   PREFLOP = 0
+  FLOP = 1
 
   def initialize(broadcaster, finish_callback)
     @broadcaster = broadcaster
@@ -45,11 +46,20 @@ class RoundManager
   def start_street(street, table)
     if street == PREFLOP
       preflop(table)
+    elsif street == FLOP
+      flop(table)
     end
   end
 
   def preflop(table)
     @next_player += 2  # skip blind player
+    @broadcaster.ask(@next_player, "TODO")
+  end
+
+  def flop(table)
+    for card in table.deck.draw_cards(3) do
+      table.community_cards.add_card(card)
+    end
     @broadcaster.ask(@next_player, "TODO")
   end
 

@@ -98,6 +98,7 @@ RSpec.describe RoundManager do
     context "when all players have agreed" do
 
       before {
+        table.as_null_object
         round_manager.increment_agree_num
       }
 
@@ -138,10 +139,32 @@ RSpec.describe RoundManager do
   end
 
   describe "#flop" do
+    let(:table) { double("table") }
+    let(:deck) { double("deck") }
+    let(:community_cards) { double("community cards") }
 
-    it "should add three commnity card"
+    before {
+      allow(deck).to receive(:draw_cards).and_return(["card1", "card2", "card3"])
+      allow(table).to receive(:deck).and_return(deck)
+      allow(table).to receive(:community_cards).and_return(community_cards)
+      allow(broadcaster).to receive(:ask)
+      allow(community_cards).to receive(:add_card)
+    }
 
-    it "should ask action to player who has dealer button"
+    it "should add three commnity card" do
+      expect(community_cards).to receive(:add_card).with("card1")
+      expect(community_cards).to receive(:add_card).with("card2")
+      expect(community_cards).to receive(:add_card).with("card3")
+
+      round_manager.start_street(RoundManager::FLOP, table)
+    end
+
+    it "should ask action to player who has dealer button"  do
+      expect(broadcaster).to receive(:ask).with(0, anything)
+
+      round_manager.start_street(RoundManager::FLOP, table)
+      expect(round_manager.next_player).to eq 0
+    end
 
   end
 
