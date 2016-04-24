@@ -27,7 +27,7 @@ class HandEvaluator
   end
 
   def eval_holecard(hole)
-    ranks = hole.map { |card| card.rank == 1 ? 14 : card.rank }.sort
+    ranks = hole.map { |card| card.rank }.sort
     ranks[1] << 4 | ranks[0]
   end
 

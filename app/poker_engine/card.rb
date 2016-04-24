@@ -1,8 +1,8 @@
 class Card
-  attr_reader :suit
+  attr_reader :suit, :rank
 
   # custom attr_reader
-  def rank
+  def read_rank
     return @rank == 14 ? 1 : @rank
   end
 
