@@ -28,7 +28,16 @@ RSpec.describe Seats do
 
   describe "#collect_bet" do
 
-    it "should collect bet from second player"
+    let(:player2) { double("player2") }
+    before {
+      seats.sitdown(player)
+      seats.sitdown(player2)
+    }
+
+    it "should collect bet from second player" do
+      expect(player2).to receive(:collect_bet).with(2)
+      seats.collect_bet(1, 2)
+    end
 
   end
 

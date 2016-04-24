@@ -13,5 +13,9 @@ class Seats
     @players.size
   end
 
+  def collect_bet(idx, amount)
+    @players[idx].collect_bet(amount)
+  end
+
 end
 
