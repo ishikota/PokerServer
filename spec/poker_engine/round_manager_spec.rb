@@ -78,8 +78,6 @@ RSpec.describe RoundManager do
 
       end
 
-      it "should execute chip transaction"
-
     end
 
 
