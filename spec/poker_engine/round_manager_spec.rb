@@ -14,19 +14,20 @@ RSpec.describe RoundManager do
 
   describe "#apply_action" do
 
+    let(:table) { double("table") }
+    let(:pot) { double("pot") }
+    let(:seats) { double("seats") }
+
+    before {
+      allow(pot).to receive(:add_chip)
+      allow(seats).to receive(:collect_bet)
+      allow(seats).to receive(:size).and_return(2)
+      allow(table).to receive(:pot).and_return(pot)
+      allow(table).to receive(:seats).and_return(seats)
+      allow(broadcaster).to receive(:ask)
+    }
+
     describe "apply passed action to table" do
-
-      let(:table) { double("table") }
-      let(:pot) { double("pot") }
-      let(:seats) { double("seats") }
-
-      before {
-        allow(pot).to receive(:add_chip)
-        allow(seats).to receive(:collect_bet)
-        allow(seats).to receive(:size).and_return(2)
-        allow(table).to receive(:pot).and_return(pot)
-        allow(table).to receive(:seats).and_return(seats)
-      }
 
       context "when passed action is CALL" do
 
@@ -79,8 +80,6 @@ RSpec.describe RoundManager do
 
       it "should execute chip transaction"
 
-      it "should shift next player"
-
     end
 
 
@@ -92,7 +91,13 @@ RSpec.describe RoundManager do
 
     context "when not agreed player exists" do
 
-      it "should ask action to him"
+      it "should ask action to him" do
+        expect(broadcaster).to receive(:ask).with(1, "TODO")
+
+        expect {
+          round_manager.apply_action(table, 'call', nil)
+        }.to change { round_manager.next_player }.by(1)
+      end
 
     end
 

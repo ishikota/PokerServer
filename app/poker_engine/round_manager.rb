@@ -21,6 +21,13 @@ class RoundManager
       table.pot.add_chip(bet_amount)
       @agree_num = 1
     end
+
+    if everyone_agree?(table.seats)
+      # start next street
+    else
+      shift_next_player(table.seats)
+      @broadcaster.ask(@next_player, "TODO")
+    end
   end
 
   def shift_next_player(seats)
