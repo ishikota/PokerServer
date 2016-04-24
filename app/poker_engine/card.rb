@@ -31,8 +31,12 @@ class Card
       tmp >>= 1
     end
 
-    binding.pry
     return rank + 13 * num
+  end
+
+  def self.from_id(id)
+    suit, rank = id_to_rank_and_suit(id)
+    self.new(suit, rank)
   end
 
   private
@@ -61,6 +65,18 @@ class Card
       HEART => 'H',
       SPADE => 'S'
     }
+
+    def self.id_to_rank_and_suit(id)
+      rank = id
+      suit = 2
+      while rank > 13
+        suit = suit << 1
+        rank -= 13
+      end
+
+      return suit, rank
+    end
+
 
 end
 
