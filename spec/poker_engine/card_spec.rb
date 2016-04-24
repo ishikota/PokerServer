@@ -14,5 +14,13 @@ RSpec.describe Card do
     end
   end
 
+  describe "#to_id" do
+
+    it "should return the id of the card" do
+      expect(Card.new(Card::HEART, 3).to_id).to eq 29
+      expect(Card.new(Card::SPADE, 1).to_id).to eq 40
+    end
+  end
+
 end
 

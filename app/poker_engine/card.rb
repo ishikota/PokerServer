@@ -15,6 +15,20 @@ class Card
     "#{SUIT_MAP[@suit]}#{RANK_MAP[@rank]}"
   end
 
+  def to_id
+    rank = @rank == 14 ? 1 : @rank
+    tmp = @suit >> 1
+    num = 0
+
+    while tmp&1 != 1
+      num += 1
+      tmp >>= 1
+    end
+
+    binding.pry
+    return rank + 13 * num
+  end
+
   private
 
     # rank 2~A is converted into 2~14.
