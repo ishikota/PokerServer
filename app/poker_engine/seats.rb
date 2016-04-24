@@ -17,5 +17,9 @@ class Seats
     @players[idx].collect_bet(amount)
   end
 
+  def deactivate(idx)
+    @players[idx].deactivate
+  end
+
 end
 
