@@ -2,9 +2,15 @@ require 'rails_helper'
 
 RSpec.describe Seats do
 
-  describe "#sit_down" do
+  let(:seats) { Seats.new }
 
-    it "should set player"
+  describe "#sit_down" do
+    let(:player) { double("player") }
+
+    it "should set player" do
+      seats.sitdown(player)
+      expect(seats.players).to include(player)
+    end
 
   end
 
