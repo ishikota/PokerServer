@@ -14,6 +14,7 @@ RSpec.describe RoundManager do
       allow(seats).to receive(:collect_bet)
       allow(table).to receive(:seats).and_return(seats)
       allow(table).to receive(:dealer_btn).and_return(0)
+      allow(broadcaster).to receive(:ask)
     }
 
     it "should collect blind" do

@@ -17,10 +17,12 @@ class RoundManager
   def start_new_round(table)
     small_blind = 5
     @next_player = table.dealer_btn
+    @street = PREFLOP
 
     # collect blind
     table.seats.collect_bet(table.dealer_btn, small_blind)
-    table.seats.collect_bet(shift_next_player(table.dealer_btn), small_blind * 2)
+    table.seats.collect_bet(shift_next_player(exec_shift=false, table.dealer_btn), small_blind * 2)
+    start_street(@street, table)
   end
 
   def apply_action(table, action, bet_amount)
@@ -79,8 +81,10 @@ class RoundManager
     @broadcaster.ask(@next_player, "TODO")
   end
 
-  def shift_next_player(seats)
-    @next_player = (@next_player + 1) % seats.size
+  def shift_next_player(exec_shift=true, seats)
+    next_player = (@next_player + 1) % seats.size
+    @next_player = next_player if exec_shift
+    next_player
   end
 
   def everyone_agree?(seats)
