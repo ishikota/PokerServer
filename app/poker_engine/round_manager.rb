@@ -52,6 +52,7 @@ class RoundManager
   end
 
   def start_street(street, table)
+    @agree_num = 0
 
     if street == PREFLOP
       preflop(table)

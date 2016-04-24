@@ -47,15 +47,32 @@ RSpec.describe RoundManager do
 
     describe "forward next street" do
 
-      before {
-        round_manager.start_new_round(table)
-      }
+      describe "PREFLOP to FLOP" do
+        before { round_manager.start_new_round(table) }
 
-      it "should forward to flop" do
-        expect(broadcaster).to receive(:ask).with(table.dealer_btn, "TODO")
-        expect {
+        it "should forward to flop" do
+          expect(broadcaster).to receive(:ask).with(table.dealer_btn, "TODO")
+          expect {
+            round_manager.apply_action(table, 'call', 10)
+          }.to change { round_manager.street }.to(RoundManager::FLOP)
+          .and change { table.community_card.cards.size }.from(0).to(3)
+        end
+      end
+
+      describe "FLOP to TURN" do
+        before {
+          round_manager.start_new_round(table)
           round_manager.apply_action(table, 'call', 10)
-        }.to change { round_manager.street }.to(RoundManager::FLOP)
+          expect(round_manager.street).to eq RoundManager::FLOP
+        }
+
+        it "should forward to TURN" do
+          round_manager.apply_action(table, 'call', 10)
+          expect {
+            round_manager.apply_action(table, 'call', 10)
+          }.to change { round_manager.street }.to(RoundManager::TURN)
+          .and change { table.community_card.cards.size }.from(3).to(4)
+        end
       end
     end
 
@@ -86,7 +103,7 @@ RSpec.describe RoundManager do
           expect {
             round_manager.apply_action(table, 'fold', nil)
           }.to change { round_manager.street }.to(RoundManager::FLOP)
-          .and change { table.community_card.cards.size }.from(0).to(2)
+          .and change { table.community_card.cards.size }.from(0).to(3)
         end
       end
 
