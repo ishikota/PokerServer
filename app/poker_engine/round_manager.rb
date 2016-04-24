@@ -9,6 +9,14 @@ class RoundManager
     @next_player = 0
   end
 
+  def apply_action(table, action, bet_amount)
+    if action == 'call'
+      table.seats.collect_bet(@next_player, bet_amount)
+      table.pot.add_chip(bet_amount)
+      increment_agree_num
+    end
+  end
+
   def shift_next_player(seats)
     @next_player = (@next_player + 1) % seats.size
   end

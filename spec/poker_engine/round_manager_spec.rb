@@ -16,6 +16,35 @@ RSpec.describe RoundManager do
 
     describe "apply passed action to table" do
 
+      let(:table) { double("table") }
+      let(:pot) { double("pot") }
+      let(:seats) { double("seats") }
+
+      before {
+        allow(pot).to receive(:add_chip)
+        allow(seats).to receive(:collect_bet)
+        allow(seats).to receive(:size).and_return(2)
+        allow(table).to receive(:pot).and_return(pot)
+        allow(table).to receive(:seats).and_return(seats)
+      }
+
+      context "when passed action is CALL" do
+
+        it "should execute chip transaction" do
+          expect(seats).to receive(:collect_bet).with(0, 5)
+          expect(pot).to receive(:add_chip).with(5)
+
+          round_manager.apply_action(table, 'call', 5)
+        end
+
+        it "should increment agree_num" do
+          expect {
+            round_manager.apply_action(table, 'call', 5)
+          }.to change { round_manager.agree_num }.by(1)
+        end
+      end
+
+
       context "when passed action is illegal" do
 
         it "should accept the action as fold"
