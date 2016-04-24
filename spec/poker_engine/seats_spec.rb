@@ -55,5 +55,28 @@ RSpec.describe Seats do
     end
   end
 
+  describe "#count_active_player" do
+    let(:player2) { double("player2") }
+
+    before {
+      seats.sitdown(player)
+      seats.sitdown(player2)
+      allow(player).to receive(:active?).and_return(true)
+    }
+
+    context "when player 2 is active" do
+      before { allow(player2).to receive(:active?).and_return(true) }
+
+      it { expect(seats.count_active_player).to eq 2 }
+    end
+
+    context "when player 2 is not active" do
+      before { allow(player2).to receive(:active?).and_return(false) }
+
+      it { expect(seats.count_active_player).to eq 1 }
+    end
+
+  end
+
 end
 

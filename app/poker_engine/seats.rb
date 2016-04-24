@@ -21,5 +21,9 @@ class Seats
     @players[idx].deactivate
   end
 
+  def count_active_player
+    @players.map { |p| p.active? }.select { |status| status }.size
+  end
+
 end
 
