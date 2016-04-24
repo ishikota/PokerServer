@@ -119,6 +119,7 @@ RSpec.describe RoundManager do
     before {
       allow(seats).to receive(:size).and_return(3)
       allow(table).to receive(:seats).and_return(seats)
+      allow(table).to receive(:dealer_btn).and_return(0)
     }
 
     it "should ask action to player who sits next to blind player" do
@@ -139,6 +140,7 @@ RSpec.describe RoundManager do
       allow(deck).to receive(:draw_cards).and_return(["card1", "card2", "card3"])
       allow(table).to receive(:deck).and_return(deck)
       allow(table).to receive(:community_card).and_return(community_card)
+      allow(table).to receive(:dealer_btn).and_return(0)
       allow(broadcaster).to receive(:ask)
       allow(community_card).to receive(:add)
     }
@@ -169,6 +171,7 @@ RSpec.describe RoundManager do
       allow(deck).to receive(:draw_card).and_return("card1")
       allow(table).to receive(:deck).and_return(deck)
       allow(table).to receive(:community_card).and_return(community_card)
+      allow(table).to receive(:dealer_btn).and_return(0)
       allow(broadcaster).to receive(:ask)
       allow(community_card).to receive(:add)
     }
@@ -197,6 +200,7 @@ RSpec.describe RoundManager do
       allow(deck).to receive(:draw_card).and_return("card1")
       allow(table).to receive(:deck).and_return(deck)
       allow(table).to receive(:community_card).and_return(community_card)
+      allow(table).to receive(:dealer_btn).and_return(0)
       allow(broadcaster).to receive(:ask)
       allow(community_card).to receive(:add)
     }
