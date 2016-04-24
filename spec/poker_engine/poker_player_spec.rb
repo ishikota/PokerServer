@@ -21,7 +21,9 @@ RSpec.describe PokerPlayer do
 
   describe "#deactivate" do
 
-    it "should deactivate player"
+    it "should deactivate player" do
+      expect { player.deactivate }.to change { player.active? }
+    end
 
   end
 
