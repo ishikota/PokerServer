@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Dealer do
+RSpec.describe "Dealer" do
 
   describe "#setup_game" do
 
