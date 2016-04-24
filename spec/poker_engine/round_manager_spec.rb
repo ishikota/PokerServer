@@ -44,6 +44,18 @@ RSpec.describe RoundManager do
         end
       end
 
+      context "when passed action is FOLD" do
+        before {
+          allow(seats).to receive(:deactivate)
+        }
+
+        it "should deactivate player" do
+          expect(seats).to receive(:deactivate).with(0)
+
+          round_manager.apply_action(table, 'fold', nil)
+        end
+      end
+
 
       context "when passed action is illegal" do
 
