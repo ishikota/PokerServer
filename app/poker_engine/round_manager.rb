@@ -9,6 +9,15 @@ class RoundManager
     @next_player = 0
   end
 
+  def start_new_round(table)
+    small_blind = 5
+    @next_player = table.dealer_btn
+
+    # collect blind
+    table.seats.collect_bet(table.dealer_btn, small_blind)
+    table.seats.collect_bet(shift_next_player(table.dealer_btn), small_blind * 2)
+  end
+
   def apply_action(table, action, bet_amount)
     if action == 'call'
       table.seats.collect_bet(@next_player, bet_amount)

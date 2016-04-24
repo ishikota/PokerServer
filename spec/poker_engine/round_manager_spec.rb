@@ -7,8 +7,22 @@ RSpec.describe RoundManager do
   let(:round_manager) { RoundManager.new(broadcaster, finish_callback) }
 
   describe "#start_new_round" do
+    let(:table) { double("table") }
+    let(:seats) { double("seats") }
 
-    it "should start preflop"
+    before {
+      allow(seats).to receive(:collect_bet)
+      allow(table).to receive(:seats).and_return(seats)
+      allow(table).to receive(:dealer_btn).and_return(0)
+    }
+
+    it "should collect blind" do
+      small_blind = 5  #TODO read blind amount from somewhare
+      expect(seats).to receive(:collect_bet).with(0, small_blind)
+      expect(seats).to receive(:collect_bet).with(1, small_blind * 2)
+
+      round_manager.start_new_round(table)
+    end
 
   end
 
