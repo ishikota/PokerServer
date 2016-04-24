@@ -169,10 +169,30 @@ RSpec.describe RoundManager do
   end
 
   describe "#turn" do
+    let(:table) { double("table") }
+    let(:deck) { double("deck") }
+    let(:community_cards) { double("community cards") }
 
-    it "should add a community card"
+    before {
+      allow(deck).to receive(:draw_card).and_return("card1")
+      allow(table).to receive(:deck).and_return(deck)
+      allow(table).to receive(:community_cards).and_return(community_cards)
+      allow(broadcaster).to receive(:ask)
+      allow(community_cards).to receive(:add_card)
+    }
 
-    it "should ask action to player who has dealer button"
+    it "should add a community card" do
+      expect(community_cards).to receive(:add_card).with("card1")
+
+      round_manager.start_street(RoundManager::TURN, table)
+    end
+
+    it "should ask action to player who has dealer button" do
+      expect(broadcaster).to receive(:ask).with(0, anything)
+
+      round_manager.start_street(RoundManager::TURN, table)
+      expect(round_manager.next_player).to eq 0
+    end
 
   end
 
