@@ -23,6 +23,7 @@ class HandEvaluator
   #       FourCard of rank 2       =>  1000000 0010 0000
   #       straight flash of rank 7 => 10000000 0111 0000
   def eval_hand(hole, community)
+    return TWOPAIR | eval_twopair(hole, community) if twopair?(hole, community)
     return ONEPAIR | (eval_onepair(hole, community) << 4) if onepair?(hole, community)
     eval_holecard(hole)
   end
@@ -47,6 +48,27 @@ class HandEvaluator
     end
 
     return rank
+  end
+
+  def twopair?(hole, community)
+    search_twopair(hole, community).size == 2
+  end
+
+  def eval_twopair(hole, community)
+    ranks = search_twopair(hole, community)
+    ranks.reduce(0) { |acc, e| acc << 4 | e }
+  end
+
+  def search_twopair(hole, community)
+    ranks = []
+    memo = 0
+    for card in hole + community
+      mask = 1 << card.rank
+      ranks = ranks.push(card.rank) if memo & mask != 0
+      memo |= mask
+    end
+
+    return ranks.sort.reverse.take(2)
   end
 
   def mask_strength(bit)

@@ -46,6 +46,25 @@ RSpec.describe HandEvaluator do
       end
     end
 
+    context "TwoPair" do
+      before {
+        community << card(Card::CLUB, 7)
+        community << card(Card::CLUB, 9)
+        community << card(Card::DIAMOND, 3)
+        community << card(Card::DIAMOND, 2)
+        community << card(Card::DIAMOND, 5)
+        hole << card(Card::CLUB, 9)
+        hole << card(Card::DIAMOND, 3)
+      }
+
+      it "should evaluate as two pair of 9 and 3" do
+        bit = evaluator.eval_hand(hole, community)
+        expect(evaluator.mask_strength(bit)).to eq HandEvaluator::TWOPAIR
+        expect(evaluator.mask_high_rank(bit)).to eq 9
+        expect(evaluator.mask_low_rank(bit)).to eq 3
+      end
+    end
+
   end
 
 
