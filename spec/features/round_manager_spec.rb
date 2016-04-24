@@ -4,7 +4,8 @@ RSpec.describe RoundManager do
 
   let(:finish_callback) { double("finish_callback") }
   let(:broadcaster) { double("broadcaster") }
-  let(:round_manager) { RoundManager.new(broadcaster, finish_callback) }
+  let(:game_evaluator) { double("game_evaluator") }
+  let(:round_manager) { RoundManager.new(broadcaster, finish_callback, game_evaluator) }
 
   before {
     allow(broadcaster).to receive(:ask)
@@ -36,11 +37,13 @@ RSpec.describe RoundManager do
     context "when finished in PREFLOP" do
 
       before {
+        allow(game_evaluator).to receive(:judge)
+        allow(finish_callback).to receive(:call)
         round_manager.start_new_round(table)
         round_manager.apply_action(table, 'fold', nil)
       }
 
-      it "should reach showoff without asking" do
+      it "should reach showdown without asking" do
         expect(round_manager.street).to eq RoundManager::SHOWDOWN
       end
     end

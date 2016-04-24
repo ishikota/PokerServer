@@ -7,9 +7,10 @@ class RoundManager
   RIVER = 3
   SHOWDOWN = 4
 
-  def initialize(broadcaster, finish_callback)
+  def initialize(broadcaster, finish_callback, game_evaluator)
     @broadcaster = broadcaster
     @callback = finish_callback
+    @game_evaluator = game_evaluator
     @street = 0
     @agree_num = 0
     @next_player = 0
@@ -63,6 +64,8 @@ class RoundManager
       turn(table)
     elsif street == RIVER
       river(table)
+    elsif street == SHOWDOWN
+      showdown(table)
     end
   end
 
@@ -87,6 +90,11 @@ class RoundManager
   def river(table)
     table.community_card.add(table.deck.draw_card)
     @broadcaster.ask(@next_player, "TODO")
+  end
+
+  def showdown(table)
+    winner, accounting_info = @game_evaluator.judge(table)
+    @callback.call(winner, accounting_info)
   end
 
   def shift_next_player(exec_shift=true, seats)

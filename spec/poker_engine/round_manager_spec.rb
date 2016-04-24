@@ -4,7 +4,8 @@ RSpec.describe RoundManager do
 
   let(:finish_callback) { double("dealer.finish_round") }
   let(:broadcaster) { double("broadcaster") }
-  let(:round_manager) { RoundManager.new(broadcaster, finish_callback) }
+  let(:game_evaluator) { double("game evaluator") }
+  let(:round_manager) { RoundManager.new(broadcaster, finish_callback, game_evaluator) }
 
   describe "#start_new_round" do
     let(:table) { double("table") }
@@ -220,9 +221,20 @@ RSpec.describe RoundManager do
 
   end
 
-  describe "#showoff" do
+  describe "#showdown" do
+    let(:table) { double("table") }
 
-    it "should call dealer's callback with game result"
+    before {
+      allow(table).to receive(:dealer_btn).and_return(0)
+    }
+
+    it "should call dealer's callback with game result" do
+      expect(finish_callback).to receive(:call).with("dummy player", "accounting info")
+      allow(game_evaluator).to receive(:judge)
+          .and_return(["dummy player", "accounting info"])
+
+      round_manager.start_street(RoundManager::SHOWDOWN, table)
+    end
 
   end
 
