@@ -4,6 +4,7 @@ class RoundManager
   PREFLOP = 0
   FLOP = 1
   TURN = 2
+  RIVER = 3
 
   def initialize(broadcaster, finish_callback)
     @broadcaster = broadcaster
@@ -51,6 +52,8 @@ class RoundManager
       flop(table)
     elsif street == TURN
       turn(table)
+    elsif street == RIVER
+      river(table)
     end
   end
 
@@ -67,6 +70,11 @@ class RoundManager
   end
 
   def turn(table)
+    table.community_cards.add_card(table.deck.draw_card)
+    @broadcaster.ask(@next_player, "TODO")
+  end
+
+  def river(table)
     table.community_cards.add_card(table.deck.draw_card)
     @broadcaster.ask(@next_player, "TODO")
   end
