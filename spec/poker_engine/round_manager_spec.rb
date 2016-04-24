@@ -79,6 +79,42 @@ RSpec.describe RoundManager do
 
   end
 
+  describe "#shift_next_player" do
+    let(:seats) { double("seats") }
+    before {
+      allow(seats).to receive(:size).and_return(2)
+    }
+
+    context "when next player is active" do
+
+      it "should shift next player to second player" do
+        round_manager.shift_next_player(seats)
+        expect(round_manager.next_player).to eq 1
+      end
+
+    end
+
+    context "when next player is not active" do
+
+      it "should skip the person"
+
+    end
+
+    describe "cycle ask order" do
+
+      before {
+        round_manager.shift_next_player(seats)
+      }
+
+      it "should shift next player to first player" do
+        round_manager.shift_next_player(seats)
+        expect(round_manager.next_player).to eq 0
+      end
+
+    end
+  end
+
+
 
 end
 
