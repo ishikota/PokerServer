@@ -51,7 +51,7 @@ RSpec.describe RoundManager do
         before { round_manager.start_new_round(table) }
 
         it "should forward to flop" do
-          expect(broadcaster).to receive(:ask).with(table.dealer_btn, "TODO")
+          expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
           expect {
             round_manager.apply_action(table, 'call', 10)
           }.to change { round_manager.street }.to(RoundManager::FLOP)
@@ -68,6 +68,7 @@ RSpec.describe RoundManager do
 
         it "should forward to TURN" do
           round_manager.apply_action(table, 'call', 10)
+          expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
           expect {
             round_manager.apply_action(table, 'call', 10)
           }.to change { round_manager.street }.to(RoundManager::TURN)
@@ -86,6 +87,7 @@ RSpec.describe RoundManager do
 
         it "should forward to RIVER" do
           round_manager.apply_action(table, 'call', 10)
+          expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
           expect {
             round_manager.apply_action(table, 'call', 10)
           }.to change { round_manager.street }.to(RoundManager::RIVER)
