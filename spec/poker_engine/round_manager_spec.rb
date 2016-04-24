@@ -114,6 +114,33 @@ RSpec.describe RoundManager do
     end
   end
 
+  describe "#everyone_agree?" do
+    let(:seats) { double("seats") }
+
+    before {
+      allow(seats).to receive(:size).and_return(2)
+    }
+
+    context "when a player does not agree" do
+
+      it "should return false" do
+        expect(round_manager.everyone_agree?(seats)).to be_falsy
+      end
+
+    end
+
+    context "when everyone agreed" do
+
+      before {
+        round_manager.increment_agree_num
+        round_manager.increment_agree_num
+      }
+
+      it "should return true" do
+        expect(round_manager.everyone_agree?(seats)).to be_truthy
+      end
+    end
+  end
 
 
 end
