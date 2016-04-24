@@ -27,7 +27,7 @@ RSpec.describe Card do
     it "should initialize from suit and rank" do
       card = Card.new(Card::CLUB, 1)
       expect(card.suit).to eq Card::CLUB
-      expect(card.rank).to eq 14
+      expect(card.rank).to eq 1
     end
 
     it "should initialize from id" do
