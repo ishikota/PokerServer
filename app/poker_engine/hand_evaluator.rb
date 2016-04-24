@@ -23,6 +23,7 @@ class HandEvaluator
   #       FourCard of rank 2       =>  1000000 0010 0000
   #       straight flash of rank 7 => 10000000 0111 0000
   def eval_hand(hole, community)
+    return ONEPAIR | (eval_onepair(hole, community) << 4) if onepair?(hole, community)
     eval_holecard(hole)
   end
 
@@ -31,8 +32,25 @@ class HandEvaluator
     ranks[1] << 4 | ranks[0]
   end
 
+  def onepair?(hole, community)
+    eval_onepair(hole, community) != -1
+  end
+
+  def eval_onepair(hole, community)
+    cards = hole + community
+    rank = -1
+    memo = 0 # bit memo
+    for card in cards
+      mask = 1 << card.rank
+      rank = [rank, card.rank].max if memo & mask != 0
+      memo |= mask
+    end
+
+    return rank
+  end
+
   def mask_strength(bit)
-    bit >> 8
+    bit & (511 << 8)  # 511 = (1 << 9) -1
   end
 
   def mask_high_rank(bit)
