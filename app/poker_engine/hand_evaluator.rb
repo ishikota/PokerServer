@@ -23,6 +23,7 @@ class HandEvaluator
   #       FourCard of rank 2       =>  1000000 0010 0000
   #       straight flash of rank 7 => 10000000 0111 0000
   def eval_hand(hole, community)
+    return STRAIGHT | eval_straight(hole, community) if straight?(hole, community)
     return THREECARD | eval_threecard(hole, community) if threecard?(hole, community)
     return TWOPAIR | eval_twopair(hole, community) if twopair?(hole, community)
     return ONEPAIR | (eval_onepair(hole, community) << 4) if onepair?(hole, community)
@@ -92,6 +93,27 @@ class HandEvaluator
 
     return rank
   end
+
+  def straight?(hole, community)
+    search_straight(hole, community) != -1
+  end
+
+  def eval_straight(hole, community)
+    search_straight(hole, community) << 4
+  end
+
+  def search_straight(hole, community)
+    cards = hole + community
+    bit_memo = cards.reduce(0) { |memo, card| memo |= 1 << card.rank }
+
+    rank = -1
+    for r in 2..14
+      rank = r if (0..4).reduce(true) { |acc, i| acc &= ((bit_memo >> (r+i)) & 1) == 1 }
+    end
+
+    return rank
+  end
+
 
   def mask_strength(bit)
     bit & (511 << 8)  # 511 = (1 << 9) -1
