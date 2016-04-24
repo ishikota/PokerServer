@@ -1,6 +1,8 @@
 class RoundManager
   attr_reader :next_player, :agree_num, :street
 
+  PREFLOP = 0
+
   def initialize(broadcaster, finish_callback)
     @broadcaster = broadcaster
     @callback = finish_callback
@@ -33,14 +35,22 @@ class RoundManager
 
     if everyone_agree?(table.seats)
       @street += 1
-      start_street(@street)
+      start_street(@street, table)
     else
       shift_next_player(table.seats)
       @broadcaster.ask(@next_player, "TODO")
     end
   end
 
-  def start_street(street)
+  def start_street(street, table)
+    if street == PREFLOP
+      preflop(table)
+    end
+  end
+
+  def preflop(table)
+    @next_player += 2  # skip blind player
+    @broadcaster.ask(@next_player, "TODO")
   end
 
   def shift_next_player(seats)

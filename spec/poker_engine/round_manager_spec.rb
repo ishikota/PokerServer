@@ -126,8 +126,14 @@ RSpec.describe RoundManager do
   end
 
   describe "#preflop" do
+    let(:table) { double("table") }
 
-    it "should ask action to player who sits next to blind player"
+    it "should ask action to player who sits next to blind player" do
+      expect(broadcaster).to receive(:ask).with(2, anything)
+
+      round_manager.start_street(RoundManager::PREFLOP, table)
+      expect(round_manager.next_player).to eq 2
+    end
 
   end
 
