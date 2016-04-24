@@ -74,6 +74,25 @@ RSpec.describe RoundManager do
           .and change { table.community_card.cards.size }.from(3).to(4)
         end
       end
+
+      describe "TURN to RIVER" do
+        before {
+          round_manager.start_new_round(table)
+          round_manager.apply_action(table, 'call', 10)
+          round_manager.apply_action(table, 'call', 10)
+          round_manager.apply_action(table, 'call', 10)
+          expect(round_manager.street).to eq RoundManager::TURN
+        }
+
+        it "should forward to RIVER" do
+          round_manager.apply_action(table, 'call', 10)
+          expect {
+            round_manager.apply_action(table, 'call', 10)
+          }.to change { round_manager.street }.to(RoundManager::RIVER)
+          .and change { table.community_card.cards.size }.from(4).to(5)
+        end
+      end
+
     end
 
   end
