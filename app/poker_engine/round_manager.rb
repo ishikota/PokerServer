@@ -39,11 +39,11 @@ class RoundManager
       @agree_num = 1
     end
 
-    if everyone_agree?(table.seats)
-      @street += 1
-      start_street(@street, table)
-    elsif table.seats.count_active_player == 1
+    if table.seats.count_active_player == 1
       @street = SHOWDOWN
+      start_street(@street, table)
+    elsif everyone_agree?(table.seats)
+      @street += 1
       start_street(@street, table)
     else
       shift_next_player(table.seats)
@@ -94,7 +94,7 @@ class RoundManager
   end
 
   def everyone_agree?(seats)
-    @agree_num == seats.size
+    @agree_num == seats.count_active_player
   end
 
   def increment_agree_num

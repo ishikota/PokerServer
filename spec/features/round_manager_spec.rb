@@ -6,7 +6,11 @@ RSpec.describe RoundManager do
   let(:broadcaster) { double("broadcaster") }
   let(:round_manager) { RoundManager.new(broadcaster, finish_callback) }
 
-  describe "player a round" do
+  before {
+    allow(broadcaster).to receive(:ask)
+  }
+
+  describe "player a round with two player" do
     let(:table) { Table.new }
     let(:player1) { PokerPlayer.new(100) }
     let(:player2) { PokerPlayer.new(100) }
@@ -14,7 +18,6 @@ RSpec.describe RoundManager do
     before {
       table.seats.sitdown(player1)
       table.seats.sitdown(player2)
-      allow(broadcaster).to receive(:ask)
     }
 
     it "should collect blind" do
@@ -54,6 +57,39 @@ RSpec.describe RoundManager do
           round_manager.apply_action(table, 'call', 10)
         }.to change { round_manager.street }.to(RoundManager::FLOP)
       end
+    end
+
+  end
+
+  describe "play a round with three player" do
+    let(:table) { Table.new }
+    let(:player1) { PokerPlayer.new(100) }
+    let(:player2) { PokerPlayer.new(100) }
+    let(:player3) { PokerPlayer.new(100) }
+
+    before {
+      for player in [player1, player2, player3] do
+        table.seats.sitdown(player)
+      end
+    }
+
+    describe "PREFLOP to FLOP" do
+
+      describe "one player call and another is fold" do
+
+        it "should forward to FLOP" do
+          round_manager.start_new_round(table)
+          round_manager.apply_action(table, 'call', 10)
+
+          expect(broadcaster).to receive(:ask).with(table.dealer_btn, "TODO")
+
+          expect {
+            round_manager.apply_action(table, 'fold', nil)
+          }.to change { round_manager.street }.to(RoundManager::FLOP)
+          .and change { table.community_card.cards.size }.from(0).to(2)
+        end
+      end
+
     end
 
   end

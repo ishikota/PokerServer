@@ -98,24 +98,6 @@ RSpec.describe RoundManager do
 
     end
 
-
-    context "when all players have agreed" do
-
-      before {
-        table.as_null_object
-        round_manager.increment_agree_num
-      }
-
-      it "should start next street" do
-        expect {
-          round_manager.apply_action(table, 'call', 5)
-        }.to change {
-          round_manager.street
-        }.by(1)
-      end
-
-    end
-
     context "when not agreed player exists" do
 
       it "should ask action to him" do
@@ -281,7 +263,7 @@ RSpec.describe RoundManager do
 
     before {
       allow(seats).to receive(:size).and_return(2)
-      allow(seats).to receive(:count_active_player)
+      allow(seats).to receive(:count_active_player).and_return(2)
     }
 
     context "when a player does not agree" do
