@@ -64,18 +64,18 @@ class RoundManager
 
   def flop(table)
     for card in table.deck.draw_cards(3) do
-      table.community_cards.add_card(card)
+      table.community_card.add(card)
     end
     @broadcaster.ask(@next_player, "TODO")
   end
 
   def turn(table)
-    table.community_cards.add_card(table.deck.draw_card)
+    table.community_card.add(table.deck.draw_card)
     @broadcaster.ask(@next_player, "TODO")
   end
 
   def river(table)
-    table.community_cards.add_card(table.deck.draw_card)
+    table.community_card.add(table.deck.draw_card)
     @broadcaster.ask(@next_player, "TODO")
   end
 

@@ -141,20 +141,20 @@ RSpec.describe RoundManager do
   describe "#flop" do
     let(:table) { double("table") }
     let(:deck) { double("deck") }
-    let(:community_cards) { double("community cards") }
+    let(:community_card) { double("community cards") }
 
     before {
       allow(deck).to receive(:draw_cards).and_return(["card1", "card2", "card3"])
       allow(table).to receive(:deck).and_return(deck)
-      allow(table).to receive(:community_cards).and_return(community_cards)
+      allow(table).to receive(:community_card).and_return(community_card)
       allow(broadcaster).to receive(:ask)
-      allow(community_cards).to receive(:add_card)
+      allow(community_card).to receive(:add)
     }
 
     it "should add three commnity card" do
-      expect(community_cards).to receive(:add_card).with("card1")
-      expect(community_cards).to receive(:add_card).with("card2")
-      expect(community_cards).to receive(:add_card).with("card3")
+      expect(community_card).to receive(:add).with("card1")
+      expect(community_card).to receive(:add).with("card2")
+      expect(community_card).to receive(:add).with("card3")
 
       round_manager.start_street(RoundManager::FLOP, table)
     end
@@ -171,18 +171,18 @@ RSpec.describe RoundManager do
   describe "#turn" do
     let(:table) { double("table") }
     let(:deck) { double("deck") }
-    let(:community_cards) { double("community cards") }
+    let(:community_card) { double("community cards") }
 
     before {
       allow(deck).to receive(:draw_card).and_return("card1")
       allow(table).to receive(:deck).and_return(deck)
-      allow(table).to receive(:community_cards).and_return(community_cards)
+      allow(table).to receive(:community_card).and_return(community_card)
       allow(broadcaster).to receive(:ask)
-      allow(community_cards).to receive(:add_card)
+      allow(community_card).to receive(:add)
     }
 
     it "should add a community card" do
-      expect(community_cards).to receive(:add_card).with("card1")
+      expect(community_card).to receive(:add).with("card1")
 
       round_manager.start_street(RoundManager::TURN, table)
     end
@@ -199,18 +199,18 @@ RSpec.describe RoundManager do
   describe "#river" do
     let(:table) { double("table") }
     let(:deck) { double("deck") }
-    let(:community_cards) { double("community cards") }
+    let(:community_card) { double("community cards") }
 
     before {
       allow(deck).to receive(:draw_card).and_return("card1")
       allow(table).to receive(:deck).and_return(deck)
-      allow(table).to receive(:community_cards).and_return(community_cards)
+      allow(table).to receive(:community_card).and_return(community_card)
       allow(broadcaster).to receive(:ask)
-      allow(community_cards).to receive(:add_card)
+      allow(community_card).to receive(:add)
     }
 
     it "should add a community card" do
-      expect(community_cards).to receive(:add_card).with("card1")
+      expect(community_card).to receive(:add).with("card1")
 
       round_manager.start_street(RoundManager::RIVER, table)
     end
