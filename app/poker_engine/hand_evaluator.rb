@@ -23,6 +23,7 @@ class HandEvaluator
   #       FourCard of rank 2       =>  1000000 0010 0000
   #       straight flash of rank 7 => 10000000 0111 0000
   def eval_hand(hole, community)
+    return STRAIGHTFLASH | eval_straightflash(hole, community) if straightflash?(hole, community)
     return FULLHOUSE | eval_fullhouse(hole, community) if fullhouse?(hole, community)
     return FLASH | eval_flash(hole, community) if flash?(hole, community)
     return STRAIGHT | eval_straight(hole, community) if straight?(hole, community)
@@ -154,6 +155,21 @@ class HandEvaluator
     three_card_rank = rank_count.select { |rank, cards| cards.size >= 3 }.keys.max
     two_pair_rank = rank_count.select { |rank, cards| cards.size >= 2 }.keys.select { |rank| rank != three_card_rank }.max
     return [three_card_rank, two_pair_rank]
+  end
+
+  def straightflash?(hole, community)
+    search_straightflash(hole, community) != -1
+  end
+
+  def eval_straightflash(hole, community)
+    search_straightflash(hole, community) << 4
+  end
+
+  def search_straightflash(hole, community)
+    cards = hole + community
+    flash_cards = cards.group_by { |card| card.suit }
+      .select { |suit, cards| cards.size >= 5 }.values.flatten
+    search_straight(flash_cards, [])
   end
 
   def mask_strength(bit)

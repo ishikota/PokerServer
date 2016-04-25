@@ -141,6 +141,25 @@ RSpec.describe HandEvaluator do
       end
     end
 
+    context "StraightFlash" do
+      before {
+        community << card(Card::DIAMOND, 4)
+        community << card(Card::DIAMOND, 5)
+        community << card(Card::HEART, 11)
+        community << card(Card::HEART, 12)
+        community << card(Card::HEART, 13)
+        hole << card(Card::HEART, 10)
+        hole << card(Card::HEART, 1)
+      }
+
+      it "should evaluate as straight flash starts from 10" do
+        bit = evaluator.eval_hand(hole, community)
+        expect(evaluator.mask_strength(bit)).to eq HandEvaluator::STRAIGHTFLASH
+        expect(evaluator.mask_high_rank(bit)).to eq 10
+        expect(evaluator.mask_low_rank(bit)).to eq 0
+      end
+    end
+
 
   end
 
