@@ -23,6 +23,7 @@ class HandEvaluator
   #       FourCard of rank 2       =>  1000000 0010 0000
   #       straight flash of rank 7 => 10000000 0111 0000
   def eval_hand(hole, community)
+    return FULLHOUSE | eval_fullhouse(hole, community) if fullhouse?(hole, community)
     return FLASH | eval_flash(hole, community) if flash?(hole, community)
     return STRAIGHT | eval_straight(hole, community) if straight?(hole, community)
     return THREECARD | eval_threecard(hole, community) if threecard?(hole, community)
@@ -137,7 +138,23 @@ class HandEvaluator
     return flash_suit.reduce(-1) { |acc, suit| [acc, suit_max_rank[suit]].max }
   end
 
+  def fullhouse?(hole, community)
+    r1, r2 = search_fullhouse(hole, community)
+    return r1 && r2
+  end
 
+  def eval_fullhouse(hole, community)
+    r1, r2 = search_fullhouse(hole, community)
+    return r1 << 4 | r2
+  end
+
+  def search_fullhouse(hole, community)
+    cards = hole + community
+    rank_count = cards.group_by { |card| card.rank }
+    three_card_rank = rank_count.select { |rank, cards| cards.size >= 3 }.keys.max
+    two_pair_rank = rank_count.select { |rank, cards| cards.size >= 2 }.keys.select { |rank| rank != three_card_rank }.max
+    return [three_card_rank, two_pair_rank]
+  end
 
   def mask_strength(bit)
     bit & (511 << 8)  # 511 = (1 << 9) -1
