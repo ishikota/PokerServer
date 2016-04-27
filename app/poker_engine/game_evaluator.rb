@@ -36,37 +36,32 @@ class GameEvaluator
     end
 
     def get_side_pots(players)
-      side_pots = []
-      allin_payinfo = fetch_allin_payinfo(players)
-
-      for allin_amount in allin_payinfo.map{ |payinfo| payinfo.amount }
-        pot, eligibles = 0, []
-
-        for player in players
-          payinfo = player.pay_info
-
-          pot += [allin_amount, player.pay_info.amount].min
-          if payinfo.amount >= allin_amount && payinfo.status != PokerPlayer::PayInfo::FOLDED
-            eligibles << player
-          end
-
-        end
-
-        pot -= side_pots.reduce(0) { |sum, side_pot| sum + side_pot[:amount] }
+      fetch_allin_payinfo(players).map{ |payinfo| payinfo.amount }.reduce([]) { |side_pots, allin_amount|
+        pot = players.reduce(0) { |pot, player| pot + [allin_amount, player.pay_info.amount].min }
+        eligibles = players.select { |player| eligible?(player, allin_amount) }
+        pot -= get_sidepots_sum(side_pots)
         side_pots << { amount: pot, eligibles: eligibles }
-      end
+      }
+    end
 
-      return side_pots
+    def eligible?(player, allin_amount)
+      player.pay_info.amount >= allin_amount && player.pay_info.status != PokerPlayer::PayInfo::FOLDED
     end
 
     def get_main_pot(players, side_pots)
-      payinfo = get_payinfo(players)
-      pay_sum = payinfo.reduce(0) { |sum, pay| sum + pay.amount }
-      sidepot_sum = side_pots.reduce(0) { |sum, side_pot| sum + side_pot[:amount] }
-      left_chip = pay_sum - sidepot_sum
-      max_pay = payinfo.max_by { |pay| pay.amount }.amount
-      eligibles = players.select { |player| player.pay_info.amount == max_pay }
-      return { amount: left_chip, eligibles: eligibles }
+      max_pay = get_payinfo(players).max_by { |pay| pay.amount }.amount
+      {
+        amount: get_players_pay_sum(players) - get_sidepots_sum(side_pots),
+        eligibles: players.select { |player| player.pay_info.amount == max_pay }
+      }
+    end
+
+    def get_players_pay_sum(players)
+      get_payinfo(players).reduce(0) { |sum, pay| sum + pay.amount }
+    end
+
+    def get_sidepots_sum(side_pots)
+      side_pots.reduce(0) { |sum, side_pot| sum + side_pot[:amount] }
     end
 
     def fetch_allin_payinfo(players)
