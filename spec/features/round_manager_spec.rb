@@ -24,6 +24,7 @@ RSpec.describe RoundManager do
 
     it "should notify starts of the round to all players" do
       expect(broadcaster).to receive(:notification).with("round info")
+      expect(broadcaster).to receive(:notification).with("PREFLOP starts")
 
       round_manager.start_new_round(table)
     end
@@ -62,6 +63,8 @@ RSpec.describe RoundManager do
 
         it "should forward to flop" do
           expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
+          expect(broadcaster).to receive(:notification).with("FLOP starts")
+
           expect {
             round_manager.apply_action(table, 'call', 10)
           }.to change { round_manager.street }.to(RoundManager::FLOP)
@@ -79,6 +82,8 @@ RSpec.describe RoundManager do
         it "should forward to TURN" do
           round_manager.apply_action(table, 'call', 10)
           expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
+          expect(broadcaster).to receive(:notification).with("TURN starts")
+
           expect {
             round_manager.apply_action(table, 'call', 10)
           }.to change { round_manager.street }.to(RoundManager::TURN)
@@ -98,6 +103,8 @@ RSpec.describe RoundManager do
         it "should forward to RIVER" do
           round_manager.apply_action(table, 'call', 10)
           expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
+          expect(broadcaster).to receive(:notification).with("RIVER starts")
+
           expect {
             round_manager.apply_action(table, 'call', 10)
           }.to change { round_manager.street }.to(RoundManager::RIVER)

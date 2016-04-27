@@ -7,6 +7,14 @@ class RoundManager
   RIVER = 3
   SHOWDOWN = 4
 
+  STREET_MAP = {
+    PREFLOP  => "PREFLOP",
+    FLOP     => "FLOP",
+    TURN     => "TURN",
+    RIVER    => "RIVER",
+    SHOWDOWN => "SHOWDOWN"
+  }
+
   def initialize(broadcaster, finish_callback, game_evaluator)
     @broadcaster = broadcaster
     @callback = finish_callback
@@ -57,6 +65,7 @@ class RoundManager
   def start_street(street, table)
     @agree_num = 0
     @next_player = table.dealer_btn
+    @broadcaster.notification("#{STREET_MAP[street]} starts")
 
     if street == PREFLOP
       preflop(table)
