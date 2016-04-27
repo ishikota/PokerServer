@@ -8,6 +8,7 @@ RSpec.describe RoundManager do
   let(:round_manager) { RoundManager.new(broadcaster, finish_callback, game_evaluator) }
 
   before {
+    allow(broadcaster).to receive(:notification)
     allow(broadcaster).to receive(:ask)
   }
 
@@ -20,6 +21,12 @@ RSpec.describe RoundManager do
       table.seats.sitdown(player1)
       table.seats.sitdown(player2)
     }
+
+    it "should notify starts of the round to all players" do
+      expect(broadcaster).to receive(:notification).with("round info")
+
+      round_manager.start_new_round(table)
+    end
 
     it "should collect blind" do
       expect {
