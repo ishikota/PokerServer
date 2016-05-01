@@ -30,6 +30,7 @@ class RoundManager
 
     clear_player_log(table.seats.players)
     correct_blind(small_blind=5, table)
+    deal_holecard(table.deck, table.seats.players)
 
     @broadcaster.notification("round info")
     start_street(@street, table)
@@ -152,6 +153,12 @@ class RoundManager
 
       table.seats.players[small_blind_pos].add_action_history(PokerPlayer::ACTION::RAISE, small_blind)
       table.seats.players[big_blind_pos].add_action_history(PokerPlayer::ACTION::RAISE, small_blind * 2)
+    end
+
+    def deal_holecard(deck, players)
+      for player in players
+        player.add_holecard(deck.draw_cards(2))
+      end
     end
 
 end

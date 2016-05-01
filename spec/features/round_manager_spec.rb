@@ -37,6 +37,13 @@ RSpec.describe RoundManager do
        .and change { player2.stack }.by(-10)
     end
 
+    it "should deal hole card to players" do
+      expect {
+        round_manager.start_new_round(table)
+      }.to change { player1.hole_card.size }.by(2)
+      .and change { player2.hole_card.size }.by(2)
+    end
+
     it "should not ask blind player in preflop" do
       expect(broadcaster).to receive(:ask).with(0, "TODO")
 

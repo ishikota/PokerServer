@@ -9,6 +9,7 @@ RSpec.describe RoundManager do
 
   describe "#start_new_round" do
     let(:table) { double("table") }
+    let(:deck) { deck_with_cards }
     let(:seats) { seat_with_active_players }
 
     before {
@@ -16,14 +17,26 @@ RSpec.describe RoundManager do
       allow(seats).to receive(:size).and_return(2)
       allow(table).to receive(:seats).and_return(seats)
       allow(table).to receive(:dealer_btn).and_return(0)
+      allow(table).to receive(:deck).and_return(deck)
       allow(broadcaster).to receive(:ask)
       allow(broadcaster).to receive(:notification)
+      for player in seats.players
+        allow(player).to receive(:add_holecard)
+      end
     }
 
     it "should collect blind" do
       small_blind = 5  #TODO read blind amount from somewhare
       expect(seats).to receive(:collect_bet).with(0, small_blind)
       expect(seats).to receive(:collect_bet).with(1, small_blind * 2)
+
+      round_manager.start_new_round(table)
+    end
+
+    it "should deal hole card to players" do
+      expect(seats.players[0]).to receive(:add_holecard).with([anything, anything])
+      expect(seats.players[1]).to receive(:add_holecard).with([anything, anything])
+      expect(seats.players[2]).to receive(:add_holecard).with([anything, anything])
 
       round_manager.start_new_round(table)
     end
@@ -382,6 +395,14 @@ RSpec.describe RoundManager do
       seats = double("seats")
       allow(seats).to receive(:players).and_return(players)
       return seats
+    end
+
+    def deck_with_cards
+      deck = double("deck")
+      card = double("card")
+      allow(card).to receive(:is_a?).with(Card).and_return(true)
+      allow(deck).to receive(:draw_cards).and_return([card, card])
+      deck
     end
 
 
