@@ -17,6 +17,7 @@ RSpec.describe RoundManager do
       allow(table).to receive(:seats).and_return(seats)
       allow(table).to receive(:dealer_btn).and_return(0)
       allow(broadcaster).to receive(:ask)
+      allow(broadcaster).to receive(:notification)
     }
 
     it "should collect blind" do
@@ -118,6 +119,7 @@ RSpec.describe RoundManager do
     let(:seats) { double("seats") }
 
     before {
+      allow(broadcaster).to receive(:notification)
       allow(seats).to receive(:size).and_return(3)
       allow(table).to receive(:seats).and_return(seats)
       allow(table).to receive(:dealer_btn).and_return(0)
@@ -138,6 +140,7 @@ RSpec.describe RoundManager do
     let(:community_card) { double("community cards") }
 
     before {
+      allow(broadcaster).to receive(:notification)
       allow(deck).to receive(:draw_cards).and_return(["card1", "card2", "card3"])
       allow(table).to receive(:deck).and_return(deck)
       allow(table).to receive(:community_card).and_return(community_card)
@@ -169,6 +172,7 @@ RSpec.describe RoundManager do
     let(:community_card) { double("community cards") }
 
     before {
+      allow(broadcaster).to receive(:notification)
       allow(deck).to receive(:draw_card).and_return("card1")
       allow(table).to receive(:deck).and_return(deck)
       allow(table).to receive(:community_card).and_return(community_card)
@@ -198,6 +202,7 @@ RSpec.describe RoundManager do
     let(:community_card) { double("community cards") }
 
     before {
+      allow(broadcaster).to receive(:notification)
       allow(deck).to receive(:draw_card).and_return("card1")
       allow(table).to receive(:deck).and_return(deck)
       allow(table).to receive(:community_card).and_return(community_card)
@@ -225,6 +230,7 @@ RSpec.describe RoundManager do
     let(:table) { double("table") }
 
     before {
+      allow(broadcaster).to receive(:notification)
       allow(table).to receive(:dealer_btn).and_return(0)
     }
 
