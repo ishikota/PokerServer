@@ -109,7 +109,10 @@ class RoundManager
   end
 
   def shift_next_player(exec_shift=true, seats)
-    next_player = (@next_player + 1) % seats.size
+    next_player = @next_player
+    begin
+      next_player = (next_player + 1) % seats.size
+    end until seats.players[next_player].active?
     @next_player = next_player if exec_shift
     next_player
   end

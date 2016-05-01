@@ -9,7 +9,7 @@ RSpec.describe RoundManager do
 
   describe "#start_new_round" do
     let(:table) { double("table") }
-    let(:seats) { double("seats") }
+    let(:seats) { seat_with_active_players }
 
     before {
       allow(seats).to receive(:collect_bet)
@@ -34,7 +34,7 @@ RSpec.describe RoundManager do
 
     let(:table) { double("table") }
     let(:pot) { double("pot") }
-    let(:seats) { double("seats") }
+    let(:seats) { seat_with_active_players }
 
     before {
       allow(pot).to receive(:add_chip)
@@ -116,7 +116,7 @@ RSpec.describe RoundManager do
 
   describe "#preflop" do
     let(:table) { double("table") }
-    let(:seats) { double("seats") }
+    let(:seats) { seat_with_active_players }
 
     before {
       allow(broadcaster).to receive(:notification)
@@ -246,9 +246,17 @@ RSpec.describe RoundManager do
 
   describe "#shift_next_player" do
     let(:seats) { double("seats") }
+    let(:players) do
+      (1..3).inject([]) { |acc, i| acc << double("player#{i}") }
+    end
+
     before {
-      allow(seats).to receive(:size).and_return(2)
+      allow(seats).to receive(:size).and_return(3)
       allow(seats).to receive(:count_active_player)
+      allow(seats).to receive(:players).and_return(players)
+      for player in players
+        allow(player).to receive(:active?).and_return(true)
+      end
     }
 
     context "when next player is active" do
@@ -262,13 +270,21 @@ RSpec.describe RoundManager do
 
     context "when next player is not active" do
 
-      it "should skip the person"
+      before {
+        allow(players[1]).to receive(:active?).and_return(false)
+      }
+
+      it "should skip the person" do
+        round_manager.shift_next_player(seats)
+        expect(round_manager.next_player).to eq 2
+      end
 
     end
 
     describe "cycle ask order" do
 
       before {
+        round_manager.shift_next_player(seats)
         round_manager.shift_next_player(seats)
       }
 
@@ -308,6 +324,21 @@ RSpec.describe RoundManager do
       end
     end
   end
+
+
+  private
+
+    def seat_with_active_players
+      players =  (1..3).inject([]) do |acc, i|
+        player = double("player#{i}")
+        allow(player).to receive(:active?).and_return(true)
+        acc << player
+      end
+
+      seats = double("seats")
+      allow(seats).to receive(:players).and_return(players)
+      return seats
+    end
 
 
 end
