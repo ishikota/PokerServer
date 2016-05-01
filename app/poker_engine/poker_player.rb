@@ -1,5 +1,5 @@
 class PokerPlayer
-  attr_reader :stack, :pay_info
+  attr_reader :stack, :pay_info, :action_histories
 
   def initialize(initial_stack)
     @stack = initial_stack
@@ -19,8 +19,24 @@ class PokerPlayer
     @active
   end
 
+  def init_action_histories
+    @action_histories = []
+  end
+
   def init_pay_info
     @pay_info = PayInfo.new
+  end
+
+  def add_action_history(kind, chip_amount=nil)
+    if kind == ACTION::FOLD
+      @action_histories << fold_history
+    elsif kind == ACTION::CALL
+      @action_histories << call_history(chip_amount)
+    elsif kind == ACTION::RAISE
+      @action_histories << raise_history(chip_amount)
+    else
+      raise "Un expected action kind #{kind} passed"
+    end
   end
 
   class PayInfo
@@ -49,6 +65,40 @@ class PokerPlayer
     end
 
   end
+
+  module ACTION
+    FOLD = 0
+    CALL = 1
+    RAISE = 2
+  end
+
+
+  private
+
+    def fold_history
+      { "action" => "FOLD" }
+    end
+
+    def call_history(amount)
+      {
+        "action" => "CALL",
+        "amount" => amount,
+        "paid" => amount - paid_sum
+      }
+    end
+
+    def raise_history(amount)
+      {
+        "action" => "RAISE",
+        "amount" => amount,
+        "paid" => amount - paid_sum
+      }
+    end
+
+    def paid_sum
+      last_history = action_histories.select {|h| h["action"] != 'FOLD'}.last
+      last_history.nil? ? 0 : last_history["amount"]
+    end
 
 end
 

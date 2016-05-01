@@ -67,5 +67,79 @@ RSpec.describe PokerPlayer do
     end
   end
 
+  describe "add_action_history" do
+
+    before {
+      player.init_action_histories
+    }
+
+    context "FOLD" do
+
+      before {
+        player.add_action_history(PokerPlayer::ACTION::FOLD)
+      }
+
+      it "should add action_history" do
+        expect(player.action_histories.last["action"]).to eq "FOLD"
+      end
+    end
+
+    describe "CALL" do
+
+      context "when player has enought money to action" do
+
+        before {
+          player.add_action_history(PokerPlayer::ACTION::CALL, 10)
+        }
+
+        it "should add action_history" do
+          expect(player.action_histories.last["action"]).to eq "CALL"
+          expect(player.action_histories.last["amount"]).to eq 10
+          expect(player.action_histories.last["paid"]).to eq 10
+        end
+
+        context "call $20 when already paid $10" do
+
+          before {
+            player.add_action_history(PokerPlayer::ACTION::CALL, 20)
+          }
+
+          it "should pay only $10" do
+            expect(player.action_histories.last["amount"]).to eq 20
+            expect(player.action_histories.last["paid"]).to eq 10
+          end
+
+        end
+      end
+
+    end
+
+    describe "RAISE" do
+
+      before {
+        player.add_action_history(PokerPlayer::ACTION::RAISE, 10)
+      }
+
+      it "should add action_history" do
+        expect(player.action_histories.last["action"]).to eq "RAISE"
+        expect(player.action_histories.last["amount"]).to eq 10
+        expect(player.action_histories.last["paid"]).to eq 10
+      end
+
+      context "call $20 when already paid $10" do
+
+        before {
+          player.add_action_history(PokerPlayer::ACTION::CALL, 20)
+        }
+
+        it "should pay only $10" do
+          expect(player.action_histories.last["amount"]).to eq 20
+          expect(player.action_histories.last["paid"]).to eq 10
+        end
+      end
+
+    end
+
+  end
 end
 

@@ -38,15 +38,20 @@ class RoundManager
   end
 
   def apply_action(table, action, bet_amount)
+    # TODO convert illegal action into fold action
+    # if illegal then remove last action_history and add fold history
     if action == 'call'
       table.seats.collect_bet(@next_player, bet_amount)
       table.pot.add_chip(bet_amount)
+      #TODO update pay info
       increment_agree_num
     elsif action == 'fold'
       table.seats.deactivate(@next_player)
+      #TODO update pay info
     elsif action =='raise'
       table.seats.collect_bet(@next_player, bet_amount)
       table.pot.add_chip(bet_amount)
+      #TODO update pay info
       @agree_num = 1
     end
 
