@@ -169,12 +169,14 @@ RSpec.describe RoundManager do
 
   describe "#flop" do
     let(:table) { double("table") }
+    let(:seats) { seat_with_active_players }
     let(:deck) { double("deck") }
     let(:community_card) { double("community cards") }
 
     before {
       allow(broadcaster).to receive(:notification)
       allow(deck).to receive(:draw_cards).and_return(["card1", "card2", "card3"])
+      allow(table).to receive(:seats).and_return(seats)
       allow(table).to receive(:deck).and_return(deck)
       allow(table).to receive(:community_card).and_return(community_card)
       allow(table).to receive(:dealer_btn).and_return(0)
@@ -201,12 +203,14 @@ RSpec.describe RoundManager do
 
   describe "#turn" do
     let(:table) { double("table") }
+    let(:seats) { seat_with_active_players }
     let(:deck) { double("deck") }
     let(:community_card) { double("community cards") }
 
     before {
       allow(broadcaster).to receive(:notification)
       allow(deck).to receive(:draw_card).and_return("card1")
+      allow(table).to receive(:seats).and_return(seats)
       allow(table).to receive(:deck).and_return(deck)
       allow(table).to receive(:community_card).and_return(community_card)
       allow(table).to receive(:dealer_btn).and_return(0)
@@ -231,12 +235,14 @@ RSpec.describe RoundManager do
 
   describe "#river" do
     let(:table) { double("table") }
+    let(:seats) { seat_with_active_players }
     let(:deck) { double("deck") }
     let(:community_card) { double("community cards") }
 
     before {
       allow(broadcaster).to receive(:notification)
       allow(deck).to receive(:draw_card).and_return("card1")
+      allow(table).to receive(:seats).and_return(seats)
       allow(table).to receive(:deck).and_return(deck)
       allow(table).to receive(:community_card).and_return(community_card)
       allow(table).to receive(:dealer_btn).and_return(0)
@@ -261,10 +267,12 @@ RSpec.describe RoundManager do
 
   describe "#showdown" do
     let(:table) { double("table") }
+    let(:seats) { seat_with_active_players }
 
     before {
       allow(broadcaster).to receive(:notification)
       allow(table).to receive(:dealer_btn).and_return(0)
+      allow(table).to receive(:seats).and_return(seats)
     }
 
     it "should call dealer's callback with game result" do
@@ -365,6 +373,8 @@ RSpec.describe RoundManager do
       players =  (1..3).inject([]) do |acc, i|
         player = double("player#{i}")
         allow(player).to receive(:active?).and_return(true)
+        allow(player).to receive(:init_action_histories)
+        allow(player).to receive(:init_pay_info)
         allow(player).to receive(:add_action_history)
         acc << player
       end

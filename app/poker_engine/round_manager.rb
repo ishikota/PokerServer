@@ -25,13 +25,11 @@ class RoundManager
   end
 
   def start_new_round(table)
-    small_blind = 5
     @next_player = table.dealer_btn
     @street = PREFLOP
 
-    # collect blind
-    table.seats.collect_bet(table.dealer_btn, small_blind)
-    table.seats.collect_bet(shift_next_player(exec_shift=false, table.seats), small_blind * 2)
+    clear_player_log(table.seats.players)
+    correct_blind(small_blind=5, table)
 
     @broadcaster.notification("round info")
     start_street(@street, table)
@@ -39,7 +37,9 @@ class RoundManager
 
   def apply_action(table, action, bet_amount, action_checker)
 
-    action = 'fold' if action_checker.illegal?(action)
+    if action_checker.illegal?(table.seats.players, @next_player, action, bet_amount)
+      action = 'fold'
+    end
 
     if action == 'call'
       table.seats.collect_bet(@next_player, bet_amount)
@@ -63,6 +63,7 @@ class RoundManager
       start_street(@street, table)
     elsif everyone_agree?(table.seats)
       @street += 1
+      clear_player_log(table.seats.players)
       start_street(@street, table)
     else
       shift_next_player(table.seats)
@@ -132,6 +133,26 @@ class RoundManager
   def increment_agree_num
     @agree_num += 1
   end
+
+  private
+
+    def clear_player_log(players)
+      for player in players
+        player.init_action_histories
+        player.init_pay_info
+      end
+    end
+
+    def correct_blind(small_blind, table)
+      small_blind_pos = table.dealer_btn
+      big_blind_pos = shift_next_player(exec_shift=false, table.seats)
+
+      table.seats.collect_bet(small_blind_pos, small_blind)
+      table.seats.collect_bet(big_blind_pos, small_blind * 2)
+
+      table.seats.players[small_blind_pos].add_action_history(PokerPlayer::ACTION::RAISE, small_blind)
+      table.seats.players[big_blind_pos].add_action_history(PokerPlayer::ACTION::RAISE, small_blind * 2)
+    end
 
 end
 

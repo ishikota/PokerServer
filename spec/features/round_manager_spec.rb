@@ -6,6 +6,7 @@ RSpec.describe RoundManager do
   let(:broadcaster) { double("broadcaster") }
   let(:game_evaluator) { double("game_evaluator") }
   let(:round_manager) { RoundManager.new(broadcaster, finish_callback, game_evaluator) }
+  let(:action_checker) { ActionChecker.new }
 
   before {
     allow(broadcaster).to receive(:notification)
@@ -48,7 +49,7 @@ RSpec.describe RoundManager do
         allow(game_evaluator).to receive(:judge)
         allow(finish_callback).to receive(:call)
         round_manager.start_new_round(table)
-        round_manager.apply_action(table, 'fold', nil)
+        round_manager.apply_action(table, 'fold', nil, action_checker)
       }
 
       it "should reach showdown without asking" do
@@ -66,7 +67,7 @@ RSpec.describe RoundManager do
           expect(broadcaster).to receive(:notification).with("FLOP starts")
 
           expect {
-            round_manager.apply_action(table, 'call', 10)
+            round_manager.apply_action(table, 'call', 10, action_checker)
           }.to change { round_manager.street }.to(RoundManager::FLOP)
           .and change { table.community_card.cards.size }.from(0).to(3)
         end
@@ -75,17 +76,17 @@ RSpec.describe RoundManager do
       describe "FLOP to TURN" do
         before {
           round_manager.start_new_round(table)
-          round_manager.apply_action(table, 'call', 10)
+          round_manager.apply_action(table, 'call', 10, action_checker)
           expect(round_manager.street).to eq RoundManager::FLOP
         }
 
         it "should forward to TURN" do
-          round_manager.apply_action(table, 'call', 10)
+          round_manager.apply_action(table, 'raise', 10, action_checker)
           expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
           expect(broadcaster).to receive(:notification).with("TURN starts")
 
           expect {
-            round_manager.apply_action(table, 'call', 10)
+            round_manager.apply_action(table, 'call', 10, action_checker)
           }.to change { round_manager.street }.to(RoundManager::TURN)
           .and change { table.community_card.cards.size }.from(3).to(4)
         end
@@ -94,19 +95,19 @@ RSpec.describe RoundManager do
       describe "TURN to RIVER" do
         before {
           round_manager.start_new_round(table)
-          round_manager.apply_action(table, 'call', 10)
-          round_manager.apply_action(table, 'call', 10)
-          round_manager.apply_action(table, 'call', 10)
+          round_manager.apply_action(table, 'call', 10, action_checker)
+          round_manager.apply_action(table, 'raise', 10, action_checker)
+          round_manager.apply_action(table, 'call', 10, action_checker)
           expect(round_manager.street).to eq RoundManager::TURN
         }
 
         it "should forward to RIVER" do
-          round_manager.apply_action(table, 'call', 10)
+          round_manager.apply_action(table, 'raise', 10, action_checker)
           expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
           expect(broadcaster).to receive(:notification).with("RIVER starts")
 
           expect {
-            round_manager.apply_action(table, 'call', 10)
+            round_manager.apply_action(table, 'call', 10, action_checker)
           }.to change { round_manager.street }.to(RoundManager::RIVER)
           .and change { table.community_card.cards.size }.from(4).to(5)
         end
@@ -134,12 +135,12 @@ RSpec.describe RoundManager do
 
         it "should forward to FLOP" do
           round_manager.start_new_round(table)
-          round_manager.apply_action(table, 'call', 10)
+          round_manager.apply_action(table, 'call', 10, action_checker)
 
           expect(broadcaster).to receive(:ask).with(table.dealer_btn, "TODO")
 
           expect {
-            round_manager.apply_action(table, 'fold', nil)
+            round_manager.apply_action(table, 'fold', nil, action_checker)
           }.to change { round_manager.street }.to(RoundManager::FLOP)
           .and change { table.community_card.cards.size }.from(0).to(3)
         end
