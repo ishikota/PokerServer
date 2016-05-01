@@ -64,6 +64,13 @@ RSpec.describe RoundManager do
             round_manager.apply_action(table, 'call', 5, action_checker)
           }.to change { round_manager.agree_num }.by(1)
         end
+
+        it "should update player's pay_info" do
+          expect(seats.players[0]).to receive(:add_action_history)
+              .with(PokerPlayer::ACTION::CALL, 5)
+
+          round_manager.apply_action(table, 'call', 5, action_checker)
+        end
       end
 
       context "when passed action is FOLD" do
@@ -74,6 +81,13 @@ RSpec.describe RoundManager do
 
         it "should deactivate player" do
           expect(seats).to receive(:deactivate).with(0)
+
+          round_manager.apply_action(table, 'fold', nil, action_checker)
+        end
+
+        it "should update player's pay_info" do
+          expect(seats.players[0]).to receive(:add_action_history)
+              .with(PokerPlayer::ACTION::FOLD)
 
           round_manager.apply_action(table, 'fold', nil, action_checker)
         end
@@ -91,6 +105,13 @@ RSpec.describe RoundManager do
         it "should reset agree_num" do
           round_manager.apply_action(table, 'raise', 5, action_checker)
           expect(round_manager.agree_num).to eq 1
+        end
+
+        it "should update player's pay_info" do
+          expect(seats.players[0]).to receive(:add_action_history)
+              .with(PokerPlayer::ACTION::RAISE, 5)
+
+          round_manager.apply_action(table, 'raise', 5, action_checker)
         end
       end
 
@@ -343,6 +364,7 @@ RSpec.describe RoundManager do
       players =  (1..3).inject([]) do |acc, i|
         player = double("player#{i}")
         allow(player).to receive(:active?).and_return(true)
+        allow(player).to receive(:add_action_history)
         acc << player
       end
 

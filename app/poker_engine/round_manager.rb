@@ -47,15 +47,17 @@ class RoundManager
     if action == 'call'
       table.seats.collect_bet(@next_player, bet_amount)
       table.pot.add_chip(bet_amount)
-      #TODO update pay info
+      table.seats.players[@next_player]
+          .add_action_history(PokerPlayer::ACTION::CALL, bet_amount)
       increment_agree_num
     elsif action == 'fold'
       table.seats.deactivate(@next_player)
-      #TODO update pay info
+      table.seats.players[@next_player].add_action_history(PokerPlayer::ACTION::FOLD)
     elsif action =='raise'
       table.seats.collect_bet(@next_player, bet_amount)
       table.pot.add_chip(bet_amount)
-      #TODO update pay info
+      table.seats.players[@next_player]
+          .add_action_history(PokerPlayer::ACTION::RAISE, bet_amount)
       @agree_num = 1
     end
 
