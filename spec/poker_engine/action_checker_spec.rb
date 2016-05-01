@@ -4,6 +4,47 @@ RSpec.describe ActionChecker do
 
   let(:action_checker) { ActionChecker.new }
 
+  context "when no action is done before" do
+
+    let(:players) do
+      [1,2].inject([]) { |ary, i|
+        player = double("player#{i}")
+        allow(player).to receive(:action_histories).and_return []
+        allow(player).to receive(:stack).and_return 100
+        ary << player
+      }
+    end
+
+    describe "CALL $0 (CHECK)" do
+
+      it "should be legal" do
+        expect(action_checker.illegal?(players, 0, 'call', 0)).to be_falsy
+      end
+    end
+
+    describe "CALL $10" do
+
+      it "should be illegal" do
+        expect(action_checker.illegal?(players, 0, 'call', 10)).to be_truthy
+      end
+    end
+
+    describe "RAISE $1" do
+
+      it "should be illegal because bet amount is smaller than DEFAULT minimum raise amount" do
+        expect(action_checker.illegal?(players, 0, 'raise', 1)).to be_truthy
+      end
+    end
+
+    describe "RAISE $5" do
+
+      it "should be legal" do
+        expect(action_checker.illegal?(players, 0, 'raise', 5)).to be_falsy
+      end
+    end
+  end
+
+
   context "when agree amount = $10, minimum bet = $15" do
     let(:player1) do
       player1 = double("small blind")

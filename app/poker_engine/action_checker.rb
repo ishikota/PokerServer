@@ -14,6 +14,8 @@ class ActionChecker
 
   private
 
+    DEFAULT_MIN_RAISE = 5
+
     def short_of_money?(player, amount)
       player.stack < amount
     end
@@ -24,7 +26,7 @@ class ActionChecker
 
     def illegal_raise?(players, amount)
       last_raise = fetch_last_raise(players)
-      min_raise = last_raise["amount"] + last_raise["add_amount"]
+      min_raise = last_raise.nil? ? DEFAULT_MIN_RAISE : last_raise["amount"] + last_raise["add_amount"]
       min_raise > amount
     end
 
