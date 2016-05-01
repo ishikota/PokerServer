@@ -4,7 +4,8 @@ RSpec.describe RoundManager do
 
   let(:finish_callback) { double("finish_callback") }
   let(:broadcaster) { double("broadcaster") }
-  let(:game_evaluator) { double("game_evaluator") }
+  let(:hand_evaluator) { HandEvaluator.new }
+  let(:game_evaluator) { GameEvaluator.new(hand_evaluator) }
   let(:round_manager) { RoundManager.new(broadcaster, finish_callback, game_evaluator) }
   let(:action_checker) { ActionChecker.new }
 
@@ -14,7 +15,7 @@ RSpec.describe RoundManager do
   }
 
   describe "player a round with two player" do
-    let(:table) { Table.new }
+    let(:table) { Table.new(cheat_deck) }
     let(:player1) { PokerPlayer.new(100) }
     let(:player2) { PokerPlayer.new(100) }
 
@@ -120,6 +121,40 @@ RSpec.describe RoundManager do
         end
       end
 
+      describe "RIVER to SHOWOFF" do
+        before {
+          round_manager.start_new_round(table)
+          round_manager.apply_action(table, 'call', 10, action_checker)
+          round_manager.apply_action(table, 'call', 0, action_checker)
+          round_manager.apply_action(table, 'call', 0, action_checker)
+          round_manager.apply_action(table, 'call', 0, action_checker)
+          round_manager.apply_action(table, 'call', 0, action_checker)
+          expect(round_manager.street).to eq RoundManager::RIVER
+        }
+
+        describe "evaluate the game" do
+
+          before {
+            allow(finish_callback).to receive(:call)
+          }
+
+          it "should forward to SHOWDOWN" do
+            expect {
+              round_manager.apply_action(table, 'call', 0, action_checker)
+              round_manager.apply_action(table, 'call', 0, action_checker)
+            }.to change { round_manager.street }.to(RoundManager::SHOWDOWN)
+          end
+
+          it "should invoke callback with winner = player1" do
+            expect(finish_callback).to receive(:call).with([player2], { 1=>10 })
+
+            round_manager.apply_action(table, 'call', 0, action_checker)
+            round_manager.apply_action(table, 'call', 0, action_checker)
+          end
+        end
+
+      end
+
     end
 
   end
@@ -156,6 +191,30 @@ RSpec.describe RoundManager do
     end
 
   end
+
+  private
+
+    C = Card::CLUB
+    D = Card::DIAMOND
+    H = Card::HEART
+    S = Card::SPADE
+
+    def cheat_deck
+      p1_hole = [card(C,9), card(D,2)]  # no pair
+      p2_hole = [card(C,8), card(D,3)]  # one pair
+      flop_community = [card(D,3), card(D,5), card(C, 7)]
+      turn_community = card(D,6)
+      river_community = card(C,10)
+
+      cards = [] << p1_hole << p2_hole \
+          << flop_community << turn_community << river_community
+
+      Deck.new(cheat=true, cheat_cards=cards.flatten)
+    end
+
+    def card(suit, rank)
+      Card.new(suit, rank)
+    end
 
 end
 
