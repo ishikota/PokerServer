@@ -37,9 +37,13 @@ class RoundManager
     start_street(@street, table)
   end
 
-  def apply_action(table, action, bet_amount)
-    # TODO convert illegal action into fold action
-    # if illegal then remove last action_history and add fold history
+  def apply_action(table, action, bet_amount, action_checker)
+
+    if action_checker.illegal?(action)
+      action = 'fold'
+      table.seats.players[@next_player].invalidate_last_action
+    end
+
     if action == 'call'
       table.seats.collect_bet(@next_player, bet_amount)
       table.pot.add_chip(bet_amount)

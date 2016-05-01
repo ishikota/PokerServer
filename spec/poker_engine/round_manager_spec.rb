@@ -35,6 +35,7 @@ RSpec.describe RoundManager do
     let(:table) { double("table") }
     let(:pot) { double("pot") }
     let(:seats) { seat_with_active_players }
+    let(:action_checker) { double("action checker") }
 
     before {
       allow(pot).to receive(:add_chip)
@@ -44,6 +45,7 @@ RSpec.describe RoundManager do
       allow(table).to receive(:pot).and_return(pot)
       allow(table).to receive(:seats).and_return(seats)
       allow(broadcaster).to receive(:ask)
+      allow(action_checker).to receive(:illegal?).and_return false
     }
 
     describe "apply passed action to table" do
@@ -54,12 +56,12 @@ RSpec.describe RoundManager do
           expect(seats).to receive(:collect_bet).with(0, 5)
           expect(pot).to receive(:add_chip).with(5)
 
-          round_manager.apply_action(table, 'call', 5)
+          round_manager.apply_action(table, 'call', 5, action_checker)
         end
 
         it "should increment agree_num" do
           expect {
-            round_manager.apply_action(table, 'call', 5)
+            round_manager.apply_action(table, 'call', 5, action_checker)
           }.to change { round_manager.agree_num }.by(1)
         end
       end
@@ -73,7 +75,7 @@ RSpec.describe RoundManager do
         it "should deactivate player" do
           expect(seats).to receive(:deactivate).with(0)
 
-          round_manager.apply_action(table, 'fold', nil)
+          round_manager.apply_action(table, 'fold', nil, action_checker)
         end
       end
 
@@ -83,18 +85,27 @@ RSpec.describe RoundManager do
           expect(seats).to receive(:collect_bet).with(0, 5)
           expect(pot).to receive(:add_chip).with(5)
 
-          round_manager.apply_action(table, 'raise', 5)
+          round_manager.apply_action(table, 'raise', 5, action_checker)
         end
 
         it "should reset agree_num" do
-          round_manager.apply_action(table, 'raise', 5)
+          round_manager.apply_action(table, 'raise', 5, action_checker)
           expect(round_manager.agree_num).to eq 1
         end
       end
 
       context "when passed action is illegal" do
+        before {
+          allow(action_checker).to receive(:illegal?).and_return(true)
+        }
 
-        it "should accept the action as fold"
+        it "should accept the action as fold" do
+          expect(seats).to receive(:deactivate).with(0)
+          expect(seats.players[0]).to receive(:invalidate_last_action)
+
+          round_manager.apply_action(table, 'raise', 100, action_checker)
+          expect(round_manager.agree_num).to eq 0
+        end
 
       end
 
@@ -106,7 +117,7 @@ RSpec.describe RoundManager do
         expect(broadcaster).to receive(:ask).with(1, "TODO")
 
         expect {
-          round_manager.apply_action(table, 'call', nil)
+          round_manager.apply_action(table, 'call', nil, action_checker)
         }.to change { round_manager.next_player }.by(1)
       end
 
