@@ -39,12 +39,6 @@ class PokerPlayer
     end
   end
 
-  def invalidate_last_action
-    raise 'Try to invalidate last action but no action history is found' if action_histories.empty?
-    action_histories.pop
-    action_histories << fold_history
-  end
-
   class PayInfo
     attr_reader :amount, :status
 
