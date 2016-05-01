@@ -102,12 +102,12 @@ RSpec.describe RoundManager do
         }
 
         it "should forward to RIVER" do
-          round_manager.apply_action(table, 'raise', 10, action_checker)
+          round_manager.apply_action(table, 'call', 0, action_checker)
           expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
           expect(broadcaster).to receive(:notification).with("RIVER starts")
 
           expect {
-            round_manager.apply_action(table, 'call', 10, action_checker)
+            round_manager.apply_action(table, 'call', 0, action_checker)
           }.to change { round_manager.street }.to(RoundManager::RIVER)
           .and change { table.community_card.cards.size }.from(4).to(5)
         end
