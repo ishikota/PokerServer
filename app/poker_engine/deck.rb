@@ -1,7 +1,15 @@
 class Deck
 
-  def initialize
-    setup_52_cards
+  # HOW TO CHEAT
+  # deck = Deck.new(cheat=true, chat_cards=[card1, card2, card3])
+  # > deck.draw_card
+  # => card1
+  def initialize(cheat=false, cheat_cards=nil)
+    if cheat
+      setup_cheat_deck(cheat_cards)
+    else
+      setup_52_cards
+    end
   end
 
   def draw_card
@@ -23,6 +31,10 @@ class Deck
       for id in 1..52
         @deck << Card.from_id(id)
       end
+    end
+
+    def setup_cheat_deck(cards)
+      @deck = cards.reverse
     end
 end
 

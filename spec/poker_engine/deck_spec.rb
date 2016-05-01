@@ -24,5 +24,14 @@ RSpec.describe Deck do
 
   end
 
+  describe "cheat mode" do
+    let(:cheat_deck) { Deck.new(cheat=true, cheat_cards=cards) }
+    let(:cards) { [double("card1"), double("card2"), double("card3")] }
+
+    it "should draw passed card" do
+      expect(cheat_deck.draw_cards(3)).to eq cards
+    end
+  end
+
 end
 
