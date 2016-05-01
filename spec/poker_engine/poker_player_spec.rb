@@ -4,6 +4,42 @@ RSpec.describe PokerPlayer do
 
   let(:player) { PokerPlayer.new(100) }
 
+  describe "add_holecard" do
+
+    describe "pass wrong number of card" do
+
+      it "should raise error" do
+        expect { player.add_holecard([create_mock_card(2,2)]) }.to raise_error
+        expect { player.add_holecard(create_mock_card(2,2)) }.to raise_error
+        expect { player.add_holecard(
+          [create_mock_card(2,2), create_mock_card(2,2), create_mock_card(2,2)])
+        }.to raise_error
+      end
+
+    end
+
+    context "when already has hole card" do
+      before {
+        player.add_holecard([create_mock_card(2,2), create_mock_card(4,4)])
+      }
+
+      it "should raise error" do
+        expect { player.add_holecard(
+          [create_mock_card(2,2), create_mock_card(2,2)])
+        }.to raise_error
+      end
+    end
+
+
+    it "should success"  do
+      cards = [create_mock_card(2,2), create_mock_card(4,4)]
+      player.add_holecard(cards)
+      expect(player.hole_card).to include cards[0]
+      expect(player.hole_card).to include cards[1]
+    end
+
+  end
+
   describe "#collect_bet" do
 
     it "should collect bet from player's stack" do
@@ -141,6 +177,14 @@ RSpec.describe PokerPlayer do
     end
 
   end
+
+  private
+
+    def create_mock_card(rank, suit)
+      card = double("Card rank:#{rank}, suit#{suit}")
+      allow(card).to receive(:is_a?).with(Card).and_return true
+      card
+    end
 
 end
 

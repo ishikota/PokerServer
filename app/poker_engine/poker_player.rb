@@ -1,7 +1,8 @@
 class PokerPlayer
-  attr_reader :stack, :pay_info, :action_histories
+  attr_reader :stack, :pay_info, :action_histories, :hole_card
 
   def initialize(initial_stack)
+    @hole_card = []
     @stack = initial_stack
     @active = true
   end
@@ -26,6 +27,14 @@ class PokerPlayer
   def init_pay_info
     @pay_info = PayInfo.new
   end
+
+  def add_holecard(cards)
+    raise "Hole card is already set" unless @hole_card.empty?
+    raise "You passing wrong number of cards #{cards.size}" unless cards.size == 2
+    raise "what you are passing are not cards" unless cards.map { |card| card.is_a?(Card) }.all?
+    @hole_card = cards
+  end
+
 
   def add_action_history(kind, chip_amount=nil)
     if kind == ACTION::FOLD
