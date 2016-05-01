@@ -122,7 +122,8 @@ RSpec.describe RoundManager do
 
         it "should accept the action as fold" do
           expect(seats).to receive(:deactivate).with(0)
-          expect(seats.players[0]).to receive(:invalidate_last_action)
+          expect(seats.players[0]).to receive(:add_action_history)
+              .with(PokerPlayer::ACTION::FOLD)
 
           round_manager.apply_action(table, 'raise', 100, action_checker)
           expect(round_manager.agree_num).to eq 0

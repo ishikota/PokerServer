@@ -39,10 +39,7 @@ class RoundManager
 
   def apply_action(table, action, bet_amount, action_checker)
 
-    if action_checker.illegal?(action)
-      action = 'fold'
-      table.seats.players[@next_player].invalidate_last_action
-    end
+    action = 'fold' if action_checker.illegal?(action)
 
     if action == 'call'
       table.seats.collect_bet(@next_player, bet_amount)

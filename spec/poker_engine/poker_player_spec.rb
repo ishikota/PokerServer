@@ -142,35 +142,5 @@ RSpec.describe PokerPlayer do
 
   end
 
-  describe "invalidate_last_action" do
-
-    before {
-      player.init_action_histories
-    }
-
-    context "when last action was CALL" do
-
-      before {
-        player.add_action_history(PokerPlayer::ACTION::CALL, 10)
-      }
-
-      it "should replace last action with fold action" do
-        player.invalidate_last_action
-        expect(player.action_histories.size).to eq 1
-        expect(player.action_histories.last["action"]).to eq "FOLD"
-      end
-    end
-
-    context "called when no action_histories" do
-
-      it "should raise error" do
-        expect {
-          player.invalidate_last_action
-        }.to raise_error
-      end
-    end
-  end
-
-
 end
 
