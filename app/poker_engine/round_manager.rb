@@ -31,7 +31,7 @@ class RoundManager
 
     # collect blind
     table.seats.collect_bet(table.dealer_btn, small_blind)
-    table.seats.collect_bet(shift_next_player(exec_shift=false, table.dealer_btn), small_blind * 2)
+    table.seats.collect_bet(shift_next_player(exec_shift=false, table.seats), small_blind * 2)
 
     @broadcaster.notification("round info")
     start_street(@street, table)
