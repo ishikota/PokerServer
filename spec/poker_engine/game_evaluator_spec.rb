@@ -6,15 +6,17 @@ RSpec.describe GameEvaluator do
   let(:seats) { double("seats") }
   let(:pot) { double("pot") }
   let(:players) { [] }
+  let(:community_card) { double("community card") }
   let(:hand_evaluator) { double("hand evaluator") }
   let(:game_evaluator) { GameEvaluator.new(hand_evaluator) }
 
   before {
-    allow(table).to receive(:community_card)
+    allow(table).to receive(:community_card).and_return(community_card)
     allow(table).to receive(:pot).and_return(pot)
     allow(table).to receive(:seats).and_return(seats)
     allow(seats).to receive(:players).and_return(players)
     allow(hand_evaluator).to receive(:eval_hand)
+    allow(community_card).to receive(:cards)
   }
 
   describe "#judge" do

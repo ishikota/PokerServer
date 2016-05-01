@@ -5,7 +5,7 @@ class GameEvaluator
   end
 
   def judge(table)
-    winners = find_winner_from(table.community_card, table.seats.players)
+    winners = find_winner_from(table.community_card.cards, table.seats.players)
     prize_map = calc_prize_distribution(table.pot, winners, table.seats.players)
     return [winners, prize_map]
   end
