@@ -37,11 +37,23 @@ RSpec.describe Deck do
 
   describe "cheat mode" do
     let(:cheat_deck) { Deck.new(cheat=true, cheat_cards=cards) }
-    let(:cards) { [double("card1"), double("card2"), double("card3")] }
+    let(:cards) {
+      [Card.new(Card::CLUB, 2), Card.new(Card::SPADE, 3), Card.new(Card::CLUB, 4) ]
+    }
 
     it "should draw passed card" do
       expect(cheat_deck.draw_cards(3)).to eq cards
     end
+
+    describe "restore" do
+
+      it "should restore cheat deck" do
+        cheat_deck.draw_cards(3)
+        expect { cheat_deck.restore }.to change { cheat_deck.size }.to cards.size
+        expect(cheat_deck.draw_cards(3)).to eq cards
+      end
+    end
+
   end
 
 end

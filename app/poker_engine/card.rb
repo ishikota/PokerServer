@@ -17,6 +17,10 @@ class Card
     @rank = rank
   end
 
+  def ==(other)
+    rank == other.rank && suit == other.suit
+  end
+
   def to_s
     "#{SUIT_MAP[@suit]}#{RANK_MAP[@rank]}"
   end

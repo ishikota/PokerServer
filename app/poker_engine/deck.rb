@@ -5,11 +5,9 @@ class Deck
   # > deck.draw_card
   # => card1
   def initialize(cheat=false, cheat_cards=nil)
-    if cheat
-      setup_cheat_deck(cheat_cards)
-    else
-      setup_52_cards
-    end
+    @cheat = cheat
+    remember_cheat_cards(cheat_cards) if cheat
+    @deck = setup
   end
 
   def draw_card
@@ -25,20 +23,27 @@ class Deck
   end
 
   def restore
-    setup_52_cards
+    @deck = setup
   end
 
   private
 
-    def setup_52_cards
-      @deck = []
-      for id in 1..52
-        @deck << Card.from_id(id)
-      end
+    def setup
+      @cheat ? setup_cheat_deck : setup_52_cards
     end
 
-    def setup_cheat_deck(cards)
-      @deck = cards.reverse
+    def setup_52_cards
+      (1..52).map { |i| Card.from_id(i) }
     end
+
+    def setup_cheat_deck
+      cards = @cheat_card_ids.map { |id| Card.from_id(id) }
+      cards.reverse
+    end
+
+    def remember_cheat_cards(cards)
+      @cheat_card_ids = cards.map { |card| card.to_id }
+    end
+
 end
 
