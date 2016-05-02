@@ -22,16 +22,24 @@ class Dealer
     apply_action(action, bet_amount)
   end
 
-  # Called from RoundManager when round has finished
-  def teardown_round(winners, accounting_info)
+  def finish_round(winners, accounting_info)
+    @broadcaster.notification(game_result_message(@table, winners, accounting_info))
+    teardown_round
+  end
+
+  def teardown_round
     if @round_count == @config.max_round
       teardown_game
     else
       @round_count += 1
+      @table.shift_dealer_btn
       start_round
     end
   end
 
+  def teardown_game
+    @broadcaster.notification(goodbye_message)
+  end
 
   # private
 
@@ -51,6 +59,14 @@ class Dealer
 
     def game_information_message
       "TODO game info"
+    end
+
+    def game_result_message(table, winners, accounting_info)
+      "TODO game result"
+    end
+
+    def goodbye_message
+      "TODO goodbye"
     end
 
     def apply_action(action, bet_amount)

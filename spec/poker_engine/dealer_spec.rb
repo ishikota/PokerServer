@@ -71,61 +71,72 @@ RSpec.describe "Dealer" do
 
   end
 
-  describe "#resume_round" do
-
-    it "should pass received action to round_manager and resume game"
-
-  end
-
   describe "#finish_round" do
+    let(:player1) { double("player1") }
+    let(:player2) { double("player2") }
+    let(:winners) { [player1] }
+    let(:accounting_info) { { 1 => 20 } }
+    let(:community_card) { double("community card") }
 
-    it "should notify game result"
+    before {
+      allow(table).to receive(:community_card).and_return(community_card)
+      allow(table).to receive(:shift_dealer_btn)
+      allow(broadcaster).to receive(:notification)
+      allow(config).to receive(:max_round).and_return(10)
+    }
 
-    it "should call teardown_round"
+    it "should notify game result" do
+      allow(table).to receive(:shift_dealer_btn)
+      allow(round_manager).to receive(:start_new_round)
+      expect(broadcaster).to receive(:notification).with("TODO game result")
 
-  end
-
-  describe "#teardown_round" do
-
-    describe "prepare for next round" do
-
-      it "should shift dealer button position"
-
-      it "should clear pot chip"
-
-      it "should clear board card"
-
-      it "should shuffule deck"
-
-      it "should get folded or allin players back"
-
+      dealer.finish_round(winners, accounting_info)
     end
 
-    context "when last game was not final round" do
+    describe "#teardown_round" do
 
-      it "should start to setup next round"
+      context "when last game was not final round" do
 
-      it "should shift dealer button position"
+        it "should shift dealer button position" do
+          allow(round_manager).to receive(:start_new_round)
+          expect(table).to receive(:shift_dealer_btn)
 
+          dealer.finish_round(winners, accounting_info)
+        end
+
+        it "should start next round" do
+          expect(round_manager).to receive(:start_new_round)
+
+          dealer.finish_round(winners, accounting_info)
+        end
+      end
+
+      context "when last game was final round" do
+
+        before {
+          allow(config).to receive(:max_round).and_return(0)
+        }
+
+        it "should not start the next game" do
+          expect(round_manager).not_to receive(:start_new_round)
+
+          dealer.finish_round(winners, accounting_info)
+        end
+
+
+        it "should teardown the game and say goodbye to players" do
+          expect(broadcaster).to receive(:notification).with("TODO goodbye")
+
+          dealer.finish_round(winners, accounting_info)
+        end
+      end
+
+      context "when winner is decided" do
+
+        it "should teardown the game"
+
+      end
     end
-
-    context "when last game was final round" do
-
-      it "should teardown the game"
-
-    end
-
-    context "when winner is decided" do
-
-      it "should teardown the game"
-
-    end
-
-  end
-
-  describe "#teardown_game" do
-
-    it "should send game result and say goodbye"
 
   end
 
