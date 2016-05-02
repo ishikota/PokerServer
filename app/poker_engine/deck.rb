@@ -24,6 +24,10 @@ class Deck
     @deck.size
   end
 
+  def restore
+    setup_52_cards
+  end
+
   private
 
     def setup_52_cards

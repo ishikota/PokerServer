@@ -24,6 +24,17 @@ RSpec.describe Deck do
 
   end
 
+  describe "restore" do
+
+    before {
+      deck.draw_cards(5)
+    }
+
+    it "should restore 52 cards to deck" do
+      expect { deck.restore }.to change { deck.size }.to 52
+    end
+  end
+
   describe "cheat mode" do
     let(:cheat_deck) { Deck.new(cheat=true, cheat_cards=cards) }
     let(:cards) { [double("card1"), double("card2"), double("card3")] }
