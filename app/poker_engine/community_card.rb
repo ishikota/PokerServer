@@ -10,6 +10,10 @@ class CommunityCard
     @cards << card
   end
 
+  def clear
+    @cards = []
+  end
+
   private
 
     def full_msg
