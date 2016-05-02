@@ -286,7 +286,16 @@ RSpec.describe RoundManager do
       allow(broadcaster).to receive(:notification)
       allow(table).to receive(:dealer_btn).and_return(0)
       allow(table).to receive(:seats).and_return(seats)
+      allow(table).to receive(:reset)
     }
+
+    it "should clear table state like before the round" do
+      allow(finish_callback).to receive(:call)
+      allow(game_evaluator).to receive(:judge)
+      expect(table).to receive(:reset)
+
+      round_manager.start_street(RoundManager::SHOWDOWN, table)
+    end
 
     it "should call dealer's callback with game result" do
       expect(finish_callback).to receive(:call).with("dummy player", "accounting info")

@@ -151,6 +151,15 @@ RSpec.describe RoundManager do
             round_manager.apply_action(table, 'call', 0, action_checker)
             round_manager.apply_action(table, 'call', 0, action_checker)
           end
+
+          it "should clear the round state for next round" do
+            round_manager.apply_action(table, 'call', 0, action_checker)
+            round_manager.apply_action(table, 'call', 0, action_checker)
+
+            expect(table.pot.main).to eq 0
+            expect(table.community_card.cards.size).to eq 0
+            expect(table.deck.size).to eq cheat_deck.size
+          end
         end
 
       end

@@ -115,6 +115,7 @@ class RoundManager
 
   def showdown(table)
     winner, accounting_info = @game_evaluator.judge(table)
+    table.reset
     @callback.call(winner, accounting_info)
   end
 
