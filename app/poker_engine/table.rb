@@ -15,5 +15,11 @@ class Table
     @community_card.clear
   end
 
+  def shift_dealer_btn
+    begin
+      @dealer_btn = (@dealer_btn + 1) % @seats.size
+    end until @seats.players[@dealer_btn].active?
+  end
+
 end
 

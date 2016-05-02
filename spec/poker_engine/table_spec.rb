@@ -42,5 +42,55 @@ RSpec.describe Table do
 
   end
 
+  describe "shift_dealer_btn" do
+    let(:players) do
+      (1..3).inject([]) { |acc, i| acc << double("player#{i}") }
+    end
+
+    before {
+      for player in players
+        allow(player).to receive(:active?).and_return(true)
+        table.seats.sitdown(player)
+      end
+    }
+
+    describe "when next player is active" do
+
+      it "should shift to next player" do
+        expect {
+          table.shift_dealer_btn
+        }.to change { table.dealer_btn }.to(1)
+      end
+    end
+
+    describe "when next player is not active" do
+
+      before {
+        allow(players[1]).to receive(:active?).and_return(false) }
+
+      it "should skip next player" do
+        expect {
+          table.shift_dealer_btn
+        }.to change { table.dealer_btn }.to(2)
+      end
+    end
+
+    describe "cycle shift position to head" do
+
+      before {
+        table.shift_dealer_btn
+        table.shift_dealer_btn
+      }
+
+      it "should shift to first player" do
+        expect {
+          table.shift_dealer_btn
+        }.to change { table.dealer_btn }.to(0)
+      end
+    end
+
+
+  end
+
 end
 
