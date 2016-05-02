@@ -9,5 +9,9 @@ class Pot
     @main += amount
   end
 
+  def clear
+    @main = 0
+  end
+
 end
 

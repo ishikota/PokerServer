@@ -11,5 +11,14 @@ RSpec.describe Pot do
     end
   end
 
+  describe "clear" do
+
+    before { pot.add_chip(5) }
+
+    it "should clear the chip" do
+      expect { pot.clear }.to change { pot.main }.to(0)
+    end
+  end
+
 end
 
