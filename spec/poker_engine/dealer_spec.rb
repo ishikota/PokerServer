@@ -60,11 +60,14 @@ RSpec.describe "Dealer" do
 
   end
 
-  describe "#start_round" do
+  describe "#receive_data" do
 
-    it "should broadcast start of the round for everyone in the room"
+    it "should pass received action to round_manager and resume game" do
+      expect(round_manager).to receive(:apply_action)
+          .with(table, "call", 10, action_checker)
 
-    it "should notify start to round manager"
+      dealer.receive_data(0, { "action" => "call", "bet_amount" => 10 })
+    end
 
   end
 

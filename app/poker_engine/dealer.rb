@@ -12,14 +12,24 @@ class Dealer
 
   def start_game(player_info)
     players = player_info.map { |info| create_player(info) }
-
     set_player_to_seat(players)
-
     @broadcaster.notification(game_information_message)
-
     start_round
+  end
 
-    # notify game start
+  def receive_data(player_id, data)
+    action, bet_amount = fetch_action_from_data(data)
+    apply_action(action, bet_amount)
+  end
+
+  # Called from RoundManager when round has finished
+  def teardown_round(winners, accounting_info)
+    if @round_count == @config.max_round
+      teardown_game
+    else
+      @round_count += 1
+      start_round
+    end
   end
 
 
@@ -41,6 +51,16 @@ class Dealer
 
     def game_information_message
       "TODO game info"
+    end
+
+    def apply_action(action, bet_amount)
+      @round_manager.apply_action(@table, action, bet_amount, @action_checker)
+    end
+
+    def fetch_action_from_data(data)
+      action = data["action"]
+      bet_amount = data["bet_amount"]
+      [action, bet_amount]
     end
 
 
