@@ -15,5 +15,32 @@ RSpec.describe Table do
     end
   end
 
+  describe "reset" do
+
+    before {
+      table.pot.add_chip(53)
+      5.times { table.community_card.add(table.deck.draw_card) }
+    }
+
+    it "should clear pot" do
+      expect { table.reset }.to change {
+        table.pot.main
+      }.to(0)
+    end
+
+    it "should reset deck (do not need to shuffle)" do
+      expect { table.reset }.to change {
+        table.deck.size
+      }.to(52)
+    end
+
+    it "should clear community card" do
+      expect { table.reset }.to change {
+        table.community_card.cards.size
+      }.to(0)
+    end
+
+  end
+
 end
 

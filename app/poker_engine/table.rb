@@ -9,6 +9,11 @@ class Table
     @community_card = CommunityCard.new
   end
 
+  def reset
+    @deck.restore
+    @pot.clear
+    @community_card.clear
+  end
 
 end
 
