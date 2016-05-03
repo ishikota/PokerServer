@@ -75,6 +75,21 @@ RSpec.describe Dealer do
       end
     end
 
+    context "one player fold the first game" do
+
+      it "should activate folded player in teardown raound" do
+        # first round
+        dealer.receive_data(0, call_msg(10))
+        dealer.receive_data(0, raise_msg(10))
+        dealer.receive_data(1, fold_msg)
+        # second round
+        play_a_round(dealer)
+
+        expect(table.seats.players[0].stack).to eq 100
+        expect(table.seats.players[1].stack).to eq 100
+      end
+    end
+
   end
 
 
