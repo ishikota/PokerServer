@@ -33,8 +33,18 @@ RSpec.describe Dealer do
   describe "play a round" do
     let(:config) { Config.new(initial_stack=100, max_round=0) }
 
+    before { dealer.start_game(["dummy", "info"]) }
+
+    it "should finish by player 1 win" do
+      dealer.receive_data(0, call_msg(10))
+      dealer.receive_data(0, raise_msg(10))
+      dealer.receive_data(1, fold_msg)
+
+      expect(table.seats.players[0].stack).to eq 110
+      expect(table.seats.players[1].stack).to eq 90
+    end
+
     it "should finish by player 2 win" do
-      dealer.start_game(["dummy", "info"])
       play_a_round(dealer)
 
       expect(table.seats.players[0].stack).to eq 90
@@ -46,17 +56,23 @@ RSpec.describe Dealer do
   describe "play two rounds successibly" do
     let(:config) { Config.new(initial_stack=100, max_round=1) }
 
-    it "should finish by player 2 win" do
+    before {
       expect(broadcaster).to receive(:notification).with("round info").twice
       expect(broadcaster).to receive(:notification).with("TODO game result").twice
       expect(broadcaster).to receive(:notification).with("TODO goodbye")
 
       dealer.start_game(["dummy", "info"])
-      play_a_round(dealer)
-      play_a_round(dealer)
+    }
 
-      expect(table.seats.players[0].stack).to eq 80
-      expect(table.seats.players[1].stack).to eq 120
+    context "just call both of players untill end" do
+
+      it "should finish by player 2 win" do
+        play_a_round(dealer)
+        play_a_round(dealer)
+
+        expect(table.seats.players[0].stack).to eq 80
+        expect(table.seats.players[1].stack).to eq 120
+      end
     end
 
   end

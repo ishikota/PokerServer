@@ -11,9 +11,11 @@ class GameEvaluator
   end
 
   def find_winner_from(community_card, players)
-    players.group_by { |player|
-      @hand_evaluator.eval_hand(player.hole_card, community_card)
-    }.max.last
+    players
+      .select { |player| player.active? }
+      .group_by { |player|
+        @hand_evaluator.eval_hand(player.hole_card, community_card)
+      }.max.last
   end
 
   def create_side_pot(players)
@@ -31,7 +33,7 @@ class GameEvaluator
         winners.include?(player)
       }.reduce({}) { |map, player_with_idx|
         _, idx = player_with_idx
-        map.merge( { idx => prize } )
+        map.merge( { idx => prize / winners.size } )
       }
     end
 

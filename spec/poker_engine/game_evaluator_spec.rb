@@ -23,23 +23,39 @@ RSpec.describe GameEvaluator do
       3.times do |i|
         player = create_player_with_pay_info(i, 5, PokerPlayer::PayInfo::PAY_TILL_END)
         allow(player).to receive(:hole_card)
+        allow(player).to receive(:active?).and_return(true)
         players << player
       end
     }
 
     describe "without all-in player" do
 
-      describe "second player is winner" do
+      before {
+        allow(hand_evaluator).to receive(:eval_hand).and_return(0, 1, 0)
+      }
 
-        before {
-          allow(hand_evaluator).to receive(:eval_hand).and_return(0, 1, 0)
-        }
+      describe "second player is winner" do
 
         it "should return winner and prize distribution" do
           winner, prize_map = game_evaluator.judge(table)
           expect(winner.size).to eq 1
           expect(winner).to include players[1]
           expect(prize_map[1]).to eq 15
+        end
+      end
+
+      context "but second player is folded the game" do
+
+        before {
+          allow(hand_evaluator).to receive(:eval_hand).and_return(0, 0)
+          allow(players[1]).to receive(:active?).and_return(false)
+        }
+
+        it "should not choose second player as winner" do
+          winners, prize_map = game_evaluator.judge(table)
+          expect(winners.size).to eq 2
+          expect(prize_map[0]).to eq 7
+          expect(prize_map[2]).to eq 7
         end
       end
 
@@ -70,6 +86,7 @@ RSpec.describe GameEvaluator do
       3.times do |i|
         player = double("player#{i}")
         allow(player).to receive(:hole_card)
+        allow(player).to receive(:active?).and_return(true)
         players << player
       end
     }
