@@ -118,10 +118,11 @@ RSpec.describe RoundManager do
         before {
           allow(seats).to receive(:deactivate)
           allow(seats).to receive(:count_active_player)
+          allow(seats.players[0].pay_info).to receive(:update_to_fold)
         }
 
         it "should deactivate player" do
-          expect(seats).to receive(:deactivate).with(0)
+          expect(seats.players[0].pay_info).to receive(:update_to_fold)
 
           round_manager.apply_action(table, 'fold', nil, action_checker)
         end
@@ -182,7 +183,7 @@ RSpec.describe RoundManager do
         }
 
         it "should accept the action as fold" do
-          expect(seats).to receive(:deactivate).with(0)
+          expect(seats.players[0].pay_info).to receive(:update_to_fold)
           expect(seats.players[0]).to receive(:add_action_history)
               .with(PokerPlayer::ACTION::FOLD)
 

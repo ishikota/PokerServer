@@ -61,10 +61,26 @@ RSpec.describe PokerPlayer do
 
   end
 
-  describe "#deactivate" do
+  describe "#active?" do
 
-    it "should deactivate player" do
-      expect { player.deactivate }.to change { player.active? }
+    it "should be active" do
+      player.pay_info.update_by_pay(10)
+      expect(player.active?).to be_truthy
+    end
+
+    specify "allin player is not active" do
+      player.pay_info.update_to_allin(10)
+      expect(player.active?).to be_falsy
+    end
+
+    specify "folded player is not active" do
+      player.pay_info.update_to_fold
+      expect(player.active?).to be_falsy
+    end
+
+    specify "no money player is not active" do
+      player.collect_bet(100)
+      expect(player.active?).to be_falsy
     end
 
   end

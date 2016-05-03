@@ -41,20 +41,6 @@ RSpec.describe Seats do
 
   end
 
-  describe "#deactivate" do
-
-    let(:player2) { double("player2") }
-    before {
-      seats.sitdown(player)
-      seats.sitdown(player2)
-    }
-
-    it "should deactivate specified player" do
-      expect(player2).to receive(:deactivate)
-      seats.deactivate(1)
-    end
-  end
-
   describe "#count_active_player" do
     let(:player2) { double("player2") }
 

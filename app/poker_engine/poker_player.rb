@@ -5,7 +5,6 @@ class PokerPlayer
     @name = name
     @hole_card = []
     @stack = initial_stack
-    @active = true
     @action_histories = []
     @pay_info = PayInfo.new
   end
@@ -15,12 +14,8 @@ class PokerPlayer
     @stack -= amount
   end
 
-  def deactivate
-    @active = false
-  end
-
   def active?
-    @active
+    @pay_info.status == PayInfo::PAY_TILL_END && @stack != 0
   end
 
   def clear_holecard
