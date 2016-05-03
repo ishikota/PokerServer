@@ -65,21 +65,34 @@ RSpec.describe Dealer do
   private
 
     def play_a_round(dealer)
-      dealer.receive_data(0, call_action_message(10))
+      dealer.receive_data(0, call_msg(10))
       # FLOP start
-      dealer.receive_data(0, call_action_message(0))
-      dealer.receive_data(1, call_action_message(0))
+      dealer.receive_data(0, call_msg(0))
+      dealer.receive_data(1, call_msg(0))
       # TURN start
-      dealer.receive_data(0, call_action_message(0))
-      dealer.receive_data(1, call_action_message(0))
+      dealer.receive_data(0, call_msg(0))
+      dealer.receive_data(1, call_msg(0))
       # RIVER start
-      dealer.receive_data(0, call_action_message(0))
-      dealer.receive_data(1, call_action_message(0))
+      dealer.receive_data(0, call_msg(0))
+      dealer.receive_data(1, call_msg(0))
     end
 
-    def call_action_message(bet_amount)
-      { "action" => "call", "bet_amount" => bet_amount }
+    def call_msg(bet_amount)
+      base_msg("call", bet_amount)
     end
+
+    def fold_msg
+      base_msg("fold", 0)
+    end
+
+    def raise_msg(bet_amount)
+      base_msg("raise", bet_amount)
+    end
+
+    def base_msg(action, bet_amount)
+      { "action" => action, "bet_amount" => bet_amount }
+    end
+
 
     C = Card::CLUB
     D = Card::DIAMOND
