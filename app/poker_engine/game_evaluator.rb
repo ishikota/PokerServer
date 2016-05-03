@@ -6,7 +6,7 @@ class GameEvaluator
 
   def judge(table)
     winners = find_winner_from(table.community_card.cards, table.seats.players)
-    prize_map = calc_prize_distribution(table.pot, winners, table.seats.players)
+    prize_map = calc_prize_distribution(winners, table.seats.players)
     return [winners, prize_map]
   end
 
@@ -25,8 +25,8 @@ class GameEvaluator
 
   private
 
-    def calc_prize_distribution(pot, winners, players)
-      prize = pot.main/winners.size
+    def calc_prize_distribution(winners, players)
+      prize = get_main_pot(players, [])[:amount]  #TODO use get_side_pot
       players.each_with_index.select { |player, idx|
         winners.include?(player)
       }.reduce({}) { |map, player_with_idx|

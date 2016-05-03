@@ -4,7 +4,6 @@ RSpec.describe GameEvaluator do
 
   let(:table) { double("table") }
   let(:seats) { double("seats") }
-  let(:pot) { double("pot") }
   let(:players) { [] }
   let(:community_card) { double("community card") }
   let(:hand_evaluator) { double("hand evaluator") }
@@ -12,7 +11,6 @@ RSpec.describe GameEvaluator do
 
   before {
     allow(table).to receive(:community_card).and_return(community_card)
-    allow(table).to receive(:pot).and_return(pot)
     allow(table).to receive(:seats).and_return(seats)
     allow(seats).to receive(:players).and_return(players)
     allow(hand_evaluator).to receive(:eval_hand)
@@ -23,17 +21,13 @@ RSpec.describe GameEvaluator do
 
     before {
       3.times do |i|
-        player = double("player#{i}")
+        player = create_player_with_pay_info(i, 5, PokerPlayer::PayInfo::PAY_TILL_END)
         allow(player).to receive(:hole_card)
         players << player
       end
     }
 
     describe "without all-in player" do
-      let(:pot_amount) { 10 }
-      before {
-        allow(pot).to receive(:main).and_return(pot_amount)
-      }
 
       describe "second player is winner" do
 
@@ -45,7 +39,7 @@ RSpec.describe GameEvaluator do
           winner, prize_map = game_evaluator.judge(table)
           expect(winner.size).to eq 1
           expect(winner).to include players[1]
-          expect(prize_map[1]).to eq pot_amount
+          expect(prize_map[1]).to eq 15
         end
       end
 
