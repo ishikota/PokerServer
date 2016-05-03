@@ -54,7 +54,6 @@ RSpec.describe RoundManager do
     context "when finished in PREFLOP" do
 
       before {
-        allow(game_evaluator).to receive(:judge)
         allow(finish_callback).to receive(:call)
         round_manager.start_new_round(table)
         round_manager.apply_action(table, 'fold', nil, action_checker)
@@ -63,6 +62,7 @@ RSpec.describe RoundManager do
       it "should reach showdown without asking" do
         expect(round_manager.street).to eq RoundManager::SHOWDOWN
       end
+
     end
 
     describe "forward next street" do
@@ -145,8 +145,16 @@ RSpec.describe RoundManager do
             }.to change { round_manager.street }.to(RoundManager::SHOWDOWN)
           end
 
-          it "should invoke callback with winner = player1" do
-            expect(finish_callback).to receive(:call).with([player2], { 1=>10 })
+          it "should update player's stack by game result" do
+            round_manager.apply_action(table, 'call', 0, action_checker)
+            round_manager.apply_action(table, 'call', 0, action_checker)
+
+            expect(table.seats.players[0].stack).to eq 90
+            expect(table.seats.players[1].stack).to eq 110
+          end
+
+          it "should invoke callback with winner = player2" do
+            expect(finish_callback).to receive(:call).with([player2], { 1=>20 })
 
             round_manager.apply_action(table, 'call', 0, action_checker)
             round_manager.apply_action(table, 'call', 0, action_checker)
@@ -156,7 +164,6 @@ RSpec.describe RoundManager do
             round_manager.apply_action(table, 'call', 0, action_checker)
             round_manager.apply_action(table, 'call', 0, action_checker)
 
-            expect(table.pot.main).to eq 0
             expect(table.community_card.cards.size).to eq 0
             expect(table.deck.size).to eq cheat_deck.size
           end
