@@ -395,8 +395,8 @@ RSpec.describe RoundManager do
       players =  (1..3).inject([]) do |acc, i|
         player = double("player#{i}")
         allow(player).to receive(:active?).and_return(true)
-        allow(player).to receive(:init_action_histories)
-        allow(player).to receive(:init_pay_info)
+        allow(player).to receive(:clear_action_histories)
+        allow(player).to receive(:clear_pay_info)
         allow(player).to receive(:add_action_history)
         acc << player
       end

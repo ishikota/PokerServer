@@ -5,6 +5,8 @@ class PokerPlayer
     @hole_card = []
     @stack = initial_stack
     @active = true
+    @action_histories = []
+    @pay_info = PayInfo.new
   end
 
   def collect_bet(amount)
@@ -20,11 +22,11 @@ class PokerPlayer
     @active
   end
 
-  def init_action_histories
+  def clear_action_histories
     @action_histories = []
   end
 
-  def init_pay_info
+  def clear_pay_info
     @pay_info = PayInfo.new
   end
 

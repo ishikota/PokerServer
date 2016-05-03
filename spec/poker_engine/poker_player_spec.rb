@@ -71,10 +71,6 @@ RSpec.describe PokerPlayer do
 
   describe "pay_info" do
 
-    before {
-      player.init_pay_info
-    }
-
     describe "#update" do
 
       context "by pay more chip" do
@@ -110,10 +106,6 @@ RSpec.describe PokerPlayer do
   end
 
   describe "add_action_history" do
-
-    before {
-      player.init_action_histories
-    }
 
     context "FOLD" do
 

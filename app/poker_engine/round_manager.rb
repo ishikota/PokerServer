@@ -140,8 +140,8 @@ class RoundManager
 
     def clear_player_log(players)
       for player in players
-        player.init_action_histories
-        player.init_pay_info
+        player.clear_action_histories
+        player.clear_pay_info
       end
     end
 
