@@ -156,7 +156,7 @@ RSpec.describe RoundManager do
           end
 
           it "should invoke callback with winner = player2" do
-            expect(finish_callback).to receive(:call).with([player2], { 1=>20 })
+            expect(finish_callback).to receive(:call).with([player2], { 0 => 0, 1=>20 })
 
             round_manager.apply_action(table, 'call', 0, action_checker)
             round_manager.apply_action(table, 'call', 0, action_checker)

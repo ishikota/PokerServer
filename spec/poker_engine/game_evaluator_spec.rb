@@ -19,19 +19,20 @@ RSpec.describe GameEvaluator do
 
   describe "#judge" do
 
-    before {
-      3.times do |i|
-        player = create_player_with_pay_info(i, 5, PokerPlayer::PayInfo::PAY_TILL_END)
-        allow(player).to receive(:hole_card)
-        allow(player).to receive(:active?).and_return(true)
-        players << player
-      end
-    }
+    let(:pay_till_end) { PokerPlayer::PayInfo::PAY_TILL_END }
+    let(:folded) { PokerPlayer::PayInfo::FOLDED }
+    let(:allin) { PokerPlayer::PayInfo::ALLIN }
 
     describe "without all-in player" do
 
       before {
-        allow(hand_evaluator).to receive(:eval_hand).and_return(0, 1, 0)
+        3.times do |i|
+          player = create_player_with_pay_info(i, 5, pay_till_end)
+          allow(player).to receive(:hole_card)
+          allow(player).to receive(:active?).and_return(true)
+          players << player
+        end
+        allow(hand_evaluator).to receive(:eval_hand).and_return(0, 1, 0, 0, 1, 0)
       }
 
       describe "second player is winner" do
@@ -63,16 +64,48 @@ RSpec.describe GameEvaluator do
 
     describe "when all-in player exists" do
 
+      before {
+        players << create_player_with_pay_info("A", 50, pay_till_end)
+        players << create_player_with_pay_info("B", 20, allin)
+        players << create_player_with_pay_info("C", 30, allin)
+        players.each do |player|
+          allow(player).to receive(:hole_card)
+          allow(player).to receive(:active?).and_return(true)
+        end
+      }
+
       context "and all-in player wins" do
 
-        it "should take side pot into consideratino"
+        example "B win (hand rank = B > C > A)" do
+          allow(hand_evaluator).to receive(:eval_hand).and_return(0,2,1,0,2,1,0,2,1)
+          winners, prize_map = game_evaluator.judge(table)
+
+          expect(prize_map[0]).to eq 20
+          expect(prize_map[1]).to eq 60
+          expect(prize_map[2]).to eq 20
+        end
+
+        example "B win (hand rank = B > A > C)" do
+          allow(hand_evaluator).to receive(:eval_hand).and_return(1,2,0,1,2,0,1,0)
+          winners, prize_map = game_evaluator.judge(table)
+
+          expect(prize_map[0]).to eq 40
+          expect(prize_map[1]).to eq 60
+          expect(prize_map[2]).to eq 0
+        end
 
       end
 
       context "but all-in player does not win" do
 
-        it "should give main and side pot to winner"
+        example "A win (hand rank = A > B > C)" do
+          allow(hand_evaluator).to receive(:eval_hand).and_return(2,1,0,2,1,0,2,0)
+          winners, prize_map = game_evaluator.judge(table)
 
+          expect(prize_map[0]).to eq 100
+          expect(prize_map[1]).to eq 0
+          expect(prize_map[2]).to eq 0
+        end
       end
 
     end
