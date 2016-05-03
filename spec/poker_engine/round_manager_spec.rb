@@ -158,6 +158,41 @@ RSpec.describe RoundManager do
 
     end
 
+    context "when everyone agreed" do
+
+      let(:deck) do
+        deck = double("deck")
+        allow(deck).to receive(:draw_cards).and_return([])
+        deck
+      end
+
+      before {
+        allow(seats).to receive(:count_active_player).and_return(3)
+        allow(table).to receive(:dealer_btn).and_return(0)
+        allow(table).to receive(:deck).and_return(deck)
+        allow(broadcaster).to receive(:notification)
+
+        round_manager.increment_agree_num
+        round_manager.increment_agree_num
+      }
+
+      it "should clear player's action history but not pay_info" do
+        seats.players.each { |player|
+          expect(player).to receive(:clear_action_histories)
+          expect(player).not_to receive(:clear_pay_info)
+        }
+
+        round_manager.apply_action(table, 'call', nil, action_checker)
+      end
+
+      it "should forward to next street" do
+        expect(broadcaster).to receive(:notification).with("FLOP starts")
+
+        round_manager.apply_action(table, 'call', nil, action_checker)
+      end
+
+    end
+
   end
 
   describe "#preflop" do

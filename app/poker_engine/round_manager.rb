@@ -28,7 +28,6 @@ class RoundManager
     @next_player = table.dealer_btn
     @street = PREFLOP
 
-    clear_player_log(table.seats.players)
     correct_blind(small_blind=5, table)
     deal_holecard(table.deck, table.seats.players)
 
@@ -64,7 +63,7 @@ class RoundManager
       start_street(@street, table)
     elsif everyone_agree?(table.seats)
       @street += 1
-      clear_player_log(table.seats.players)
+      clear_action_histories(table.seats.players)
       start_street(@street, table)
     else
       shift_next_player(table.seats)
@@ -138,10 +137,9 @@ class RoundManager
 
   private
 
-    def clear_player_log(players)
+    def clear_action_histories(players)
       for player in players
         player.clear_action_histories
-        player.clear_pay_info
       end
     end
 
