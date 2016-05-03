@@ -16,10 +16,14 @@ RSpec.describe Table do
   end
 
   describe "reset" do
+    let(:player) { double("player") }
 
     before {
       table.pot.add_chip(53)
       5.times { table.community_card.add(table.deck.draw_card) }
+      table.seats.sitdown(player)
+      allow(player).to receive(:clear_action_histories)
+      allow(player).to receive(:clear_pay_info)
     }
 
     it "should clear pot" do
@@ -38,6 +42,13 @@ RSpec.describe Table do
       expect { table.reset }.to change {
         table.community_card.cards.size
       }.to(0)
+    end
+
+    it "should reset player action log" do
+      expect(player).to receive(:clear_action_histories)
+      expect(player).to receive(:clear_pay_info)
+
+      table.reset
     end
 
   end

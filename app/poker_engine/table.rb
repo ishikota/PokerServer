@@ -13,6 +13,10 @@ class Table
     @deck.restore
     @pot.clear
     @community_card.clear
+    @seats.players.each { |player|
+      player.clear_action_histories
+      player.clear_pay_info
+    }
   end
 
   def shift_dealer_btn
