@@ -40,6 +40,12 @@ RSpec.describe PokerPlayer do
 
   end
 
+  describe "#append_chip" do
+    it "should append chip to player's stack" do
+      expect { player.append_chip(10) }.to change { player.stack }.by(10)
+    end
+  end
+
   describe "#collect_bet" do
 
     it "should collect bet from player's stack" do

@@ -28,6 +28,10 @@ class PokerPlayer
     @pay_info = PayInfo.new
   end
 
+  def append_chip(amount)
+    @stack += amount
+  end
+
   def add_holecard(cards)
     raise "Hole card is already set" unless @hole_card.empty?
     raise "You passing wrong number of cards #{cards.size}" unless cards.size == 2
