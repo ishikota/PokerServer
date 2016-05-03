@@ -24,19 +24,47 @@ RSpec.describe Dealer do
     }
   end
 
+  before {
+    allow(broadcaster).to receive(:ask)
+    allow(broadcaster).to receive(:notification)
+    allow(finish_callback).to receive(:call)
+  }
+
   describe "play a round" do
     let(:config) { Config.new(initial_stack=100, max_round=0) }
 
-    before {
-      allow(broadcaster).to receive(:ask)
-      allow(broadcaster).to receive(:notification)
-      allow(finish_callback).to receive(:call)
-    }
+    it "should finish by player 2 win" do
+      dealer.start_game(["dummy", "info"])
+      play_a_round(dealer)
+
+      expect(table.seats.players[0].stack).to eq 90
+      expect(table.seats.players[1].stack).to eq 110
+    end
+
+  end
+
+  describe "play two rounds successibly" do
+    let(:config) { Config.new(initial_stack=100, max_round=1) }
 
     it "should finish by player 2 win" do
+      expect(broadcaster).to receive(:notification).with("round info").twice
+      expect(broadcaster).to receive(:notification).with("TODO game result").twice
       expect(broadcaster).to receive(:notification).with("TODO goodbye")
 
       dealer.start_game(["dummy", "info"])
+      play_a_round(dealer)
+      play_a_round(dealer)
+
+      expect(table.seats.players[0].stack).to eq 80
+      expect(table.seats.players[1].stack).to eq 120
+    end
+
+  end
+
+
+  private
+
+    def play_a_round(dealer)
       dealer.receive_data(0, call_action_message(10))
       # FLOP start
       dealer.receive_data(0, call_action_message(0))
@@ -47,15 +75,7 @@ RSpec.describe Dealer do
       # RIVER start
       dealer.receive_data(0, call_action_message(0))
       dealer.receive_data(1, call_action_message(0))
-
-      expect(table.seats.players[0].stack).to eq 90
-      expect(table.seats.players[1].stack).to eq 110
     end
-
-  end
-
-
-  private
 
     def call_action_message(bet_amount)
       { "action" => "call", "bet_amount" => bet_amount }
