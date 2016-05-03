@@ -316,26 +316,36 @@ RSpec.describe RoundManager do
   describe "#showdown" do
     let(:table) { double("table") }
     let(:seats) { seat_with_active_players }
+    let(:winner) { seats.players[1] }
+    let(:accounting_info) { { 1 => 20 } }
 
     before {
       allow(broadcaster).to receive(:notification)
+      allow(finish_callback).to receive(:call)
+      allow(game_evaluator).to receive(:judge)
+          .and_return([[winner], accounting_info])
       allow(table).to receive(:dealer_btn).and_return(0)
       allow(table).to receive(:seats).and_return(seats)
       allow(table).to receive(:reset)
+      allow(winner).to receive(:append_chip)
     }
 
     it "should clear table state like before the round" do
-      allow(finish_callback).to receive(:call)
-      allow(game_evaluator).to receive(:judge)
       expect(table).to receive(:reset)
 
       round_manager.start_street(RoundManager::SHOWDOWN, table)
     end
 
     it "should call dealer's callback with game result" do
-      expect(finish_callback).to receive(:call).with("dummy player", "accounting info")
-      allow(game_evaluator).to receive(:judge)
-          .and_return(["dummy player", "accounting info"])
+      expect(finish_callback).to receive(:call).with([winner], accounting_info)
+
+      round_manager.start_street(RoundManager::SHOWDOWN, table)
+    end
+
+    it "should give prize to winner" do
+      loser = seats.players[0]
+      expect(winner).to receive(:append_chip).with(20)
+      expect(loser).not_to receive(:append_chip)
 
       round_manager.start_street(RoundManager::SHOWDOWN, table)
     end

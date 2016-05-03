@@ -114,6 +114,7 @@ class RoundManager
 
   def showdown(table)
     winner, accounting_info = @game_evaluator.judge(table)
+    prize_to_winner(table.seats.players, accounting_info)
     table.reset
     @callback.call(winner, accounting_info)
   end
@@ -159,6 +160,13 @@ class RoundManager
         player.add_holecard(deck.draw_cards(2))
       end
     end
+
+    def prize_to_winner(players, accounting_info)
+      accounting_info.each { |idx, prize|
+        players[idx].append_chip(prize)
+      }
+    end
+
 
 end
 
