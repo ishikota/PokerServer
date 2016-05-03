@@ -44,7 +44,6 @@ class RoundManager
     if action == 'call'
       need_amount = calc_chip_for_agree(table.seats.players[@next_player], bet_amount)
       table.seats.collect_bet(@next_player, need_amount)
-      table.pot.add_chip(need_amount)
       table.seats.players[@next_player]
           .add_action_history(PokerPlayer::ACTION::CALL, bet_amount)
       table.seats.players[@next_player].pay_info.update_by_pay(need_amount)
@@ -55,7 +54,6 @@ class RoundManager
     elsif action =='raise'
       need_amount = calc_chip_for_agree(table.seats.players[@next_player], bet_amount)
       table.seats.collect_bet(@next_player, need_amount)
-      table.pot.add_chip(need_amount)
       table.seats.players[@next_player]
           .add_action_history(PokerPlayer::ACTION::RAISE, bet_amount)
       table.seats.players[@next_player].pay_info.update_by_pay(need_amount)

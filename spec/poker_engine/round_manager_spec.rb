@@ -49,16 +49,13 @@ RSpec.describe RoundManager do
   describe "#apply_action" do
 
     let(:table) { double("table") }
-    let(:pot) { double("pot") }
     let(:seats) { seat_with_active_players }
     let(:action_checker) { double("action checker") }
 
     before {
-      allow(pot).to receive(:add_chip)
       allow(seats).to receive(:collect_bet)
       allow(seats).to receive(:count_active_player)
       allow(seats).to receive(:size).and_return(2)
-      allow(table).to receive(:pot).and_return(pot)
       allow(table).to receive(:seats).and_return(seats)
       allow(broadcaster).to receive(:ask)
       allow(action_checker).to receive(:illegal?).and_return false
@@ -77,7 +74,6 @@ RSpec.describe RoundManager do
 
             it "should pay $10" do
               expect(seats).to receive(:collect_bet).with(0, 10)
-              expect(pot).to receive(:add_chip).with(10)
               expect(seats.players[0].pay_info).to receive(:update_by_pay).with(10)
 
               round_manager.apply_action(table, 'call', 10, action_checker)
@@ -92,7 +88,6 @@ RSpec.describe RoundManager do
 
             it "should pay only $5" do
               expect(seats).to receive(:collect_bet).with(0, 5)
-              expect(pot).to receive(:add_chip).with(5)
               expect(seats.players[0].pay_info).to receive(:update_by_pay).with(5)
 
               round_manager.apply_action(table, 'call', 10, action_checker)
@@ -143,7 +138,6 @@ RSpec.describe RoundManager do
 
             it "should pay $10" do
               expect(seats).to receive(:collect_bet).with(0, 10)
-              expect(pot).to receive(:add_chip).with(10)
               expect(seats.players[0].pay_info).to receive(:update_by_pay).with(10)
 
               round_manager.apply_action(table, 'raise', 10, action_checker)
@@ -157,7 +151,6 @@ RSpec.describe RoundManager do
 
             it "shoukd pay only $5" do
               expect(seats).to receive(:collect_bet).with(0, 5)
-              expect(pot).to receive(:add_chip).with(5)
               expect(seats.players[0].pay_info).to receive(:update_by_pay).with(5)
 
               round_manager.apply_action(table, 'raise', 10, action_checker)
