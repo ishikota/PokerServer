@@ -1,7 +1,8 @@
 class PokerPlayer
-  attr_reader :stack, :pay_info, :action_histories, :hole_card
+  attr_reader :name, :stack, :pay_info, :action_histories, :hole_card
 
-  def initialize(initial_stack)
+  def initialize(name="No Name", initial_stack)
+    @name = name
     @hole_card = []
     @stack = initial_stack
     @active = true

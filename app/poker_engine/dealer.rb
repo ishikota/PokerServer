@@ -48,7 +48,7 @@ class Dealer
     end
 
     def create_player(info)
-      @player_maker.create(@config.initial_stack) #TODO use passed info
+      @player_maker.create(name=info, @config.initial_stack) #TODO use passed info
     end
 
     def set_player_to_seat(players)
