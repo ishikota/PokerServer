@@ -12,6 +12,7 @@ class Table
     @deck.restore
     @community_card.clear
     @seats.players.each { |player|
+      player.clear_holecard
       player.clear_action_histories
       player.clear_pay_info
     }

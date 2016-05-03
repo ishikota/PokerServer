@@ -20,6 +20,7 @@ RSpec.describe Table do
     before {
       5.times { table.community_card.add(table.deck.draw_card) }
       table.seats.sitdown(player)
+      allow(player).to receive(:clear_holecard)
       allow(player).to receive(:clear_action_histories)
       allow(player).to receive(:clear_pay_info)
     }
@@ -36,7 +37,8 @@ RSpec.describe Table do
       }.to(0)
     end
 
-    it "should reset player action log" do
+    it "should reset player action log and hole card" do
+      expect(player).to receive(:clear_holecard)
       expect(player).to receive(:clear_action_histories)
       expect(player).to receive(:clear_pay_info)
 

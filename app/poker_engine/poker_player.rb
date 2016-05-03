@@ -23,6 +23,10 @@ class PokerPlayer
     @active
   end
 
+  def clear_holecard
+    @hole_card = []
+  end
+
   def clear_action_histories
     @action_histories = []
   end
