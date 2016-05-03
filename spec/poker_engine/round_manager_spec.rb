@@ -15,9 +15,11 @@ RSpec.describe RoundManager do
     let(:table) { double("table") }
     let(:deck) { deck_with_cards }
     let(:seats) { seat_with_active_players }
+    let(:player1) { seats.players[0] }
+    let(:player2) { seats.players[1] }
+    let(:player3) { seats.players[2] }
 
     before {
-      allow(seats).to receive(:collect_bet)
       allow(seats).to receive(:size).and_return(2)
       allow(table).to receive(:seats).and_return(seats)
       allow(table).to receive(:dealer_btn).and_return(0)
@@ -26,24 +28,25 @@ RSpec.describe RoundManager do
       allow(broadcaster).to receive(:notification)
       for player in seats.players
         allow(player).to receive(:add_holecard)
+        allow(player).to receive(:collect_bet)
         allow(player.pay_info).to receive(:update_by_pay)
       end
     }
 
     it "should collect blind" do
       small_blind = 5  #TODO read blind amount from somewhare
-      expect(seats).to receive(:collect_bet).with(0, small_blind)
-      expect(seats).to receive(:collect_bet).with(1, small_blind * 2)
-      expect(seats.players[0].pay_info).to receive(:update_by_pay).with(small_blind)
-      expect(seats.players[1].pay_info).to receive(:update_by_pay).with(small_blind * 2)
+      expect(player1).to receive(:collect_bet).with(small_blind)
+      expect(player2).to receive(:collect_bet).with(small_blind * 2)
+      expect(player1.pay_info).to receive(:update_by_pay).with(small_blind)
+      expect(player2.pay_info).to receive(:update_by_pay).with(small_blind * 2)
 
       round_manager.start_new_round(table)
     end
 
     it "should deal hole card to players" do
-      expect(seats.players[0]).to receive(:add_holecard).with([anything, anything])
-      expect(seats.players[1]).to receive(:add_holecard).with([anything, anything])
-      expect(seats.players[2]).to receive(:add_holecard).with([anything, anything])
+      expect(player1).to receive(:add_holecard).with([anything, anything])
+      expect(player2).to receive(:add_holecard).with([anything, anything])
+      expect(player3).to receive(:add_holecard).with([anything, anything])
 
       round_manager.start_new_round(table)
     end
@@ -54,10 +57,12 @@ RSpec.describe RoundManager do
 
     let(:table) { double("table") }
     let(:seats) { seat_with_active_players }
+    let(:player1) { seats.players[0] }
+    let(:player2) { seats.players[1] }
+    let(:player3) { seats.players[2] }
     let(:action_checker) { double("action checker") }
 
     before {
-      allow(seats).to receive(:collect_bet)
       allow(seats).to receive(:count_active_player)
       allow(seats).to receive(:size).and_return(2)
       allow(table).to receive(:seats).and_return(seats)
@@ -65,6 +70,7 @@ RSpec.describe RoundManager do
       allow(action_checker).to receive(:illegal?).and_return false
       for player in seats.players
         allow(player.pay_info).to receive(:update_by_pay)
+        allow(player).to receive(:collect_bet)
       end
     }
 
@@ -77,8 +83,8 @@ RSpec.describe RoundManager do
           context "when not yet paid" do
 
             it "should pay $10" do
-              expect(seats).to receive(:collect_bet).with(0, 10)
-              expect(seats.players[0].pay_info).to receive(:update_by_pay).with(10)
+              expect(player1).to receive(:collect_bet).with(10)
+              expect(player1.pay_info).to receive(:update_by_pay).with(10)
 
               round_manager.apply_action(table, 'call', 10, action_checker)
             end
@@ -87,12 +93,12 @@ RSpec.describe RoundManager do
           context "when already paid $5" do
 
             before {
-              allow(seats.players[0]).to receive(:paid_sum).and_return(5)
+              allow(player1).to receive(:paid_sum).and_return(5)
             }
 
             it "should pay only $5" do
-              expect(seats).to receive(:collect_bet).with(0, 5)
-              expect(seats.players[0].pay_info).to receive(:update_by_pay).with(5)
+              expect(player1).to receive(:collect_bet).with(5)
+              expect(player1.pay_info).to receive(:update_by_pay).with(5)
 
               round_manager.apply_action(table, 'call', 10, action_checker)
             end
@@ -107,7 +113,7 @@ RSpec.describe RoundManager do
         end
 
         it "should update player's pay_info" do
-          expect(seats.players[0]).to receive(:add_action_history)
+          expect(player1).to receive(:add_action_history)
               .with(PokerPlayer::ACTION::CALL, 5)
 
           round_manager.apply_action(table, 'call', 5, action_checker)
@@ -118,17 +124,17 @@ RSpec.describe RoundManager do
         before {
           allow(seats).to receive(:deactivate)
           allow(seats).to receive(:count_active_player)
-          allow(seats.players[0].pay_info).to receive(:update_to_fold)
+          allow(player1.pay_info).to receive(:update_to_fold)
         }
 
         it "should deactivate player" do
-          expect(seats.players[0].pay_info).to receive(:update_to_fold)
+          expect(player1.pay_info).to receive(:update_to_fold)
 
           round_manager.apply_action(table, 'fold', nil, action_checker)
         end
 
         it "should update player's pay_info" do
-          expect(seats.players[0]).to receive(:add_action_history)
+          expect(player1).to receive(:add_action_history)
               .with(PokerPlayer::ACTION::FOLD)
 
           round_manager.apply_action(table, 'fold', nil, action_checker)
@@ -142,8 +148,8 @@ RSpec.describe RoundManager do
           context "when not yet paid" do
 
             it "should pay $10" do
-              expect(seats).to receive(:collect_bet).with(0, 10)
-              expect(seats.players[0].pay_info).to receive(:update_by_pay).with(10)
+              expect(player1).to receive(:collect_bet).with(10)
+              expect(player1.pay_info).to receive(:update_by_pay).with(10)
 
               round_manager.apply_action(table, 'raise', 10, action_checker)
             end
@@ -151,12 +157,12 @@ RSpec.describe RoundManager do
 
           context "when already paid $5" do
             before {
-              allow(seats.players[0]).to receive(:paid_sum).and_return(5)
+              allow(player1).to receive(:paid_sum).and_return(5)
             }
 
             it "shoukd pay only $5" do
-              expect(seats).to receive(:collect_bet).with(0, 5)
-              expect(seats.players[0].pay_info).to receive(:update_by_pay).with(5)
+              expect(player1).to receive(:collect_bet).with(5)
+              expect(player1.pay_info).to receive(:update_by_pay).with(5)
 
               round_manager.apply_action(table, 'raise', 10, action_checker)
             end
@@ -170,7 +176,7 @@ RSpec.describe RoundManager do
         end
 
         it "should update player's pay_info" do
-          expect(seats.players[0]).to receive(:add_action_history)
+          expect(player1).to receive(:add_action_history)
               .with(PokerPlayer::ACTION::RAISE, 5)
 
           round_manager.apply_action(table, 'raise', 5, action_checker)
@@ -183,8 +189,8 @@ RSpec.describe RoundManager do
         }
 
         it "should accept the action as fold" do
-          expect(seats.players[0].pay_info).to receive(:update_to_fold)
-          expect(seats.players[0]).to receive(:add_action_history)
+          expect(player1.pay_info).to receive(:update_to_fold)
+          expect(player1).to receive(:add_action_history)
               .with(PokerPlayer::ACTION::FOLD)
 
           round_manager.apply_action(table, 'raise', 100, action_checker)

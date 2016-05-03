@@ -13,10 +13,6 @@ class Seats
     @players.size
   end
 
-  def collect_bet(idx, amount)
-    @players[idx].collect_bet(amount)
-  end
-
   def count_active_player
     @players.map { |p| p.active? }.select { |status| status }.size
   end

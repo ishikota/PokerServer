@@ -39,28 +39,26 @@ class RoundManager
   end
 
   def apply_action(table, action, bet_amount, action_checker)
+    next_player = table.seats.players[@next_player]
 
     if action_checker.illegal?(table.seats.players, @next_player, action, bet_amount)
       action = 'fold'
     end
 
-    if action == 'call'
-      need_amount = calc_chip_for_agree(table.seats.players[@next_player], bet_amount)
-      table.seats.collect_bet(@next_player, need_amount)
-      table.seats.players[@next_player]
-          .add_action_history(PokerPlayer::ACTION::CALL, bet_amount)
-      table.seats.players[@next_player].pay_info.update_by_pay(need_amount)
-      increment_agree_num
+    if action == 'call' || action == 'raise'
+      action_flg = action == 'call' ? PokerPlayer::ACTION::CALL : PokerPlayer::ACTION::RAISE
+      need_amount = calc_chip_for_agree(next_player, bet_amount)
+      next_player.collect_bet(need_amount)
+      next_player.add_action_history(action_flg, bet_amount)
+      next_player.pay_info.update_by_pay(need_amount)
+      if action == 'call'
+        increment_agree_num
+      else
+        @agree_num = 1 if action == 'raise'
+      end
     elsif action == 'fold'
-      table.seats.players[@next_player].add_action_history(PokerPlayer::ACTION::FOLD)
-      table.seats.players[@next_player].pay_info.update_to_fold
-    elsif action =='raise'
-      need_amount = calc_chip_for_agree(table.seats.players[@next_player], bet_amount)
-      table.seats.collect_bet(@next_player, need_amount)
-      table.seats.players[@next_player]
-          .add_action_history(PokerPlayer::ACTION::RAISE, bet_amount)
-      table.seats.players[@next_player].pay_info.update_by_pay(need_amount)
-      @agree_num = 1
+      next_player.add_action_history(PokerPlayer::ACTION::FOLD)
+      next_player.pay_info.update_to_fold
     end
 
     if table.seats.count_active_player == 1
@@ -153,13 +151,16 @@ class RoundManager
       small_blind_pos = table.dealer_btn
       big_blind_pos = shift_next_player(exec_shift=false, table.seats)
 
-      table.seats.collect_bet(small_blind_pos, small_blind)
-      table.seats.collect_bet(big_blind_pos, small_blind * 2)
+      sb_player = table.seats.players[small_blind_pos]
+      bb_player = table.seats.players[big_blind_pos]
 
-      table.seats.players[small_blind_pos].add_action_history(PokerPlayer::ACTION::RAISE, small_blind)
-      table.seats.players[big_blind_pos].add_action_history(PokerPlayer::ACTION::RAISE, small_blind * 2)
-      table.seats.players[small_blind_pos].pay_info.update_by_pay(small_blind)
-      table.seats.players[big_blind_pos].pay_info.update_by_pay(small_blind * 2)
+      sb_player.collect_bet(small_blind)
+      bb_player.collect_bet(small_blind * 2)
+
+      sb_player.add_action_history(PokerPlayer::ACTION::RAISE, small_blind)
+      bb_player.add_action_history(PokerPlayer::ACTION::RAISE, small_blind * 2)
+      sb_player.pay_info.update_by_pay(small_blind)
+      bb_player.pay_info.update_by_pay(small_blind * 2)
     end
 
     def deal_holecard(deck, players)

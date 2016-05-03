@@ -34,11 +34,6 @@ RSpec.describe Seats do
       seats.sitdown(player2)
     }
 
-    it "should collect bet from second player" do
-      expect(player2).to receive(:collect_bet).with(2)
-      seats.collect_bet(1, 2)
-    end
-
   end
 
   describe "#count_active_player" do
