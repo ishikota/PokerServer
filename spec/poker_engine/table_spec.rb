@@ -9,7 +9,6 @@ RSpec.describe Table do
     it "should respond to " do
       expect(table.dealer_btn).to be_a Fixnum
       expect(table.seats).to be_a Seats
-      expect(table.pot).to be_a Pot
       expect(table.deck).to be_a Deck
       expect(table.community_card).to be_a CommunityCard
     end
@@ -19,18 +18,11 @@ RSpec.describe Table do
     let(:player) { double("player") }
 
     before {
-      table.pot.add_chip(53)
       5.times { table.community_card.add(table.deck.draw_card) }
       table.seats.sitdown(player)
       allow(player).to receive(:clear_action_histories)
       allow(player).to receive(:clear_pay_info)
     }
-
-    it "should clear pot" do
-      expect { table.reset }.to change {
-        table.pot.main
-      }.to(0)
-    end
 
     it "should reset deck (do not need to shuffle)" do
       expect { table.reset }.to change {
