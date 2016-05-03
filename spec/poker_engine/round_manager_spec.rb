@@ -68,11 +68,35 @@ RSpec.describe RoundManager do
 
       context "when passed action is CALL" do
 
-        it "should execute chip transaction" do
-          expect(seats).to receive(:collect_bet).with(0, 5)
-          expect(pot).to receive(:add_chip).with(5)
+        describe "chip transation" do
 
-          round_manager.apply_action(table, 'call', 5, action_checker)
+          context "when not yet paid" do
+
+            it "should pay $10" do
+              expect(seats).to receive(:collect_bet).with(0, 10)
+              expect(pot).to receive(:add_chip).with(10)
+
+              round_manager.apply_action(table, 'call', 10, action_checker)
+            end
+          end
+
+          context "when already paid $5" do
+
+            before {
+              allow(seats.players[0]).to receive(:paid_sum).and_return(5)
+            }
+
+            it "should pay only $5" do
+              expect(seats).to receive(:collect_bet).with(0, 5)
+              expect(pot).to receive(:add_chip).with(5)
+
+              round_manager.apply_action(table, 'call', 10, action_checker)
+
+            end
+          end
+
+          it "should execute chip transaction" do
+          end
         end
 
         it "should increment agree_num" do
@@ -111,11 +135,31 @@ RSpec.describe RoundManager do
 
       context "when passed action is RAISE" do
 
-        it "should execute chip transaction" do
-          expect(seats).to receive(:collect_bet).with(0, 5)
-          expect(pot).to receive(:add_chip).with(5)
+        describe "chip transaction" do
 
-          round_manager.apply_action(table, 'raise', 5, action_checker)
+          context "when not yet paid" do
+
+            it "should pay $10" do
+              expect(seats).to receive(:collect_bet).with(0, 10)
+              expect(pot).to receive(:add_chip).with(10)
+
+              round_manager.apply_action(table, 'raise', 10, action_checker)
+            end
+          end
+
+          context "when already paid $5" do
+            before {
+              allow(seats.players[0]).to receive(:paid_sum).and_return(5)
+            }
+
+            it "shoukd pay only $5" do
+              expect(seats).to receive(:collect_bet).with(0, 5)
+              expect(pot).to receive(:add_chip).with(5)
+
+              round_manager.apply_action(table, 'raise', 10, action_checker)
+            end
+          end
+
         end
 
         it "should reset agree_num" do
@@ -155,7 +199,7 @@ RSpec.describe RoundManager do
         expect(broadcaster).to receive(:ask).with(1, "TODO")
 
         expect {
-          round_manager.apply_action(table, 'call', nil, action_checker)
+          round_manager.apply_action(table, 'call', 5, action_checker)
         }.to change { round_manager.next_player }.by(1)
       end
 
@@ -185,13 +229,13 @@ RSpec.describe RoundManager do
           expect(player).not_to receive(:clear_pay_info)
         }
 
-        round_manager.apply_action(table, 'call', nil, action_checker)
+        round_manager.apply_action(table, 'call', 5, action_checker)
       end
 
       it "should forward to next street" do
         expect(broadcaster).to receive(:notification).with("FLOP starts")
 
-        round_manager.apply_action(table, 'call', nil, action_checker)
+        round_manager.apply_action(table, 'call', 5, action_checker)
       end
 
     end
@@ -448,6 +492,8 @@ RSpec.describe RoundManager do
         allow(player).to receive(:clear_pay_info)
         allow(player).to receive(:add_action_history)
         allow(player).to receive(:pay_info).and_return pay_info
+        allow(player).to receive(:paid_sum).and_return 0
+        allow(pay_info).to receive(:amount).and_return(0)
         acc << player
       end
 

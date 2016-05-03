@@ -54,6 +54,12 @@ class PokerPlayer
     end
   end
 
+  def paid_sum
+    last_history = action_histories.select {|h| h["action"] != 'FOLD'}.last
+    last_history.nil? ? 0 : last_history["amount"]
+  end
+
+
   class PayInfo
     attr_reader :amount, :status
 
@@ -108,11 +114,6 @@ class PokerPlayer
         "amount" => amount,
         "paid" => amount - paid_sum
       }
-    end
-
-    def paid_sum
-      last_history = action_histories.select {|h| h["action"] != 'FOLD'}.last
-      last_history.nil? ? 0 : last_history["amount"]
     end
 
 end
