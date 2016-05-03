@@ -25,6 +25,7 @@ RSpec.describe "Dealer" do
 
   before {
     allow(table).to receive(:seats).and_return(seats)
+    allow(round_manager).to receive(:set_finish_callback)
   }
 
   describe "#start_game" do
@@ -90,7 +91,7 @@ RSpec.describe "Dealer" do
       allow(round_manager).to receive(:start_new_round)
       expect(broadcaster).to receive(:notification).with("TODO game result")
 
-      dealer.finish_round(winners, accounting_info)
+      dealer.finish_round_callback.call(winners, accounting_info)
     end
 
     describe "#teardown_round" do
@@ -101,13 +102,13 @@ RSpec.describe "Dealer" do
           allow(round_manager).to receive(:start_new_round)
           expect(table).to receive(:shift_dealer_btn)
 
-          dealer.finish_round(winners, accounting_info)
+          dealer.finish_round_callback.call(winners, accounting_info)
         end
 
         it "should start next round" do
           expect(round_manager).to receive(:start_new_round)
 
-          dealer.finish_round(winners, accounting_info)
+          dealer.finish_round_callback.call(winners, accounting_info)
         end
       end
 
@@ -120,14 +121,14 @@ RSpec.describe "Dealer" do
         it "should not start the next game" do
           expect(round_manager).not_to receive(:start_new_round)
 
-          dealer.finish_round(winners, accounting_info)
+          dealer.finish_round_callback.call(winners, accounting_info)
         end
 
 
         it "should teardown the game and say goodbye to players" do
           expect(broadcaster).to receive(:notification).with("TODO goodbye")
 
-          dealer.finish_round(winners, accounting_info)
+          dealer.finish_round_callback.call(winners, accounting_info)
         end
       end
 

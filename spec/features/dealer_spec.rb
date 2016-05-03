@@ -9,7 +9,7 @@ RSpec.describe Dealer do
   let(:table) { Table.new(cheat_deck) }
   let(:hand_evaluator) { HandEvaluator.new }
   let(:game_evaluator) { GameEvaluator.new(hand_evaluator) }
-  let(:round_manager) { RoundManager.new(broadcaster, finish_callback, game_evaluator) }
+  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator) }
   let(:action_checker) { ActionChecker.new }
   let(:player_maker) { PlayerMaker.new }
 

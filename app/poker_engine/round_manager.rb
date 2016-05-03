@@ -15,13 +15,16 @@ class RoundManager
     SHOWDOWN => "SHOWDOWN"
   }
 
-  def initialize(broadcaster, finish_callback, game_evaluator)
+  def initialize(broadcaster, game_evaluator)
     @broadcaster = broadcaster
-    @callback = finish_callback
     @game_evaluator = game_evaluator
     @street = 0
     @agree_num = 0
     @next_player = 0
+  end
+
+  def set_finish_callback(finish_callback)
+    @callback = finish_callback
   end
 
   def start_new_round(table)

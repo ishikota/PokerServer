@@ -5,7 +5,11 @@ RSpec.describe RoundManager do
   let(:finish_callback) { double("dealer.finish_round") }
   let(:broadcaster) { double("broadcaster") }
   let(:game_evaluator) { double("game evaluator") }
-  let(:round_manager) { RoundManager.new(broadcaster, finish_callback, game_evaluator) }
+  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator) }
+
+  before {
+    round_manager.set_finish_callback(finish_callback)
+  }
 
   describe "#start_new_round" do
     let(:table) { double("table") }

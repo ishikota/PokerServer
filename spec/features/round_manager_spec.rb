@@ -6,10 +6,12 @@ RSpec.describe RoundManager do
   let(:broadcaster) { double("broadcaster") }
   let(:hand_evaluator) { HandEvaluator.new }
   let(:game_evaluator) { GameEvaluator.new(hand_evaluator) }
-  let(:round_manager) { RoundManager.new(broadcaster, finish_callback, game_evaluator) }
+  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator) }
   let(:action_checker) { ActionChecker.new }
 
   before {
+    round_manager.set_finish_callback(finish_callback)
+
     allow(broadcaster).to receive(:notification)
     allow(broadcaster).to receive(:ask)
   }

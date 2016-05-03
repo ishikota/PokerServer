@@ -8,6 +8,7 @@ class Dealer
     @action_checker = components_holder[:action_checker]
     @player_maker = components_holder[:player_maker]
     @round_count = 0
+    @round_manager.set_finish_callback(finish_round_callback)
   end
 
   def start_game(player_info)
@@ -20,11 +21,6 @@ class Dealer
   def receive_data(player_id, data)
     action, bet_amount = fetch_action_from_data(data)
     apply_action(action, bet_amount)
-  end
-
-  def finish_round(winners, accounting_info)
-    @broadcaster.notification(game_result_message(@table, winners, accounting_info))
-    teardown_round
   end
 
   def teardown_round
@@ -42,6 +38,13 @@ class Dealer
   end
 
   # private
+
+    def finish_round_callback
+      lambda { |winners, accounting_info|
+        @broadcaster.notification(game_result_message(@table, winners, accounting_info))
+        teardown_round
+      }
+    end
 
     def start_round
       @round_manager.start_new_round(@table)
