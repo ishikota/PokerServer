@@ -34,6 +34,8 @@ RSpec.describe Dealer do
     }
 
     it "should finish by player 2 win" do
+      expect(broadcaster).to receive(:notification).with("TODO goodbye")
+
       dealer.start_game(["dummy", "info"])
       dealer.receive_data(0, call_action_message(10))
       # FLOP start
