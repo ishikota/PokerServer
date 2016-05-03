@@ -47,6 +47,7 @@ class RoundManager
       table.pot.add_chip(need_amount)
       table.seats.players[@next_player]
           .add_action_history(PokerPlayer::ACTION::CALL, bet_amount)
+      table.seats.players[@next_player].pay_info.update_by_pay(need_amount)
       increment_agree_num
     elsif action == 'fold'
       table.seats.deactivate(@next_player)
@@ -57,6 +58,7 @@ class RoundManager
       table.pot.add_chip(need_amount)
       table.seats.players[@next_player]
           .add_action_history(PokerPlayer::ACTION::RAISE, bet_amount)
+      table.seats.players[@next_player].pay_info.update_by_pay(need_amount)
       @agree_num = 1
     end
 

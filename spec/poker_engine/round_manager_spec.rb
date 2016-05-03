@@ -62,6 +62,9 @@ RSpec.describe RoundManager do
       allow(table).to receive(:seats).and_return(seats)
       allow(broadcaster).to receive(:ask)
       allow(action_checker).to receive(:illegal?).and_return false
+      for player in seats.players
+        allow(player.pay_info).to receive(:update_by_pay)
+      end
     }
 
     describe "apply passed action to table" do
@@ -75,6 +78,7 @@ RSpec.describe RoundManager do
             it "should pay $10" do
               expect(seats).to receive(:collect_bet).with(0, 10)
               expect(pot).to receive(:add_chip).with(10)
+              expect(seats.players[0].pay_info).to receive(:update_by_pay).with(10)
 
               round_manager.apply_action(table, 'call', 10, action_checker)
             end
@@ -89,14 +93,12 @@ RSpec.describe RoundManager do
             it "should pay only $5" do
               expect(seats).to receive(:collect_bet).with(0, 5)
               expect(pot).to receive(:add_chip).with(5)
+              expect(seats.players[0].pay_info).to receive(:update_by_pay).with(5)
 
               round_manager.apply_action(table, 'call', 10, action_checker)
-
             end
           end
 
-          it "should execute chip transaction" do
-          end
         end
 
         it "should increment agree_num" do
@@ -142,6 +144,7 @@ RSpec.describe RoundManager do
             it "should pay $10" do
               expect(seats).to receive(:collect_bet).with(0, 10)
               expect(pot).to receive(:add_chip).with(10)
+              expect(seats.players[0].pay_info).to receive(:update_by_pay).with(10)
 
               round_manager.apply_action(table, 'raise', 10, action_checker)
             end
@@ -155,6 +158,7 @@ RSpec.describe RoundManager do
             it "shoukd pay only $5" do
               expect(seats).to receive(:collect_bet).with(0, 5)
               expect(pot).to receive(:add_chip).with(5)
+              expect(seats.players[0].pay_info).to receive(:update_by_pay).with(5)
 
               round_manager.apply_action(table, 'raise', 10, action_checker)
             end
