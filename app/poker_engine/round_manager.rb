@@ -153,6 +153,8 @@ class RoundManager
 
       table.seats.players[small_blind_pos].add_action_history(PokerPlayer::ACTION::RAISE, small_blind)
       table.seats.players[big_blind_pos].add_action_history(PokerPlayer::ACTION::RAISE, small_blind * 2)
+      table.seats.players[small_blind_pos].pay_info.update_by_pay(small_blind)
+      table.seats.players[big_blind_pos].pay_info.update_by_pay(small_blind * 2)
     end
 
     def deal_holecard(deck, players)

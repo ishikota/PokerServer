@@ -22,6 +22,7 @@ RSpec.describe RoundManager do
       allow(broadcaster).to receive(:notification)
       for player in seats.players
         allow(player).to receive(:add_holecard)
+        allow(player.pay_info).to receive(:update_by_pay)
       end
     }
 
@@ -29,6 +30,8 @@ RSpec.describe RoundManager do
       small_blind = 5  #TODO read blind amount from somewhare
       expect(seats).to receive(:collect_bet).with(0, small_blind)
       expect(seats).to receive(:collect_bet).with(1, small_blind * 2)
+      expect(seats.players[0].pay_info).to receive(:update_by_pay).with(small_blind)
+      expect(seats.players[1].pay_info).to receive(:update_by_pay).with(small_blind * 2)
 
       round_manager.start_new_round(table)
     end
@@ -439,10 +442,12 @@ RSpec.describe RoundManager do
     def seat_with_active_players
       players =  (1..3).inject([]) do |acc, i|
         player = double("player#{i}")
+        pay_info = double("pay info #{i}")
         allow(player).to receive(:active?).and_return(true)
         allow(player).to receive(:clear_action_histories)
         allow(player).to receive(:clear_pay_info)
         allow(player).to receive(:add_action_history)
+        allow(player).to receive(:pay_info).and_return pay_info
         acc << player
       end
 
