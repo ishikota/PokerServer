@@ -12,8 +12,14 @@ class ActionChecker
     end
   end
 
-  def allin?(player, bet_amount)
-    bet_amount >= player.stack
+  def allin?(player, action, bet_amount)
+    if action == 'call'
+      bet_amount >= player.stack
+    elsif action == 'raise'
+      bet_amount == player.stack
+    else
+      false
+    end
   end
 
   def need_amount_for_action(player, amount)

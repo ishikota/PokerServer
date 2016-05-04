@@ -190,10 +190,29 @@ RSpec.describe ActionChecker do
 
     let(:player) { create_player_with_stack(100) }
 
-    it "should work" do
-      expect(action_checker.allin?(player, 99)).to be_falsy
-      expect(action_checker.allin?(player, 100)).to be_truthy
-      expect(action_checker.allin?(player, 101)).to be_truthy
+    context "passed action is CALL" do
+
+      it "should judge if allin or not" do
+        expect(action_checker.allin?(player, 'call', 99)).to be_falsy
+        expect(action_checker.allin?(player, 'call', 100)).to be_truthy
+        expect(action_checker.allin?(player, 'call', 101)).to be_truthy
+      end
+    end
+
+    context "passed action is ALLIN RAISE" do
+
+      it "should judge if allin or not" do
+        expect(action_checker.allin?(player, 'raise',  99)).to be_falsy
+        expect(action_checker.allin?(player, 'raise', 100)).to be_truthy
+        expect(action_checker.allin?(player, 'raise', 101)).to be_falsy
+      end
+    end
+
+    context "when passed action is FOLD" do
+
+      it "should return false" do
+        expect(action_checker.allin?(player, 'fold', 0)).to be_falsy
+      end
     end
 
   end
