@@ -14,7 +14,13 @@ class Seats
   end
 
   def count_active_player
-    @players.map { |p| p.active? }.select { |status| status }.size
+    @players.count { |p| p.active? }
+  end
+
+  def count_ask_wait_players
+    @players.count { |p|
+      p.pay_info.status == PokerPlayer::PayInfo::PAY_TILL_END
+    }
   end
 
 end

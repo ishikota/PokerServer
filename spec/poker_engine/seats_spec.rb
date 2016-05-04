@@ -36,7 +36,8 @@ RSpec.describe Seats do
 
   end
 
-  describe "#count_active_player" do
+  describe "count method" do
+
     let(:player2) { double("player2") }
 
     before {
@@ -45,16 +46,40 @@ RSpec.describe Seats do
       allow(player).to receive(:active?).and_return(true)
     }
 
-    context "when player 2 is active" do
-      before { allow(player2).to receive(:active?).and_return(true) }
+    describe "#count_active_player" do
 
-      it { expect(seats.count_active_player).to eq 2 }
+      context "when player 2 is active" do
+        before { allow(player2).to receive(:active?).and_return(true) }
+
+        it { expect(seats.count_active_player).to eq 2 }
+      end
+
+      context "when player 2 is not active" do
+        before { allow(player2).to receive(:active?).and_return(false) }
+
+        it { expect(seats.count_active_player).to eq 1 }
+      end
+
     end
 
-    context "when player 2 is not active" do
-      before { allow(player2).to receive(:active?).and_return(false) }
+    describe "#count_ask_wait_players" do
 
-      it { expect(seats.count_active_player).to eq 1 }
+      let(:player3) { double("player3") }
+
+      def set_pay_status(target, status)
+        allow(target).to receive_message_chain('pay_info.status').and_return status
+      end
+
+      before {
+        seats.sitdown(player3)
+        set_pay_status(player , PokerPlayer::PayInfo::PAY_TILL_END)
+        set_pay_status(player2, PokerPlayer::PayInfo::FOLDED)
+        set_pay_status(player3, PokerPlayer::PayInfo::ALLIN)
+      }
+
+      it "should include only PAY_TILL_END player" do
+        expect(seats.count_ask_wait_players).to eq 1
+      end
     end
 
   end
