@@ -177,7 +177,7 @@ class RoundManager
     end
 
     def ask_if_needed(table)
-      if table.seats.count_active_player == 1
+      if table.seats.count_ask_wait_players == 1
         @street += 1
         start_street(@street, table)
       else

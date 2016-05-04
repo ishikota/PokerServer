@@ -92,6 +92,38 @@ RSpec.describe Dealer do
 
   end
 
+  describe "Count allin player as agreed" do
+    let(:config) { Config.new(initial_stack=100, max_round=1) }
+
+    before "update player's stack to p1.stack=50, p2.stack=150" do
+      dealer.start_game(["p1", "p2"])
+      dealer.receive_data(0, raise_msg(50))
+      dealer.receive_data(1, call_msg(50))
+      dealer.receive_data(0, call_msg(0))
+      dealer.receive_data(1, call_msg(0))
+      dealer.receive_data(0, call_msg(0))
+      dealer.receive_data(0, call_msg(0))
+      dealer.receive_data(1, call_msg(0))
+      dealer.receive_data(1, call_msg(0))
+
+      # Round 2 : small blind = p2, big blind = p1
+      expect(table.seats.players[0].stack).to eq 50 - 10
+      expect(table.seats.players[1].stack).to eq 150 - 5
+    end
+
+    it "should forward to SHOWDOWN after p1's allin" do
+      expect(broadcaster).to receive(:notification).with("TODO goodbye")
+
+      binding.pry
+      dealer.receive_data(1, call_msg(10))
+      dealer.receive_data(1, call_msg(0))
+      dealer.receive_data(0, raise_msg(40))
+      dealer.receive_data(1, call_msg(40))
+
+      #expect(table.seats.players[0].stack).to eq 0
+      #expect(table.seats.players[1].stack).to eq 200
+    end
+  end
 
   private
 
