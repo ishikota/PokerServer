@@ -28,6 +28,7 @@ class Dealer
       teardown_game
     else
       @round_count += 1
+      excludes_no_money_player(@table.seats.players)
       @table.shift_dealer_btn
       start_round
     end
@@ -58,6 +59,11 @@ class Dealer
       for player in players
         @table.seats.sitdown(player)
       end
+    end
+
+    def excludes_no_money_player(players)
+      players.select { |player| player.stack == 0 }
+        .each { |player| player.pay_info.update_to_fold }
     end
 
     def game_information_message

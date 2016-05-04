@@ -84,6 +84,8 @@ RSpec.describe "Dealer" do
       allow(table).to receive(:shift_dealer_btn)
       allow(broadcaster).to receive(:notification)
       allow(config).to receive(:max_round).and_return(10)
+      allow(seats).to receive(:players).and_return([])
+      allow(table).to receive(:seats).and_return(seats)
     }
 
     it "should notify game result" do
@@ -97,6 +99,31 @@ RSpec.describe "Dealer" do
     describe "#teardown_round" do
 
       context "when last game was not final round" do
+
+        describe "excludes_no_money_player" do
+          let(:player3) { double("player3") }
+          let(:pay_info) { double("pay info") }
+
+          before {
+            players = [player1, player2, player3]
+
+            allow(player1).to receive(:stack).and_return(1)
+            allow(player2).to receive(:stack).and_return(1)
+            allow(player3).to receive(:stack).and_return(0)
+
+            allow(player3).to receive(:pay_info).and_return(pay_info)
+            allow(seats).to receive(:players).and_return(players)
+            allow(table).to receive(:seats).and_return(seats)
+            allow(round_manager).to receive(:start_new_round)
+          }
+
+          it "should change no money player state to FOLDED before round start" do
+            expect(pay_info).to receive(:update_to_fold)
+
+            dealer.finish_round_callback.call(winners, accounting_info)
+          end
+
+        end
 
         it "should shift dealer button position" do
           allow(round_manager).to receive(:start_new_round)
