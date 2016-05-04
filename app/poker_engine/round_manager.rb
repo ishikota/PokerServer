@@ -45,17 +45,15 @@ class RoundManager
       action = 'fold'
     end
 
-    if action == 'call' || action == 'raise'
-      action_flg = action == 'call' ? PokerPlayer::ACTION::CALL : PokerPlayer::ACTION::RAISE
-      need_amount = action_checker.need_amount_for_action(next_player, bet_amount)
-      next_player.collect_bet(need_amount)
-      next_player.add_action_history(action_flg, bet_amount)
-      next_player.pay_info.update_by_pay(need_amount)
-      if action == 'call'
-        increment_agree_num
-      else
-        @agree_num = 1 if action == 'raise'
-      end
+    if action == 'call'
+      chip_transaction(action_checker, next_player, bet_amount)
+      next_player.add_action_history(PokerPlayer::ACTION::CALL, bet_amount)
+      increment_agree_num
+    elsif action == 'raise'
+      chip_transaction(action_checker, next_player, bet_amount)
+      add_amount = bet_amount - action_checker.agree_amount(table.seats.players)
+      next_player.add_action_history(PokerPlayer::ACTION::RAISE, bet_amount, add_amount)
+      @agree_num = 1
     elsif action == 'fold'
       next_player.add_action_history(PokerPlayer::ACTION::FOLD)
       next_player.pay_info.update_to_fold
@@ -157,8 +155,8 @@ class RoundManager
       sb_player.collect_bet(small_blind)
       bb_player.collect_bet(small_blind * 2)
 
-      sb_player.add_action_history(PokerPlayer::ACTION::RAISE, small_blind)
-      bb_player.add_action_history(PokerPlayer::ACTION::RAISE, small_blind * 2)
+      sb_player.add_action_history(PokerPlayer::ACTION::RAISE, small_blind, 5)
+      bb_player.add_action_history(PokerPlayer::ACTION::RAISE, small_blind * 2, 5)
       sb_player.pay_info.update_by_pay(small_blind)
       bb_player.pay_info.update_by_pay(small_blind * 2)
     end
@@ -173,6 +171,12 @@ class RoundManager
       accounting_info.each { |idx, prize|
         players[idx].append_chip(prize)
       }
+    end
+
+    def chip_transaction(action_checker, player, bet_amount)
+      need_amount = action_checker.need_amount_for_action(player, bet_amount)
+      player.collect_bet(need_amount)
+      player.pay_info.update_by_pay(need_amount)
     end
 
 end

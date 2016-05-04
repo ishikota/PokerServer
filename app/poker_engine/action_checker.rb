@@ -16,6 +16,11 @@ class ActionChecker
     amount - player.paid_sum
   end
 
+  def agree_amount(players)
+    last_raise = fetch_last_raise(players)
+    last_raise.nil? ? 0 : last_raise["amount"]
+  end
+
   private
 
     DEFAULT_MIN_RAISE = 5
@@ -32,11 +37,6 @@ class ActionChecker
       last_raise = fetch_last_raise(players)
       min_raise = last_raise.nil? ? DEFAULT_MIN_RAISE : last_raise["amount"] + last_raise["add_amount"]
       min_raise > amount
-    end
-
-    def agree_amount(players)
-      last_raise = fetch_last_raise(players)
-      last_raise.nil? ? 0 : last_raise["amount"]
     end
 
     def fetch_last_raise(players)

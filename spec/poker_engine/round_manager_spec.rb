@@ -183,9 +183,9 @@ RSpec.describe RoundManager do
         it "should update player's pay_info" do
           setup_action_checker(player1, 0, 5)
           expect(player1).to receive(:add_action_history)
-              .with(PokerPlayer::ACTION::RAISE, 5)
+              .with(PokerPlayer::ACTION::RAISE, 10, 5)
 
-          round_manager.apply_action(table, 'raise', 5, action_checker)
+          round_manager.apply_action(table, 'raise', 10, action_checker)
         end
       end
 
@@ -530,6 +530,7 @@ RSpec.describe RoundManager do
     def setup_action_checker(player, pay_sum, need_amount)
       allow(player).to receive(:paid_sum).and_return(pay_sum)
       allow(action_checker).to receive(:need_amount_for_action).and_return(need_amount)
+      allow(action_checker).to receive(:agree_amount).and_return(need_amount - pay_sum)
     end
 
 end
