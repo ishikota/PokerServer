@@ -1,5 +1,15 @@
 class ActionChecker
 
+  def correct_action(players, player_pos, action, amount=nil)
+    if allin?(players[player_pos], action, amount)
+      amount = players[player_pos].stack
+    elsif illegal?(players, player_pos, action, amount)
+      action = 'fold'
+      amount = 0
+    end
+    [action, amount]
+  end
+
   def illegal?(players, player_pos, action, amount=nil)
     if action == 'fold'
       return false

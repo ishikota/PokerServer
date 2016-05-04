@@ -178,12 +178,6 @@ RSpec.describe ActionChecker do
       end
     end
 
-    context "when passed action is not allin" do
-
-      it "should return false"
-
-    end
-
   end
 
   describe "allin?" do
@@ -212,6 +206,74 @@ RSpec.describe ActionChecker do
 
       it "should return false" do
         expect(action_checker.allin?(player, 'fold', 0)).to be_falsy
+      end
+    end
+
+  end
+
+  describe "correct_action" do
+
+    let(:players) do
+      [1,2].inject([]) { |ary, i|
+        player = double("player#{i}")
+        allow(player).to receive(:action_histories).and_return []
+        allow(player).to receive(:stack).and_return 100
+        allow(player).to receive(:paid_sum).and_return 0
+        ary << player
+      }
+    end
+
+    context "when passed ALLIN CALL" do
+
+      before {
+        history = [] << create_history("RAISE", 50, 50, 50)
+        allow(players[0]).to receive(:action_histories).and_return history
+        allow(players[1]).to receive(:stack).and_return 30
+      }
+
+      it "should correct bet_amount to his stack amount" do
+        action, bet_amount = action_checker.correct_action(players, 1, 'call', 50)
+        expect(action).to eq 'call'
+        expect(bet_amount).to eq 30
+      end
+    end
+
+    context "when passed ALLIN RAISE" do
+
+      it "should correct bet_amount to his stack" do
+        action, bet_amount = action_checker.correct_action(players, 0, 'raise', 100)
+        expect(action).to eq 'raise'
+        expect(bet_amount).to eq 100
+      end
+    end
+
+    context "when passed illegal action" do
+
+      it "should convert the action into fold" do
+        action, bet_amount = action_checker.correct_action(players, 0, 'call', 10)
+        expect(action).to eq 'fold'
+        expect(bet_amount).to eq 0
+      end
+
+      it "should convert the action into fold" do
+        action, bet_amount = action_checker.correct_action(players, 0, 'raise', 110)
+        expect(action).to eq 'fold'
+        expect(bet_amount).to eq 0
+      end
+    end
+
+    describe "when passed legal action" do
+
+      it "should return the action as it is" do
+        action, bet_amount = action_checker.correct_action(players, 0, 'call', 0)
+        expect(action).to eq 'call'
+        expect(bet_amount).to eq 0
+      end
+
+      it "should return the action as it is" do
+        action, bet_amount = action_checker.correct_action(players, 0, 'raise', 10)
+        expect(action).to eq 'raise'
+        expect(bet_amount).to eq 10
       end
     end
 
