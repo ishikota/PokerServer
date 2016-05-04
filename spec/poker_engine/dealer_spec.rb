@@ -80,11 +80,13 @@ RSpec.describe "Dealer" do
     let(:community_card) { double("community card") }
 
     before {
+      allow(player1).to receive(:stack).and_return 100
+      allow(player2).to receive(:stack).and_return 100
       allow(table).to receive(:community_card).and_return(community_card)
       allow(table).to receive(:shift_dealer_btn)
       allow(broadcaster).to receive(:notification)
       allow(config).to receive(:max_round).and_return(10)
-      allow(seats).to receive(:players).and_return([])
+      allow(seats).to receive(:players).and_return([player1, player2])
       allow(table).to receive(:seats).and_return(seats)
     }
 
@@ -161,9 +163,21 @@ RSpec.describe "Dealer" do
 
       context "when winner is decided" do
 
-        it "should teardown the game"
+        before {
+          players = [ double("player1"), double("player2"), double("player3") ]
+          players.each_with_index { |player, idx|
+            allow(player).to  receive(:stack).and_return( idx % 2 )
+          }
+          allow(table).to receive_message_chain('seats.players').and_return players
+        }
 
+        it "should teardown the game" do
+          expect(broadcaster).to receive(:notification).with("TODO goodbye")
+
+          dealer.finish_round_callback.call(winners, accounting_info)
+        end
       end
+
     end
 
   end

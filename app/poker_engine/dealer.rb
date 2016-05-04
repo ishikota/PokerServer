@@ -24,7 +24,7 @@ class Dealer
   end
 
   def teardown_round
-    if @round_count == @config.max_round
+    if played_all_round? || game_winner_is_decided?
       teardown_game
     else
       @round_count += 1
@@ -59,6 +59,14 @@ class Dealer
       for player in players
         @table.seats.sitdown(player)
       end
+    end
+
+    def played_all_round?
+      @round_count == @config.max_round
+    end
+
+    def game_winner_is_decided?
+      @table.seats.players.count { |player| player.stack != 0 } <= 1
     end
 
     def excludes_no_money_player(players)
