@@ -186,6 +186,22 @@ RSpec.describe ActionChecker do
 
   end
 
+  describe "allin?" do
+
+    let(:player) do
+      player = double("player")
+      allow(player).to receive(:stack).and_return(100)
+      player
+    end
+
+    it "should work" do
+      expect(action_checker.allin?(player, 99)).to be_falsy
+      expect(action_checker.allin?(player, 100)).to be_truthy
+      expect(action_checker.allin?(player, 101)).to be_truthy
+    end
+
+  end
+
 
   private
 

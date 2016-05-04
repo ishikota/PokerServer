@@ -12,6 +12,10 @@ class ActionChecker
     end
   end
 
+  def allin?(player, bet_amount)
+    bet_amount >= player.stack
+  end
+
   def need_amount_for_action(player, amount)
     amount - player.paid_sum
   end
