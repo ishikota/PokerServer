@@ -167,13 +167,14 @@ RSpec.describe PokerPlayer do
     describe "RAISE" do
 
       before {
-        player.add_action_history(PokerPlayer::ACTION::RAISE, 10)
+        player.add_action_history(PokerPlayer::ACTION::RAISE, 10, 5)
       }
 
       it "should add action_history" do
         expect(player.action_histories.last["action"]).to eq "RAISE"
         expect(player.action_histories.last["amount"]).to eq 10
         expect(player.action_histories.last["paid"]).to eq 10
+        expect(player.action_histories.last["add_amount"]).to eq 5
       end
 
       context "call $20 when already paid $10" do

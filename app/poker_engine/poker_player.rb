@@ -42,13 +42,13 @@ class PokerPlayer
   end
 
 
-  def add_action_history(kind, chip_amount=nil)
+  def add_action_history(kind, chip_amount=nil, add_amount=nil)
     if kind == ACTION::FOLD
       @action_histories << fold_history
     elsif kind == ACTION::CALL
       @action_histories << call_history(chip_amount)
     elsif kind == ACTION::RAISE
-      @action_histories << raise_history(chip_amount)
+      @action_histories << raise_history(chip_amount, add_amount)
     else
       raise "Un expected action kind #{kind} passed"
     end
@@ -108,11 +108,12 @@ class PokerPlayer
       }
     end
 
-    def raise_history(amount)
+    def raise_history(bet_amount, add_amount)
       {
         "action" => "RAISE",
-        "amount" => amount,
-        "paid" => amount - paid_sum
+        "amount" => bet_amount,
+        "paid" => bet_amount - paid_sum,
+        "add_amount" => add_amount
       }
     end
 
