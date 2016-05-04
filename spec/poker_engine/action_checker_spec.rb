@@ -58,24 +58,8 @@ RSpec.describe ActionChecker do
 
 
   context "when agree amount = $10, minimum bet = $15" do
-    let(:player1) do
-      player1 = double("small blind")
-      allow(player1).to receive(:action_histories)
-          .and_return(create_history('RAISE', 5, 5, 5))
-      allow(player1).to receive(:stack).and_return 95
-      allow(player1).to receive(:paid_sum).and_return 5
-      player1
-    end
-
-    let(:player2) do
-      player2 = double("big blind")
-      allow(player2).to receive(:action_histories)
-          .and_return(create_history('RAISE', 10, 10, 5))
-      allow(player2).to receive(:stack).and_return 90
-      allow(player1).to receive(:paid_sum).and_return 10
-      player2
-    end
-
+    let(:player1) { create_blind_player(small_blind=true) }
+    let(:player2) { create_blind_player(small_blind=false) }
     let(:players) { [ player1, player2 ] }
 
     describe "FOLD" do
@@ -141,8 +125,8 @@ RSpec.describe ActionChecker do
 
       describe "and declare CALL $10" do
 
-        it "shoulld be illegal" do
-          expect(action_checker.illegal?(players, 0, 'call', 10)).to be_truthy
+        it "shoulld be legal because he already paid $5" do
+          expect(action_checker.illegal?(players, 0, 'call', 10)).to be_falsy
         end
       end
 
@@ -151,19 +135,47 @@ RSpec.describe ActionChecker do
         it "should illegal" do
           expect(action_checker.illegal?(players, 0, 'raise', 15)).to be_truthy
         end
-
       end
 
     end
 
   end
 
-  describe "allin?" do
+  describe "allin check" do
+
+    let(:sb_player) { create_blind_player(small_blind=true) }
+    let(:bb_player) { create_blind_player(small_blind=false) }
+    let(:players) { [ sb_player, bb_player ] }
 
     context "when passed action is allin" do
 
-      it "should return true"
+      describe "small blind allin by RAISE $100" do
+        it "should be legal" do
+          expect(action_checker.illegal?(players, 0, 'raise', 100)).to be_falsy
+        end
+      end
 
+      describe "small blind allin by RAISE $100 and big blind CALL it by allin" do
+
+        before {
+          history = [] << create_history('RAISE', 5, 5, 5) << create_history('RAISE', 100, 95, 90)
+          allow(sb_player).to receive(:action_histories).and_return(history)
+        }
+
+        it "should be legal" do
+          expect(action_checker.illegal?(players, 1, 'call', 100)).to be_falsy
+        end
+
+        describe "boundary value test" do
+
+          before { allow(bb_player).to receive(:stack).and_return 89 }
+
+          it "should be illegal" do
+            expect(action_checker.illegal?(players, 1, 'call', 100)).to be_truthy
+          end
+        end
+
+      end
     end
 
     context "when passed action is not allin" do
@@ -179,6 +191,18 @@ RSpec.describe ActionChecker do
 
     def need_amount(player, amount)
       action_checker.need_amount_for_action(player, amount)
+    end
+
+    def create_blind_player(small_blind=true)
+      name = small_blind ? "small blind" : "big blind"
+      blind_amount = small_blind ? 5 : 10
+
+      player = double(name)
+      allow(player).to receive(:action_histories)
+          .and_return(create_history('RAISE', blind_amount, blind_amount, 5))
+      allow(player).to receive(:stack).and_return 100 - blind_amount
+      allow(player).to receive(:paid_sum).and_return blind_amount
+      player
     end
 
     def create_history(action, amount=nil, paid=nil, add_amount=nil)

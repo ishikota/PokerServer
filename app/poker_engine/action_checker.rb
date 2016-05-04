@@ -26,7 +26,7 @@ class ActionChecker
     DEFAULT_MIN_RAISE = 5
 
     def short_of_money?(player, amount)
-      player.stack < amount
+      player.stack < amount - player.paid_sum
     end
 
     def illegal_call?(players, amount)
