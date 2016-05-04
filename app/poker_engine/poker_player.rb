@@ -15,7 +15,7 @@ class PokerPlayer
   end
 
   def active?
-    @pay_info.status == PayInfo::PAY_TILL_END && @stack != 0
+    @pay_info.status != PayInfo::FOLDED
   end
 
   def clear_holecard

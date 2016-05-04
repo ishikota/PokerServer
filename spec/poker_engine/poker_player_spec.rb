@@ -68,9 +68,9 @@ RSpec.describe PokerPlayer do
       expect(player.active?).to be_truthy
     end
 
-    specify "allin player is not active" do
+    specify "allin player is active" do
       player.pay_info.update_to_allin(10)
-      expect(player.active?).to be_falsy
+      expect(player.active?).to be_truthy
     end
 
     specify "folded player is not active" do
@@ -78,9 +78,9 @@ RSpec.describe PokerPlayer do
       expect(player.active?).to be_falsy
     end
 
-    specify "no money player is not active" do
+    specify "no money player is active" do
       player.collect_bet(100)
-      expect(player.active?).to be_falsy
+      expect(player.active?).to be_truthy
     end
 
   end
