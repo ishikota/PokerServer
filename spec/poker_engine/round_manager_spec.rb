@@ -82,6 +82,8 @@ RSpec.describe RoundManager do
 
           context "when not yet paid" do
 
+            before { setup_action_checker(player1, 0, 10) }
+
             it "should pay $10" do
               expect(player1).to receive(:collect_bet).with(10)
               expect(player1.pay_info).to receive(:update_by_pay).with(10)
@@ -92,9 +94,7 @@ RSpec.describe RoundManager do
 
           context "when already paid $5" do
 
-            before {
-              allow(player1).to receive(:paid_sum).and_return(5)
-            }
+            before { setup_action_checker(player1, 5, 5) }
 
             it "should pay only $5" do
               expect(player1).to receive(:collect_bet).with(5)
@@ -107,12 +107,14 @@ RSpec.describe RoundManager do
         end
 
         it "should increment agree_num" do
+          setup_action_checker(player1, 0, 5)
           expect {
             round_manager.apply_action(table, 'call', 5, action_checker)
           }.to change { round_manager.agree_num }.by(1)
         end
 
         it "should update player's pay_info" do
+          setup_action_checker(player1, 0, 5)
           expect(player1).to receive(:add_action_history)
               .with(PokerPlayer::ACTION::CALL, 5)
 
@@ -148,6 +150,7 @@ RSpec.describe RoundManager do
           context "when not yet paid" do
 
             it "should pay $10" do
+              setup_action_checker(player1, 0, 10)
               expect(player1).to receive(:collect_bet).with(10)
               expect(player1.pay_info).to receive(:update_by_pay).with(10)
 
@@ -158,6 +161,7 @@ RSpec.describe RoundManager do
           context "when already paid $5" do
             before {
               allow(player1).to receive(:paid_sum).and_return(5)
+              setup_action_checker(player1, 5, 5)
             }
 
             it "shoukd pay only $5" do
@@ -171,11 +175,13 @@ RSpec.describe RoundManager do
         end
 
         it "should reset agree_num" do
+          setup_action_checker(player1, 0, 5)
           round_manager.apply_action(table, 'raise', 5, action_checker)
           expect(round_manager.agree_num).to eq 1
         end
 
         it "should update player's pay_info" do
+          setup_action_checker(player1, 0, 5)
           expect(player1).to receive(:add_action_history)
               .with(PokerPlayer::ACTION::RAISE, 5)
 
@@ -204,6 +210,7 @@ RSpec.describe RoundManager do
     context "when not agreed player exists" do
 
       it "should ask action to him" do
+        setup_action_checker(player1, 0, 5)
         expect(broadcaster).to receive(:ask).with(1, "TODO")
 
         expect {
@@ -232,6 +239,7 @@ RSpec.describe RoundManager do
       }
 
       it "should clear player's action history but not pay_info" do
+        setup_action_checker(player1, 0, 5)
         seats.players.each { |player|
           expect(player).to receive(:clear_action_histories)
           expect(player).not_to receive(:clear_pay_info)
@@ -241,6 +249,7 @@ RSpec.describe RoundManager do
       end
 
       it "should forward to next street" do
+        setup_action_checker(player1, 0, 5)
         expect(broadcaster).to receive(:notification).with("FLOP starts")
 
         round_manager.apply_action(table, 'call', 5, action_checker)
@@ -518,6 +527,10 @@ RSpec.describe RoundManager do
       deck
     end
 
+    def setup_action_checker(player, pay_sum, need_amount)
+      allow(player).to receive(:paid_sum).and_return(pay_sum)
+      allow(action_checker).to receive(:need_amount_for_action).and_return(need_amount)
+    end
 
 end
 

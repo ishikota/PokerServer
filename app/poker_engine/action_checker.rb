@@ -12,6 +12,10 @@ class ActionChecker
     end
   end
 
+  def need_amount_for_action(player, amount)
+    amount - player.paid_sum
+  end
+
   private
 
     DEFAULT_MIN_RAISE = 5

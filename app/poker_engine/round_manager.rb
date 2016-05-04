@@ -47,7 +47,7 @@ class RoundManager
 
     if action == 'call' || action == 'raise'
       action_flg = action == 'call' ? PokerPlayer::ACTION::CALL : PokerPlayer::ACTION::RAISE
-      need_amount = calc_chip_for_agree(next_player, bet_amount)
+      need_amount = action_checker.need_amount_for_action(next_player, bet_amount)
       next_player.collect_bet(need_amount)
       next_player.add_action_history(action_flg, bet_amount)
       next_player.pay_info.update_by_pay(need_amount)
@@ -173,10 +173,6 @@ class RoundManager
       accounting_info.each { |idx, prize|
         players[idx].append_chip(prize)
       }
-    end
-
-    def calc_chip_for_agree(player, amount)
-      amount - player.paid_sum
     end
 
 end
