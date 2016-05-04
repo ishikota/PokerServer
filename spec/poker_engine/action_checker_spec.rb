@@ -188,11 +188,7 @@ RSpec.describe ActionChecker do
 
   describe "allin?" do
 
-    let(:player) do
-      player = double("player")
-      allow(player).to receive(:stack).and_return(100)
-      player
-    end
+    let(:player) { create_player_with_stack(100) }
 
     it "should work" do
       expect(action_checker.allin?(player, 99)).to be_falsy
@@ -227,6 +223,13 @@ RSpec.describe ActionChecker do
       history.merge!( { "paid" => paid } ) unless paid.nil?
       history.merge!( { "add_amount" => add_amount } ) unless add_amount.nil?
     end
+
+    def create_player_with_stack(stack_amount)
+      player = double("player")
+      allow(player).to receive(:stack).and_return(stack_amount)
+      player
+    end
+
 
 end
 
