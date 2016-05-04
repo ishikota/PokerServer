@@ -88,7 +88,7 @@ RSpec.describe RoundManager do
               expect(player1).to receive(:collect_bet).with(10)
               expect(player1.pay_info).to receive(:update_by_pay).with(10)
 
-              round_manager.apply_action(table, 'call', 10, action_checker)
+              apply_action(round_manager, table, 'call', 10, action_checker)
             end
           end
 
@@ -100,7 +100,7 @@ RSpec.describe RoundManager do
               expect(player1).to receive(:collect_bet).with(5)
               expect(player1.pay_info).to receive(:update_by_pay).with(5)
 
-              round_manager.apply_action(table, 'call', 10, action_checker)
+              apply_action(round_manager, table, 'call', 10, action_checker)
             end
           end
 
@@ -109,7 +109,7 @@ RSpec.describe RoundManager do
         it "should increment agree_num" do
           setup_action_checker(player1, 0, 5)
           expect {
-            round_manager.apply_action(table, 'call', 5, action_checker)
+            apply_action(round_manager, table, 'call', 5, action_checker)
           }.to change { round_manager.agree_num }.by(1)
         end
 
@@ -118,7 +118,7 @@ RSpec.describe RoundManager do
           expect(player1).to receive(:add_action_history)
               .with(PokerPlayer::ACTION::CALL, 5)
 
-          round_manager.apply_action(table, 'call', 5, action_checker)
+          apply_action(round_manager, table, 'call', 5, action_checker)
         end
       end
 
@@ -127,19 +127,20 @@ RSpec.describe RoundManager do
           allow(seats).to receive(:deactivate)
           allow(seats).to receive(:count_active_player)
           allow(player1.pay_info).to receive(:update_to_fold)
+          setup_action_checker(player1, 0, 10)
         }
 
         it "should deactivate player" do
           expect(player1.pay_info).to receive(:update_to_fold)
 
-          round_manager.apply_action(table, 'fold', nil, action_checker)
+          apply_action(round_manager, table, 'fold', nil, action_checker)
         end
 
         it "should update player's pay_info" do
           expect(player1).to receive(:add_action_history)
               .with(PokerPlayer::ACTION::FOLD)
 
-          round_manager.apply_action(table, 'fold', nil, action_checker)
+          apply_action(round_manager, table, 'fold', nil, action_checker)
         end
       end
 
@@ -154,7 +155,7 @@ RSpec.describe RoundManager do
               expect(player1).to receive(:collect_bet).with(10)
               expect(player1.pay_info).to receive(:update_by_pay).with(10)
 
-              round_manager.apply_action(table, 'raise', 10, action_checker)
+              apply_action(round_manager, table, 'raise', 10, action_checker)
             end
           end
 
@@ -168,7 +169,7 @@ RSpec.describe RoundManager do
               expect(player1).to receive(:collect_bet).with(5)
               expect(player1.pay_info).to receive(:update_by_pay).with(5)
 
-              round_manager.apply_action(table, 'raise', 10, action_checker)
+              apply_action(round_manager, table, 'raise', 10, action_checker)
             end
           end
 
@@ -176,7 +177,7 @@ RSpec.describe RoundManager do
 
         it "should reset agree_num" do
           setup_action_checker(player1, 0, 5)
-          round_manager.apply_action(table, 'raise', 5, action_checker)
+          apply_action(round_manager, table, 'raise', 5, action_checker)
           expect(round_manager.agree_num).to eq 1
         end
 
@@ -185,13 +186,14 @@ RSpec.describe RoundManager do
           expect(player1).to receive(:add_action_history)
               .with(PokerPlayer::ACTION::RAISE, 10, 5)
 
-          round_manager.apply_action(table, 'raise', 10, action_checker)
+          apply_action(round_manager, table, 'raise', 10, action_checker)
         end
       end
 
       context "when passed action is illegal" do
         before {
-          allow(action_checker).to receive(:illegal?).and_return(true)
+          setup_action_checker(player1, 0, 100)
+          allow(action_checker).to receive(:correct_action).and_return ['fold', 0]
         }
 
         it "should accept the action as fold" do
@@ -214,7 +216,7 @@ RSpec.describe RoundManager do
         expect(broadcaster).to receive(:ask).with(1, "TODO")
 
         expect {
-          round_manager.apply_action(table, 'call', 5, action_checker)
+          apply_action(round_manager, table, 'call', 5, action_checker)
         }.to change { round_manager.next_player }.by(1)
       end
 
@@ -245,14 +247,14 @@ RSpec.describe RoundManager do
           expect(player).not_to receive(:clear_pay_info)
         }
 
-        round_manager.apply_action(table, 'call', 5, action_checker)
+        apply_action(round_manager, table, 'call', 5, action_checker)
       end
 
       it "should forward to next street" do
         setup_action_checker(player1, 0, 5)
         expect(broadcaster).to receive(:notification).with("FLOP starts")
 
-        round_manager.apply_action(table, 'call', 5, action_checker)
+        apply_action(round_manager, table, 'call', 5, action_checker)
       end
 
     end
@@ -532,6 +534,12 @@ RSpec.describe RoundManager do
       allow(player).to receive(:paid_sum).and_return(pay_sum)
       allow(action_checker).to receive(:need_amount_for_action).and_return(need_amount)
       allow(action_checker).to receive(:agree_amount).and_return(need_amount - pay_sum)
+      allow(action_checker).to receive(:allin?).and_return(false)
+    end
+
+    def apply_action(round_manager, table, action, bet_amount, action_checker)
+      allow(action_checker).to receive(:correct_action).and_return [action, bet_amount]
+      round_manager.apply_action(table, action, bet_amount, action_checker)
     end
 
 end

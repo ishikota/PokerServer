@@ -41,9 +41,9 @@ class RoundManager
   def apply_action(table, action, bet_amount, action_checker)
     next_player = table.seats.players[@next_player]
 
-    if action_checker.illegal?(table.seats.players, @next_player, action, bet_amount)
-      action = 'fold'
-    end
+    action, bet_amount = action_checker.correct_action(
+        table.seats.players, @next_player, action, bet_amount)
+    next_player.pay_info.update_to_allin(0) if action_checker.allin?(next_player, action, bet_amount)
 
     if action == 'call'
       chip_transaction(action_checker, next_player, bet_amount)
