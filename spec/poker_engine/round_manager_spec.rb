@@ -207,6 +207,20 @@ RSpec.describe RoundManager do
 
       end
 
+      context "when passed action is allin" do
+        before {
+          setup_action_checker(player1, 0, 100)
+          allow(action_checker).to receive(:correct_action).and_return ['raise', 100]
+          allow(action_checker).to receive(:allin?).and_return true
+        }
+
+        it "should update player's pay_info" do
+          expect(player1.pay_info).to receive(:update_to_allin)
+
+          round_manager.apply_action(table, 'raise', 100, action_checker)
+        end
+      end
+
     end
 
     context "when not agreed player exists" do
