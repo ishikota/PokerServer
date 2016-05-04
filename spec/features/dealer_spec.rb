@@ -114,14 +114,13 @@ RSpec.describe Dealer do
     it "should forward to SHOWDOWN after p1's allin" do
       expect(broadcaster).to receive(:notification).with("TODO goodbye")
 
-      binding.pry
       dealer.receive_data(1, call_msg(10))
       dealer.receive_data(1, call_msg(0))
       dealer.receive_data(0, raise_msg(40))
       dealer.receive_data(1, call_msg(40))
 
-      #expect(table.seats.players[0].stack).to eq 0
-      #expect(table.seats.players[1].stack).to eq 200
+      expect(table.seats.players[0].stack).to eq 0
+      expect(table.seats.players[1].stack).to eq 200
     end
   end
 
