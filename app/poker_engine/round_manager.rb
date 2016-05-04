@@ -59,10 +59,7 @@ class RoundManager
       next_player.pay_info.update_to_fold
     end
 
-    if table.seats.count_active_player == 1
-      @street = SHOWDOWN
-      start_street(@street, table)
-    elsif everyone_agree?(table.seats)
+    if everyone_agree?(table.seats)
       @street += 1
       clear_action_histories(table.seats.players)
       start_street(@street, table)
@@ -93,24 +90,24 @@ class RoundManager
   def preflop(table)
     2.times { shift_next_player(table.seats) }
     @agree_num = 1  # big blind already agreed
-    @broadcaster.ask(@next_player, "TODO")
+    ask_if_needed(table)
   end
 
   def flop(table)
     for card in table.deck.draw_cards(3) do
       table.community_card.add(card)
     end
-    @broadcaster.ask(@next_player, "TODO")
+    ask_if_needed(table)
   end
 
   def turn(table)
     table.community_card.add(table.deck.draw_card)
-    @broadcaster.ask(@next_player, "TODO")
+    ask_if_needed(table)
   end
 
   def river(table)
     table.community_card.add(table.deck.draw_card)
-    @broadcaster.ask(@next_player, "TODO")
+    ask_if_needed(table)
   end
 
   def showdown(table)
@@ -177,6 +174,15 @@ class RoundManager
       need_amount = action_checker.need_amount_for_action(player, bet_amount)
       player.collect_bet(need_amount)
       player.pay_info.update_by_pay(need_amount)
+    end
+
+    def ask_if_needed(table)
+      if table.seats.count_active_player == 1
+        @street += 1
+        start_street(@street, table)
+      else
+        @broadcaster.ask(@next_player, "TODO")
+      end
     end
 
 end

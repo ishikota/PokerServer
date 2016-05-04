@@ -516,6 +516,7 @@ RSpec.describe RoundManager do
 
       seats = double("seats")
       allow(seats).to receive(:players).and_return(players)
+      allow(seats).to receive(:count_active_player).and_return 2
       return seats
     end
 
