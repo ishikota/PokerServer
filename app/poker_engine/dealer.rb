@@ -57,9 +57,17 @@ class Dealer
     end
 
     def set_player_to_seat(players)
-      for player in players
-        @table.seats.sitdown(player)
-      end
+      players.each { |player| @table.seats.sitdown(player) }
+    end
+
+    def apply_action(action, bet_amount)
+      @round_manager.apply_action(@table, action, bet_amount, @action_checker)
+    end
+
+    def fetch_action_from_data(data)
+      action = data["action"]
+      bet_amount = data["bet_amount"]
+      [action, bet_amount]
     end
 
     def played_all_round?
@@ -86,17 +94,6 @@ class Dealer
     def goodbye_message
       "TODO goodbye"
     end
-
-    def apply_action(action, bet_amount)
-      @round_manager.apply_action(@table, action, bet_amount, @action_checker)
-    end
-
-    def fetch_action_from_data(data)
-      action = data["action"]
-      bet_amount = data["bet_amount"]
-      [action, bet_amount]
-    end
-
 
 end
 
