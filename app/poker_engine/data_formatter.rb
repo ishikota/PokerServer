@@ -39,5 +39,11 @@ class DataFormatter
     }
   end
 
+  def format_street(street)
+    street_str = RoundManager::STREET_MAP[street]
+    raise "Unexpected street [#{street}] is passed" if street_str.nil?
+    { "street" => street_str }
+  end
+
 end
 

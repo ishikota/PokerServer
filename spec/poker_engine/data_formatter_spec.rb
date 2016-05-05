@@ -77,6 +77,27 @@ RSpec.describe DataFormatter do
     end
   end
 
+  describe "street" do
+
+    def check(arg, expected)
+      expect(formatter.format_street(arg)["street"]).to eq expected
+    end
+
+    it "should convert action into hash" do
+      check(RoundManager::PREFLOP, "PREFLOP")
+      check(RoundManager::FLOP, "FLOP")
+      check(RoundManager::TURN, "TURN")
+      check(RoundManager::RIVER, "RIVER")
+      check(RoundManager::SHOWDOWN, "SHOWDOWN")
+    end
+
+    it "should raise error when unexpected arg is passed" do
+      expect {
+        formatter.format_street(5)
+      }.to raise_error
+    end
+  end
+
 
   private
 
