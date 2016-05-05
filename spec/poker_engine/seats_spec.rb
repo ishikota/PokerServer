@@ -11,29 +11,13 @@ RSpec.describe Seats do
       seats.sitdown(player)
       expect(seats.players).to include(player)
     end
-
   end
 
   describe "#size" do
 
-    before {
-      seats.sitdown(player)
-    }
-
     it "should return the number of players who sit on" do
-      expect(seats.size).to eq 1
+      expect { seats.sitdown(player) }.to change { seats.size }.by 1
     end
-
-  end
-
-  describe "#collect_bet" do
-
-    let(:player2) { double("player2") }
-    before {
-      seats.sitdown(player)
-      seats.sitdown(player2)
-    }
-
   end
 
   describe "count method" do
