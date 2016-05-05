@@ -10,11 +10,9 @@ RSpec.describe GameEvaluator do
   let(:game_evaluator) { GameEvaluator.new(hand_evaluator) }
 
   before {
-    allow(table).to receive(:community_card).and_return(community_card)
-    allow(table).to receive(:seats).and_return(seats)
-    allow(seats).to receive(:players).and_return(players)
+    allow(table).to receive_message_chain('community_card.cards')
+    allow(table).to receive_message_chain('seats.players').and_return(players)
     allow(hand_evaluator).to receive(:eval_hand)
-    allow(community_card).to receive(:cards)
   }
 
   describe "#judge" do
