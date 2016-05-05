@@ -66,6 +66,17 @@ RSpec.describe DataFormatter do
     end
   end
 
+  describe "action" do
+    let(:player) { setup_seats_with_players.players.first }
+
+    it "should convert action into hash" do
+      data = formatter.format_action(player, 'raise', 20)
+      expect(data["player"]).to eq formatter.format_player(player)
+      expect(data["action"]).to eq 'raise'
+      expect(data["amount"]).to eq 20
+    end
+  end
+
 
   private
 

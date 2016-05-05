@@ -31,5 +31,13 @@ class DataFormatter
     hash.merge!( { "valid_actions" => ary } )
   end
 
+  def format_action(player, action, amount)
+    {
+      "player" => format_player(player),
+      "action" => action,
+      "amount" => amount
+    }
+  end
+
 end
 
