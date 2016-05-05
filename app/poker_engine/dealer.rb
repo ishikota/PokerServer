@@ -38,14 +38,15 @@ class Dealer
     @broadcaster.notification(goodbye_message)
   end
 
-  # private
+  def finish_round_callback
+    lambda { |winners, accounting_info|
+      @broadcaster.notification(game_result_message(@table, winners, accounting_info))
+      teardown_round
+    }
+  end
 
-    def finish_round_callback
-      lambda { |winners, accounting_info|
-        @broadcaster.notification(game_result_message(@table, winners, accounting_info))
-        teardown_round
-      }
-    end
+  private
+
 
     def start_round
       @round_manager.start_new_round(@table)
