@@ -15,6 +15,12 @@ class DataFormatter
     { "seats" => players }
   end
 
+  def format_game_information(config, seats)
+    hash = {}
+    hash.merge!( { "player_num" => seats.players.size } )
+    hash.merge!( { "seats" => format_seats(seats) } )
+    hash.merge!( { "rule" => JSON.parse(config.to_json) } )
+  end
 
 end
 

@@ -37,6 +37,21 @@ RSpec.describe DataFormatter do
     end
   end
 
+  describe "game_information" do
+    let(:seats) { setup_seats_with_players }
+    let(:config) { Config.new }
+
+    it "should convert game_information into hash" do
+      data = formatter.format_game_information(config, seats)
+      expect(data["player_num"]).to eq 2
+      expect(data["seats"]).to eq formatter.format_seats(seats)
+      expect(data["rule"]["small_blind_amount"]).to eq 5
+      expect(data["rule"]["max_round"]).to eq 10
+      expect(data["rule"]["initial_stack"]).to eq 100
+    end
+
+  end
+
 
   private
 
