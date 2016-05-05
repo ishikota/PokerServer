@@ -10,5 +10,11 @@ class DataFormatter
     return hash
   end
 
+  def format_seats(seats)
+    players = seats.players.map { |player| format_player(player) }
+    { "seats" => players }
+  end
+
+
 end
 

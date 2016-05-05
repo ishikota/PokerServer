@@ -27,6 +27,17 @@ RSpec.describe DataFormatter do
 
   end
 
+  describe "seat" do
+    let(:seats) { setup_seats_with_players }
+
+    it "should convert seats into hash" do
+      data = formatter.format_seats(seats)
+      expect(data["seats"].size).to eq 2
+      expect(data["seats"].first).to eq formatter.format_player(seats.players.first)
+    end
+  end
+
+
   private
 
     def setup_player
@@ -36,6 +47,13 @@ RSpec.describe DataFormatter do
       player.add_action_history(PokerPlayer::ACTION::RAISE, 10, 5)
       player.pay_info.update_by_pay(10)
       return player
+    end
+
+    def setup_seats_with_players
+      seats = Seats.new
+      seats.sitdown(PokerPlayer.new(name="hoge", 100))
+      seats.sitdown(PokerPlayer.new(name="fuga", 100))
+      return seats
     end
 
     def card(suit, rank)
