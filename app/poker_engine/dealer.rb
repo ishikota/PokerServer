@@ -52,8 +52,8 @@ class Dealer
       @round_manager.start_new_round(@table)
     end
 
-    def create_player(info)
-      @player_maker.create(name=info, @config.initial_stack) #TODO use passed info
+    def create_player(player_info)
+      @player_maker.create(info=player_info, @config.initial_stack)
     end
 
     def set_player_to_seat(players)

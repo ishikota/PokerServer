@@ -33,7 +33,7 @@ RSpec.describe Dealer do
   describe "play a round" do
     let(:config) { Config.new(initial_stack=100, max_round=0) }
 
-    before { dealer.start_game(["dummy", "info"]) }
+    before { dealer.start_game(create_players_info(2)) }
 
     it "should finish by player 1 win" do
       dealer.receive_data(0, call_msg(10))
@@ -61,7 +61,7 @@ RSpec.describe Dealer do
       expect(broadcaster).to receive(:notification).with("TODO game result").twice
       expect(broadcaster).to receive(:notification).with("TODO goodbye")
 
-      dealer.start_game(["dummy", "info"])
+      dealer.start_game(create_players_info(2))
     }
 
     context "just call both of players untill end" do
@@ -96,7 +96,7 @@ RSpec.describe Dealer do
     let(:config) { Config.new(initial_stack=100, max_round=1) }
 
     before "update player's stack to p1.stack=50, p2.stack=150" do
-      dealer.start_game(["p1", "p2"])
+      dealer.start_game(create_players_info(2))
       dealer.receive_data(0, raise_msg(50))
       dealer.receive_data(1, call_msg(50))
       dealer.receive_data(0, call_msg(0))
@@ -125,6 +125,12 @@ RSpec.describe Dealer do
   end
 
   private
+
+    def create_players_info(size)
+      (1..size).inject([]) { |ary, idx|
+        ary << { "name" => "player #{idx}" }
+      }
+    end
 
     def play_a_round(dealer)
       dealer.receive_data(0, call_msg(10))

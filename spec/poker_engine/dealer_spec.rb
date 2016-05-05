@@ -33,6 +33,7 @@ RSpec.describe "Dealer" do
     let(:seat) { double("seat") }
     let(:player1) { double("player1") }
     let(:player2) { double("player2") }
+    let(:player_info) { create_players_info(2) }
 
     before {
       allow(table).to receive(:seat).and_return seat
@@ -46,17 +47,17 @@ RSpec.describe "Dealer" do
     it "should define player seats position" do
       expect(seats).to receive(:sitdown).with(player1)
       expect(seats).to receive(:sitdown).with(player2)
-      dealer.start_game(["dummy", "playerinfo"])
+      dealer.start_game(player_info)
     end
 
     it "should send game information to players" do
       expect(broadcaster).to receive(:notification).with("TODO game info")
-      dealer.start_game(["dummy", "playerinfo"])
+      dealer.start_game(player_info)
     end
 
     it "should start first round" do
       expect(round_manager).to receive(:start_new_round).with(table)
-      dealer.start_game(["dummy", "playerinfo"])
+      dealer.start_game(player_info)
     end
 
   end
@@ -181,6 +182,14 @@ RSpec.describe "Dealer" do
     end
 
   end
+
+  private
+
+    def create_players_info(size)
+      (1..size).inject([]) { |ary, idx|
+        ary << { "name" => "player #{idx}" }
+      }
+    end
 
 end
 
