@@ -112,7 +112,7 @@ RSpec.describe GameEvaluator do
 
   end
 
-  describe "#find_winner_from" do
+  describe "#find_winners_from" do
     let(:community_card) { double("community_card") }
 
     before {
@@ -131,7 +131,7 @@ RSpec.describe GameEvaluator do
       }
 
       it "should return second player" do
-        winner = game_evaluator.find_winner_from(community_card, players)
+        winner = game_evaluator.find_winners_from(community_card, players)
         expect(winner.size).to eq 1
         expect(winner).to include players[1]
       end
@@ -145,7 +145,7 @@ RSpec.describe GameEvaluator do
       }
 
       it "should return second and third player" do
-        winner = game_evaluator.find_winner_from(table, players)
+        winner = game_evaluator.find_winners_from(table, players)
         expect(winner.size).to eq 2
         expect(winner).to include players[1]
         expect(winner).to include players[2]
@@ -155,7 +155,7 @@ RSpec.describe GameEvaluator do
 
   end
 
-  describe "#create_side_pot" do
+  describe "#create_pot" do
 
     let(:pay_till_end) { PokerPlayer::PayInfo::PAY_TILL_END }
     let(:folded) { PokerPlayer::PayInfo::FOLDED }
@@ -172,7 +172,7 @@ RSpec.describe GameEvaluator do
       }
 
       it "should create side pot with eligible players" do
-        pots = game_evaluator.create_side_pot(players.values)
+        pots = game_evaluator.create_pot(players.values)
         expect(pots.size).to eq 3
         sidepot_check(players, pots[0], 60, [:A, :B, :C])
         sidepot_check(players, pots[1], 20, [:A, :C])
@@ -190,7 +190,7 @@ RSpec.describe GameEvaluator do
       }
 
       it "should create side pot with eligible players" do
-        pots = game_evaluator.create_side_pot(players.values)
+        pots = game_evaluator.create_pot(players.values)
         expect(pots.size).to eq 2
         sidepot_check(players, pots[0], 21, [:A, :B, :C])
         sidepot_check(players, pots[1], 6, [:A, :B])
@@ -207,7 +207,7 @@ RSpec.describe GameEvaluator do
       }
 
       it "should create side pot with eligible players" do
-        pots = game_evaluator.create_side_pot(players.values)
+        pots = game_evaluator.create_pot(players.values)
         expect(pots.size).to eq 2
         sidepot_check(players, pots[0], 28, [:B, :C, :D])
         sidepot_check(players, pots[1], 59, [:B, :D])
@@ -225,7 +225,7 @@ RSpec.describe GameEvaluator do
       }
 
       it "should create side pot with eligible players" do
-        pots = game_evaluator.create_side_pot(players.values)
+        pots = game_evaluator.create_pot(players.values)
         expect(pots.size).to eq 3
         sidepot_check(players, pots[0], 28, [:A, :B, :C, :D])
         sidepot_check(players, pots[1], 15, [:A, :B, :D])
@@ -245,7 +245,7 @@ RSpec.describe GameEvaluator do
       }
 
       it "should create side pot with eligible players" do
-        pots = game_evaluator.create_side_pot(players.values)
+        pots = game_evaluator.create_pot(players.values)
         expect(pots.size).to eq 3
         sidepot_check(players, pots[0], 22, [:A, :B, :C, :D])
         sidepot_check(players, pots[1], 9, [:B, :C, :D])
