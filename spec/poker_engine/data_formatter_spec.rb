@@ -98,12 +98,62 @@ RSpec.describe DataFormatter do
     end
   end
 
+  describe "action_history" do
+    let(:table) { setup_table_with_action_histories(3) }
+    let(:player1) { table.seats.players[0] }
+    let(:player2) { table.seats.players[1] }
+    let(:player3) { table.seats.players[2] }
+
+    def check(target, player, action, amount)
+      expect(target["player"]).to eq formatter.format_player(player)
+      expect(target["action"]).to eq action
+      expect(target["amount"]).to eq amount
+    end
+
+    it "should convert action_history into hash in correct_order" do
+      data = formatter.format_action_histories(table)
+      histories = data["action_histories"]
+      expect(histories.size).to eq 4
+      check(histories[0], player1, "RAISE", 10)
+      check(histories[1], player2, "FOLD", nil)
+      check(histories[2], player3, "RAISE", 20)
+      check(histories[3], player1, "CALL", 20)
+    end
+
+    context "when dealer button is shifted" do
+
+      before { table.shift_dealer_btn }
+
+      it "should change order of action histories" do
+        data = formatter.format_action_histories(table)
+        histories = data["action_histories"]
+        check(histories[0], player2, "FOLD", nil)
+        check(histories[1], player3, "RAISE", 20)
+        check(histories[2], player1, "RAISE", 10)
+      end
+    end
+
+    context "skip folded player" do
+
+      before {
+        table.seats.players.first.clear_action_histories
+      }
+
+      it "should skip first player actioin history" do
+        data = formatter.format_action_histories(table)
+        histories = data["action_histories"]
+        expect(histories.size).to eq 2
+        check(histories[0], player2, "FOLD", nil)
+        check(histories[1], player3, "RAISE", 20)
+      end
+    end
+  end
 
   private
 
     def setup_player
       hole_card = [card(Card::CLUB, 10), card(Card::DIAMOND, 14) ]
-      player = PokerPlayer.new(name="hoge", 100)
+      player = create_player("hoge")
       player.add_holecard(hole_card)
       player.add_action_history(PokerPlayer::ACTION::RAISE, 10, 5)
       player.pay_info.update_by_pay(10)
@@ -112,9 +162,32 @@ RSpec.describe DataFormatter do
 
     def setup_seats_with_players
       seats = Seats.new
-      seats.sitdown(PokerPlayer.new(name="hoge", 100))
-      seats.sitdown(PokerPlayer.new(name="fuga", 100))
+      create_players(2).each { |player|
+        seats.sitdown(player)
+      }
       return seats
+    end
+
+    def setup_table_with_action_histories(player_num)
+      table = Table.new
+      players = create_players(player_num)
+      players.each { |player| table.seats.sitdown(player) }
+      players[0].add_action_history(PokerPlayer::ACTION::RAISE, 10, 5)
+      players[1].add_action_history(PokerPlayer::ACTION::FOLD)
+      players[2].add_action_history(PokerPlayer::ACTION::RAISE, 20, 10)
+      players[0].add_action_history(PokerPlayer::ACTION::CALL, 20)
+      return table
+    end
+
+    def create_players(num)
+      names = ["hoge", "fuga", "bar"]
+      names.take(num).each.reduce([]) { |ary, name|
+        ary << create_player(name)
+      }
+    end
+
+    def create_player(name)
+      PokerPlayer.new(name=name, 100)
     end
 
     def card(suit, rank)

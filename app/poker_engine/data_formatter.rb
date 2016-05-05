@@ -45,5 +45,24 @@ class DataFormatter
     { "street" => street_str }
   end
 
+  def format_action_histories(table)
+    { "action_histories" => order_histories(table.dealer_btn, table.seats.players) }
+  end
+
+
+  private
+
+    def order_histories(next_player_pos, players)
+      ordered_histories = []
+      histories = players.map { |player| player.action_histories }
+      begin
+        history = histories[next_player_pos].shift
+        history.merge!( { "player" => format_player(players[next_player_pos]) } ) unless history.nil?
+        ordered_histories << history
+        next_player_pos = (next_player_pos + 1) % players.size
+      end until histories.flatten.empty?
+      ordered_histories.select { |history| not history.nil? }
+    end
+
 end
 
