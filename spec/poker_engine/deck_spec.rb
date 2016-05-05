@@ -11,7 +11,6 @@ RSpec.describe Deck do
       expect(card.to_s).to eq 'SK'
       expect(deck.size).to eq 51
     end
-
   end
 
   describe "#draw_cards" do
@@ -21,7 +20,6 @@ RSpec.describe Deck do
       expect(cards[2].to_s).to eq 'SJ'
       expect(deck.size).to eq 49
     end
-
   end
 
   describe "restore" do

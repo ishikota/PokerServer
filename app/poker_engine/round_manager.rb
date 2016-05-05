@@ -31,6 +31,7 @@ class RoundManager
     @next_player = table.dealer_btn
     @street = PREFLOP
 
+    table.deck.shuffle
     correct_blind(small_blind=5, table)
     deal_holecard(table.deck, table.seats.players)
 

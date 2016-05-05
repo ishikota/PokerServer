@@ -542,6 +542,7 @@ RSpec.describe RoundManager do
       card = double("card")
       allow(card).to receive(:is_a?).with(Card).and_return(true)
       allow(deck).to receive(:draw_cards).and_return([card, card])
+      allow(deck).to receive(:shuffle)
       deck
     end
 

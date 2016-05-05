@@ -26,6 +26,10 @@ class Deck
     @deck = setup
   end
 
+  def shuffle
+    @deck.shuffle! unless @cheat
+  end
+
   private
 
     def setup
