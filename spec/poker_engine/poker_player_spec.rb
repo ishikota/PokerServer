@@ -69,7 +69,7 @@ RSpec.describe PokerPlayer do
     end
 
     specify "allin player is active" do
-      player.pay_info.update_to_allin(10)
+      player.pay_info.update_to_allin
       expect(player.active?).to be_truthy
     end
 
@@ -112,9 +112,8 @@ RSpec.describe PokerPlayer do
 
         it "should append pay amount and update state to ALLIN" do
           expect {
-            player.pay_info.update_to_allin(10)
-          }.to change { player.pay_info.amount }.by(10)
-          .and change { player.pay_info.status }.to PokerPlayer::PayInfo::ALLIN
+            player.pay_info.update_to_allin
+          }.to change { player.pay_info.status }.to PokerPlayer::PayInfo::ALLIN
         end
       end
 

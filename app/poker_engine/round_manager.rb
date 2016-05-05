@@ -44,7 +44,7 @@ class RoundManager
 
     action, bet_amount = action_checker.correct_action(
         table.seats.players, @next_player, action, bet_amount)
-    next_player.pay_info.update_to_allin(0) if action_checker.allin?(next_player, action, bet_amount)
+    next_player.pay_info.update_to_allin if action_checker.allin?(next_player, action, bet_amount)
 
     accept_action(next_player, action, bet_amount, table.seats.players, action_checker)
 

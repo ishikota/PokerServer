@@ -80,8 +80,7 @@ class PokerPlayer
       @status = FOLDED
     end
 
-    def update_to_allin(amount)
-      @amount += amount
+    def update_to_allin
       @status = ALLIN
     end
 
