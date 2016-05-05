@@ -45,19 +45,7 @@ class RoundManager
         table.seats.players, @next_player, action, bet_amount)
     next_player.pay_info.update_to_allin(0) if action_checker.allin?(next_player, action, bet_amount)
 
-    if action == 'call'
-      chip_transaction(action_checker, next_player, bet_amount)
-      next_player.add_action_history(PokerPlayer::ACTION::CALL, bet_amount)
-      increment_agree_num
-    elsif action == 'raise'
-      chip_transaction(action_checker, next_player, bet_amount)
-      add_amount = bet_amount - action_checker.agree_amount(table.seats.players)
-      next_player.add_action_history(PokerPlayer::ACTION::RAISE, bet_amount, add_amount)
-      @agree_num = 1
-    elsif action == 'fold'
-      next_player.add_action_history(PokerPlayer::ACTION::FOLD)
-      next_player.pay_info.update_to_fold
-    end
+    accept_action(next_player, action, bet_amount, table.seats.players, action_checker)
 
     if everyone_agree?(table.seats)
       @street += 1
@@ -69,6 +57,7 @@ class RoundManager
     end
   end
 
+  # public for test
   def start_street(street, table)
     @agree_num = 0
     @next_player = table.dealer_btn
@@ -87,36 +76,7 @@ class RoundManager
     end
   end
 
-  def preflop(table)
-    2.times { shift_next_player(table.seats) }
-    @agree_num = 1  # big blind already agreed
-    ask_if_needed(table)
-  end
-
-  def flop(table)
-    for card in table.deck.draw_cards(3) do
-      table.community_card.add(card)
-    end
-    ask_if_needed(table)
-  end
-
-  def turn(table)
-    table.community_card.add(table.deck.draw_card)
-    ask_if_needed(table)
-  end
-
-  def river(table)
-    table.community_card.add(table.deck.draw_card)
-    ask_if_needed(table)
-  end
-
-  def showdown(table)
-    winner, accounting_info = @game_evaluator.judge(table)
-    prize_to_winner(table.seats.players, accounting_info)
-    table.reset
-    @callback.call(winner, accounting_info)
-  end
-
+  # public for test
   def shift_next_player(exec_shift=true, seats)
     next_player = @next_player
     begin
@@ -126,20 +86,56 @@ class RoundManager
     next_player
   end
 
+  # public for test
   def everyone_agree?(seats)
     @agree_num == seats.count_active_player
   end
 
+  # public for test
   def increment_agree_num
     @agree_num += 1
   end
 
   private
 
-    def clear_action_histories(players)
-      for player in players
-        player.clear_action_histories
-      end
+    def preflop(table)
+      2.times { shift_next_player(table.seats) }
+      @agree_num = 1  # big blind already agreed
+      ask_if_needed(table)
+    end
+
+    def flop(table)
+      table.deck.draw_cards(3).each { |card|
+        table.community_card.add(card)
+      }
+      ask_if_needed(table)
+    end
+
+    def turn(table)
+      table.community_card.add(table.deck.draw_card)
+      ask_if_needed(table)
+    end
+
+    def river(table)
+      table.community_card.add(table.deck.draw_card)
+      ask_if_needed(table)
+    end
+
+    def showdown(table)
+      winner, accounting_info = @game_evaluator.judge(table)
+      prize_to_winner(table.seats.players, accounting_info)
+      table.reset
+      @callback.call(winner, accounting_info)
+    end
+
+    def prize_to_winner(players, accounting_info)
+      accounting_info.each { |idx, prize|
+        players[idx].append_chip(prize)
+      }
+    end
+
+    def deal_holecard(deck, players)
+      players.each { |player| player.add_holecard(deck.draw_cards(2)) }
     end
 
     def correct_blind(small_blind, table)
@@ -149,25 +145,30 @@ class RoundManager
       sb_player = table.seats.players[small_blind_pos]
       bb_player = table.seats.players[big_blind_pos]
 
-      sb_player.collect_bet(small_blind)
-      bb_player.collect_bet(small_blind * 2)
-
-      sb_player.add_action_history(PokerPlayer::ACTION::RAISE, small_blind, 5)
-      bb_player.add_action_history(PokerPlayer::ACTION::RAISE, small_blind * 2, 5)
-      sb_player.pay_info.update_by_pay(small_blind)
-      bb_player.pay_info.update_by_pay(small_blind * 2)
+      blind_transaction(sb_player, small_blind)
+      blind_transaction(bb_player, small_blind * 2)
     end
 
-    def deal_holecard(deck, players)
-      for player in players
-        player.add_holecard(deck.draw_cards(2))
+    def blind_transaction(player, blind_amount)
+      player.collect_bet(blind_amount)
+      player.add_action_history(PokerPlayer::ACTION::RAISE, blind_amount, 5)
+      player.pay_info.update_by_pay(blind_amount)
+    end
+
+    def accept_action(player, action, bet_amount, players, action_checker)
+      if action == 'call'
+        chip_transaction(action_checker, player, bet_amount)
+        player.add_action_history(PokerPlayer::ACTION::CALL, bet_amount)
+        increment_agree_num
+      elsif action == 'raise'
+        chip_transaction(action_checker, player, bet_amount)
+        add_amount = bet_amount - action_checker.agree_amount(players)
+        player.add_action_history(PokerPlayer::ACTION::RAISE, bet_amount, add_amount)
+        @agree_num = 1
+      elsif action == 'fold'
+        player.add_action_history(PokerPlayer::ACTION::FOLD)
+        player.pay_info.update_to_fold
       end
-    end
-
-    def prize_to_winner(players, accounting_info)
-      accounting_info.each { |idx, prize|
-        players[idx].append_chip(prize)
-      }
     end
 
     def chip_transaction(action_checker, player, bet_amount)
@@ -183,6 +184,10 @@ class RoundManager
       else
         @broadcaster.ask(@next_player, "TODO")
       end
+    end
+
+    def clear_action_histories(players)
+      players.each { |player| player.clear_action_histories }
     end
 
 end
