@@ -149,6 +149,17 @@ RSpec.describe DataFormatter do
     end
   end
 
+  describe "winners" do
+    let(:winners) { create_players(2) }
+
+    it "should convert winners into hash" do
+      data = formatter.format_winners(winners)
+      expect(data["winners"].size).to eq 2
+      expect(data["winners"].first).to eq formatter.format_player(winners.first)
+      expect(data["winners"].last).to eq formatter.format_player(winners.last)
+    end
+  end
+
   private
 
     def setup_player

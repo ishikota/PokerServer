@@ -49,6 +49,10 @@ class DataFormatter
     { "action_histories" => order_histories(table.dealer_btn, table.seats.players) }
   end
 
+  def format_winners(winners)
+    { "winners" => winners.map { |player| format_player(player) } }
+  end
+
 
   private
 
