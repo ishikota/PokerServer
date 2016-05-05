@@ -52,12 +52,12 @@ RSpec.describe Table do
       (1..3).inject([]) { |acc, i| acc << double("player#{i}") }
     end
 
-    before {
-      for player in players
+    before do
+      players.each { |player|
         allow(player).to receive(:active?).and_return(true)
         table.seats.sitdown(player)
-      end
-    }
+      }
+    end
 
     describe "when next player is active" do
 
@@ -71,7 +71,8 @@ RSpec.describe Table do
     describe "when next player is not active" do
 
       before {
-        allow(players[1]).to receive(:active?).and_return(false) }
+        allow(players[1]).to receive(:active?).and_return(false)
+      }
 
       it "should skip next player" do
         expect {
@@ -83,8 +84,7 @@ RSpec.describe Table do
     describe "cycle shift position to head" do
 
       before {
-        table.shift_dealer_btn
-        table.shift_dealer_btn
+        2.times { table.shift_dealer_btn }
       }
 
       it "should shift to first player" do
