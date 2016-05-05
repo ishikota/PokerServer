@@ -31,7 +31,7 @@ RSpec.describe Dealer do
   }
 
   describe "play a round" do
-    let(:config) { Config.new(initial_stack=100, max_round=0) }
+    let(:config) { Config.new(initial_stack=100, max_round=1) }
 
     before { dealer.start_game(create_players_info(2)) }
 
@@ -54,7 +54,7 @@ RSpec.describe Dealer do
   end
 
   describe "play two rounds successibly" do
-    let(:config) { Config.new(initial_stack=100, max_round=1) }
+    let(:config) { Config.new(initial_stack=100, max_round=2) }
 
     before {
       expect(broadcaster).to receive(:notification).with("round info").twice
@@ -93,7 +93,7 @@ RSpec.describe Dealer do
   end
 
   describe "Count allin player as agreed" do
-    let(:config) { Config.new(initial_stack=100, max_round=1) }
+    let(:config) { Config.new(initial_stack=100, max_round=2) }
 
     before "update player's stack to p1.stack=50, p2.stack=150" do
       dealer.start_game(create_players_info(2))

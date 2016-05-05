@@ -145,7 +145,7 @@ RSpec.describe "Dealer" do
       context "when last game was final round" do
 
         before {
-          allow(config).to receive(:max_round).and_return(0)
+          allow(config).to receive(:max_round).and_return(1)
         }
 
         it "should not start the next game" do

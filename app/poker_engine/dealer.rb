@@ -7,7 +7,7 @@ class Dealer
     @round_manager = components_holder[:round_manager]
     @action_checker = components_holder[:action_checker]
     @player_maker = components_holder[:player_maker]
-    @round_count = 0
+    @round_count = 1
     @round_manager.set_finish_callback(finish_round_callback)
   end
 
