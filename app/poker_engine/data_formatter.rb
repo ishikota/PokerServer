@@ -22,5 +22,14 @@ class DataFormatter
     hash.merge!( { "rule" => JSON.parse(config.to_json) } )
   end
 
+  def format_valid_actions(call_amount, min_bet_amount, max_bet_amount)
+    hash = {}
+    ary = []
+    ary << { "action" => "fold", "amount" => 0 }
+    ary << { "action" => "call", "amount" => call_amount }
+    ary << { "action" => "raise", "amount" => { "min" => min_bet_amount, "max" => max_bet_amount } }
+    hash.merge!( { "valid_actions" => ary } )
+  end
+
 end
 

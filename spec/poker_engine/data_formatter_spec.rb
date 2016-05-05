@@ -52,6 +52,20 @@ RSpec.describe DataFormatter do
 
   end
 
+  describe "valid_actions" do
+
+    it "should convert valid actions into hash" do
+      data = formatter.format_valid_actions(10, 20, 100)
+      expect(data["valid_actions"][0]["action"]).to eq "fold"
+      expect(data["valid_actions"][0]["amount"]).to eq 0
+      expect(data["valid_actions"][1]["action"]).to eq "call"
+      expect(data["valid_actions"][1]["amount"]).to eq 10
+      expect(data["valid_actions"][2]["action"]).to eq "raise"
+      expect(data["valid_actions"][2]["amount"]["min"]).to eq 20
+      expect(data["valid_actions"][2]["amount"]["max"]).to eq 100
+    end
+  end
+
 
   private
 
