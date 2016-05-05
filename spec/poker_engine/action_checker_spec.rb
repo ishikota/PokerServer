@@ -5,16 +5,9 @@ RSpec.describe ActionChecker do
   let(:action_checker) { ActionChecker.new }
 
   context "when no action is done before" do
-
-    let(:players) do
-      [1,2].inject([]) { |ary, i|
-        player = double("player#{i}")
-        allow(player).to receive(:action_histories).and_return []
-        allow(player).to receive(:stack).and_return 100
-        allow(player).to receive(:paid_sum).and_return 0
-        ary << player
-      }
-    end
+    let(:player1) { create_clean_player_with_stack("player1", 100) }
+    let(:player2) { create_clean_player_with_stack("player2", 100) }
+    let(:players) { [ player1, player2 ] }
 
     describe "CALL $0 (CHECK)" do
 
@@ -23,8 +16,8 @@ RSpec.describe ActionChecker do
       end
 
       specify "need amount for action is $0" do
-        expect(need_amount(players[0], 0)).to eq 0
-        expect(need_amount(players[1], 0)).to eq 0
+        expect(need_amount(player1, 0)).to eq 0
+        expect(need_amount(player2, 0)).to eq 0
       end
     end
 
@@ -50,8 +43,8 @@ RSpec.describe ActionChecker do
       end
 
       specify "need amount for action is $10" do
-        expect(need_amount(players[0], 5)).to eq 5
-        expect(need_amount(players[1], 5)).to eq 5
+        expect(need_amount(player1, 5)).to eq 5
+        expect(need_amount(player2, 5)).to eq 5
       end
     end
   end
@@ -182,7 +175,7 @@ RSpec.describe ActionChecker do
 
   describe "allin?" do
 
-    let(:player) { create_player_with_stack(100) }
+    let(:player) { create_clean_player_with_stack("player", 100) }
 
     context "passed action is CALL" do
 
@@ -212,23 +205,16 @@ RSpec.describe ActionChecker do
   end
 
   describe "correct_action" do
-
-    let(:players) do
-      [1,2].inject([]) { |ary, i|
-        player = double("player#{i}")
-        allow(player).to receive(:action_histories).and_return []
-        allow(player).to receive(:stack).and_return 100
-        allow(player).to receive(:paid_sum).and_return 0
-        ary << player
-      }
-    end
+    let(:player1) { create_clean_player_with_stack("player1", 100) }
+    let(:player2) { create_clean_player_with_stack("player2", 100) }
+    let(:players) { [ player1, player2 ] }
 
     context "when passed ALLIN CALL" do
 
       before {
         history = [] << create_history("RAISE", 50, 50, 50)
-        allow(players[0]).to receive(:action_histories).and_return history
-        allow(players[1]).to receive(:stack).and_return 30
+        allow(player1).to receive(:action_histories).and_return history
+        allow(player2).to receive(:stack).and_return 30
       }
 
       it "should correct bet_amount to his stack amount" do
@@ -286,6 +272,14 @@ RSpec.describe ActionChecker do
       action_checker.need_amount_for_action(player, amount)
     end
 
+    def create_clean_player_with_stack(name, stack_amount)
+      player = double(name)
+      allow(player).to receive(:stack).and_return(stack_amount)
+      allow(player).to receive(:action_histories).and_return []
+      allow(player).to receive(:paid_sum).and_return 0
+      player
+    end
+
     def create_blind_player(small_blind=true)
       name = small_blind ? "small blind" : "big blind"
       blind_amount = small_blind ? 5 : 10
@@ -304,13 +298,6 @@ RSpec.describe ActionChecker do
       history.merge!( { "paid" => paid } ) unless paid.nil?
       history.merge!( { "add_amount" => add_amount } ) unless add_amount.nil?
     end
-
-    def create_player_with_stack(stack_amount)
-      player = double("player")
-      allow(player).to receive(:stack).and_return(stack_amount)
-      player
-    end
-
 
 end
 
