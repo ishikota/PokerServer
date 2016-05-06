@@ -2,7 +2,8 @@ require 'rails_helper'
 
 RSpec.describe DataFormatter do
 
-  let(:formatter) { DataFormatter.new }
+  let(:game_evaluator) { GameEvaluator.new(hand_evaluator=nil) }
+  let(:formatter) { DataFormatter.new(game_evaluator) }
 
   describe "player" do
     let(:player) { setup_player }
@@ -34,6 +35,59 @@ RSpec.describe DataFormatter do
       data = formatter.format_seats(seats)
       expect(data["seats"].size).to eq 2
       expect(data["seats"].first).to eq formatter.format_player(seats.players.first)
+    end
+  end
+
+  describe "pot" do
+
+    let(:pay_till_end) { PokerPlayer::PayInfo::PAY_TILL_END }
+    let(:folded) { PokerPlayer::PayInfo::FOLDED }
+    let(:allin) { PokerPlayer::PayInfo::ALLIN }
+
+    let(:players) { [] }
+
+    context "A: $5, B: $10, C:$10" do
+
+      before {
+        players << create_player_with_pay_info("A",  5, pay_till_end)
+        players << create_player_with_pay_info("B", 10, pay_till_end)
+        players << create_player_with_pay_info("C", 10, pay_till_end)
+      }
+
+      it "should convert pots into hash" do
+        data = formatter.format_pot(players)
+        main_pot = data["main"]
+
+        expect(main_pot["amount"]).to eq 25
+        expect(main_pot["eligibles"]).to be_nil
+        expect(data["side"]).to be_empty
+      end
+    end
+
+
+    context "A: $5(ALLIN), B: $10, C: $8(ALLIN), D: $10, E: $2(FOLDED)" do
+
+      before {
+        players << create_player_with_pay_info("A", 5, allin)
+        players << create_player_with_pay_info("B", 10, pay_till_end)
+        players << create_player_with_pay_info("C", 8, allin)
+        players << create_player_with_pay_info("D", 10, pay_till_end)
+        players << create_player_with_pay_info("E", 2, folded)
+      }
+
+      it "should convert pots into hash" do
+        data = formatter.format_pot(players)
+        main_pot = data["main"]
+        side_pot1, side_pot2 = data["side"]
+
+        expect(main_pot["amount"]).to eq 22
+
+        expect(side_pot1["amount"]).to eq 9
+        expect(side_pot1["eligibles"].size).to eq 3
+
+        expect(side_pot2["amount"]).to eq 4
+        expect(side_pot2["eligibles"].size).to eq 2
+      end
     end
   end
 
@@ -199,6 +253,17 @@ RSpec.describe DataFormatter do
 
     def create_player(name)
       PokerPlayer.new(name=name, 100)
+    end
+
+    def create_player_with_pay_info(name, amount, status)
+      player = create_player(name)
+      player.pay_info.update_by_pay(amount)
+      if status == PokerPlayer::PayInfo::ALLIN
+        player.pay_info.update_to_allin
+      elsif status == PokerPlayer::PayInfo::FOLDED
+        player.pay_info.update_to_fold
+      end
+      return player
     end
 
     def card(suit, rank)

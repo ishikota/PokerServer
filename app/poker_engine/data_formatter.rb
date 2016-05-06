@@ -1,5 +1,9 @@
 class DataFormatter
 
+  def initialize(game_evaluator)
+    @game_evaluator = game_evaluator
+  end
+
   def format_player(player, holecard=false)
     hash = JSON.parse(player.to_json)
     hash.delete("action_histories")
@@ -14,6 +18,19 @@ class DataFormatter
     players = seats.players.map { |player| format_player(player) }
     { "seats" => players }
   end
+
+  def format_pot(players)
+    pots = @game_evaluator.create_pot(players)
+    main = { "amount" => pots.first[:amount] }
+    side = pots.drop(1).map { |side_pot|
+      new_hash = {}
+      new_hash.merge!( { "amount" => side_pot[:amount] } )
+      new_hash.merge!( { "eligibles" => format_players(side_pot[:eligibles]) } )
+    }
+
+    { "main" => main, "side" => side }
+  end
+
 
   def format_game_information(config, seats)
     hash = {}
@@ -66,6 +83,10 @@ class DataFormatter
         next_player_pos = (next_player_pos + 1) % players.size
       end until histories.flatten.empty?
       ordered_histories.select { |history| not history.nil? }
+    end
+
+    def format_players(players)
+      players.map { |player| format_player(player) }
     end
 
 end
