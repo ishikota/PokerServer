@@ -22,5 +22,16 @@ RSpec.describe MessageCreator do
     end
   end
 
+  describe "round_start_message" do
+    let(:seats) { setup_seats_with_players(2) }
+
+    it "should create correct message for correct player" do
+      msg = message_creator.round_start_message(player_pos=1, seats)
+      expect(msg["message_type"]).to eq MessageCreator::Type::ROUND_START_MESSAGE
+      expect(msg["seats"]).to eq formatter.format_seats(seats)
+      expect(msg["hole_card"]).to eq ["C8", "D3"]
+    end
+  end
+
 end
 
