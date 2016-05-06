@@ -1,4 +1,4 @@
-class MessageCreator
+class MessageBuilder
 
   module Type
     GAME_START_MESSAGE = "game_start_message"
