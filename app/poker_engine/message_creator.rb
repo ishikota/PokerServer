@@ -6,6 +6,7 @@ class MessageCreator
     STREET_START_MESSAGE = "street_start_message"
     ASK_MESSAGE = "ask_message"
     GAME_UPDATE_MESSAGE = "game_update_message"
+    ROUND_RESULT_MESSAGE = "round_result_message"
   end
 
   def initialize(data_formatter)
@@ -67,6 +68,16 @@ class MessageCreator
       "round_state" => round_state,
       "action_histories" => action_histories
     }
+  end
+
+  def round_result_message(winners, round_manager, table)
+    winners = @formatter.format_winners(winners)
+    round_state = @formatter.format_round_state(round_manager, table)
+
+    {
+      "message_type" => Type::ROUND_RESULT_MESSAGE,
+      "round_state" => round_state
+     }.merge!(winners)
   end
 
 end

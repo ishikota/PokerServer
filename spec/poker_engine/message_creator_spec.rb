@@ -83,5 +83,18 @@ RSpec.describe MessageCreator do
     end
   end
 
+  describe "round_result_message" do
+    let(:round_manager) { create_round_manager }
+    let(:table) { setup_table_with_players(2, holecard=true) }
+    let(:winners) { [table.seats.players.first] }
+
+    it "should create correct message" do
+      msg = message_creator.round_result_message(winners, round_manager, table)
+      expect(msg["message_type"]).to eq MessageCreator::Type::ROUND_RESULT_MESSAGE
+      expect(msg["winners"]).to eq formatter.format_winners(winners)["winners"]
+      expect(msg["round_state"]).to eq formatter.format_round_state(round_manager, table)
+    end
+  end
+
 end
 
