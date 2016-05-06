@@ -265,6 +265,26 @@ RSpec.describe ActionChecker do
 
   end
 
+  describe "legal_actions" do
+
+    context "after blind" do
+      let(:sb_player) { create_blind_player(small_blind=true) }
+      let(:bb_player) { create_blind_player(small_blind=false) }
+      let(:players) { [ sb_player, bb_player ] }
+
+      specify "legal actions are { FOLD, CALL$10, RAISE $15~$100 }" do
+        legal_actions = action_checker.legal_actions(players, 0)
+        expect(legal_actions[0]["action"]).to eq "fold"
+        expect(legal_actions[0]["amount"]).to eq 0
+        expect(legal_actions[1]["action"]).to eq "call"
+        expect(legal_actions[1]["amount"]).to eq 10
+        expect(legal_actions[2]["action"]).to eq "raise"
+        expect(legal_actions[2]["amount"]["min"]).to eq 15
+        expect(legal_actions[2]["amount"]["max"]).to eq 100
+      end
+    end
+  end
+
 
   private
 

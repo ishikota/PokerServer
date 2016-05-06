@@ -32,6 +32,16 @@ class ActionChecker
     end
   end
 
+  def legal_actions(players, player_pos)
+    player = players[player_pos]
+    min_raise = min_raise_amount(players)
+    pay_max = player.stack + player.paid_sum
+    actions = []
+    actions << { "action" => "fold", "amount" => 0 }
+    actions << { "action" => "call", "amount" => agree_amount(players) }
+    actions << { "action" => "raise", "amount" => { "min" => min_raise, "max" => pay_max } }
+  end
+
   def need_amount_for_action(player, amount)
     amount - player.paid_sum
   end
@@ -54,10 +64,14 @@ class ActionChecker
     end
 
     def illegal_raise?(players, amount)
-      last_raise = fetch_last_raise(players)
-      min_raise = last_raise.nil? ? DEFAULT_MIN_RAISE : last_raise["amount"] + last_raise["add_amount"]
-      min_raise > amount
+      min_raise_amount(players) > amount
     end
+
+    def min_raise_amount(players)
+      last_raise = fetch_last_raise(players)
+      last_raise.nil? ? DEFAULT_MIN_RAISE : last_raise["amount"] + last_raise["add_amount"]
+    end
+
 
     def fetch_last_raise(players)
       players.map { |player|
