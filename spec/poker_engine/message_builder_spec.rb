@@ -38,9 +38,9 @@ RSpec.describe MessageBuilder do
     let(:table) { setup_table_with_players(2) }
 
     before {
-      action_checler = ActionChecker.new
+      action_checker = ActionChecker.new
       round_manager.start_new_round(table)
-      round_manager.apply_action(table, 'call', 10, action_checler)  # forward to FLOP
+      round_manager.apply_action(table, 'call', 10, action_checker)  # forward to FLOP
     }
 
     it "should create correct message" do

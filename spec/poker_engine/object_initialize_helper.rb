@@ -54,7 +54,9 @@ module ObjectInitializeHelper
       broadcaster = mock_broadcaster
       hand_evaluator = HandEvaluator.new
       game_evaluator = GameEvaluator.new(hand_evaluator)
-      RoundManager.new(broadcaster, game_evaluator)
+      data_formatter = DataFormatter.new(game_evaluator)
+      message_builder = MessageBuilder.new(data_formatter)
+      RoundManager.new(broadcaster, game_evaluator, message_builder)
     end
 
     def mock_broadcaster

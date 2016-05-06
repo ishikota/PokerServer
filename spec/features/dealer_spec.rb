@@ -11,7 +11,8 @@ RSpec.describe Dealer do
   let(:table) { Table.new(cheat_deck) }
   let(:hand_evaluator) { HandEvaluator.new }
   let(:game_evaluator) { GameEvaluator.new(hand_evaluator) }
-  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator) }
+  let(:message_builder) { double("message_builder") }
+  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator, message_builder) }
   let(:action_checker) { ActionChecker.new }
   let(:player_maker) { PlayerMaker.new }
 
@@ -26,10 +27,25 @@ RSpec.describe Dealer do
     }
   end
 
+  let(:game_start_msg) { "game results" }
+  let(:round_start_msg) { "round starts" }
+  let(:street_start_msg) { "street starts" }
+  let(:ask_msg) { "ask" }
+  let(:update_msg) { "update" }
+  let(:round_result_msg) { "round results" }
+  let(:game_result_msg) { "game results" }
+
   before {
     allow(broadcaster).to receive(:ask)
     allow(broadcaster).to receive(:notification)
     allow(finish_callback).to receive(:call)
+    allow(message_builder).to receive(:game_start_message).and_return(game_start_msg)
+    allow(message_builder).to receive(:round_start_message).and_return(round_start_msg)
+    allow(message_builder).to receive(:street_start_message).and_return(street_start_msg)
+    allow(message_builder).to receive(:ask_message).and_return(ask_msg)
+    allow(message_builder).to receive(:update_message).and_return(update_msg)
+    allow(message_builder).to receive(:round_result_message).and_return(round_result_msg)
+    allow(message_builder).to receive(:game_result_message).and_return(game_result_msg)
   }
 
   describe "play a round" do
@@ -59,7 +75,7 @@ RSpec.describe Dealer do
     let(:config) { Config.new(initial_stack=100, max_round=2) }
 
     before {
-      expect(broadcaster).to receive(:notification).with("round info").twice
+      expect(message_builder).to receive(:round_start_message).with(0, anything).twice
       expect(broadcaster).to receive(:notification).with("TODO game result").twice
       expect(broadcaster).to receive(:notification).with("TODO goodbye")
 

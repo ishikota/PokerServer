@@ -15,9 +15,10 @@ class RoundManager
     SHOWDOWN => "SHOWDOWN"
   }
 
-  def initialize(broadcaster, game_evaluator)
+  def initialize(broadcaster, game_evaluator, message_builder)
     @broadcaster = broadcaster
     @game_evaluator = game_evaluator
+    @message_builder = message_builder
     @street = 0
     @agree_num = 0
     @next_player = 0
@@ -35,7 +36,7 @@ class RoundManager
     correct_blind(small_blind=5, table)
     deal_holecard(table.deck, table.seats.players)
 
-    @broadcaster.notification("round info")
+    notify_round_start(table)
     start_street(@street, table)
   end
 
@@ -54,7 +55,7 @@ class RoundManager
       start_street(@street, table)
     else
       shift_next_player(table.seats)
-      @broadcaster.ask(@next_player, "TODO")
+      send_ask_message(@next_player, self, table)
     end
   end
 
@@ -62,7 +63,7 @@ class RoundManager
   def start_street(street, table)
     @agree_num = 0
     @next_player = table.dealer_btn
-    @broadcaster.notification("#{STREET_MAP[street]} starts")
+    notify_street_start(table)
 
     if street == PREFLOP
       preflop(table)
@@ -183,12 +184,36 @@ class RoundManager
         @street += 1
         start_street(@street, table)
       else
-        @broadcaster.ask(@next_player, "TODO")
+        send_ask_message(@next_player, self, table)
       end
     end
 
     def clear_action_histories(players)
       players.each { |player| player.clear_action_histories }
+    end
+
+    def ask(player_pos, message)
+      @broadcaster.ask(player_pos, message)
+    end
+    def notify(message)
+      @broadcaster.notification(message)
+    end
+
+    def notify_round_start(table)
+      table.seats.players.each_with_index { |player, idx|
+        #TODO fix to notify to each person
+        notify(@message_builder.round_start_message(idx, table.seats))
+      }
+    end
+
+    def notify_street_start(table)
+      notify(@message_builder.street_start_message(self, table))
+    end
+
+    def send_ask_message(player_pos, round_manager, table)
+      action_checker = ActionChecker.new  #TODO
+      message = @message_builder.ask_message(action_checker, player_pos, round_manager, table)
+      ask(player_pos, message)
     end
 
 end

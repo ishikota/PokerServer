@@ -8,14 +8,22 @@ RSpec.describe RoundManager do
   let(:broadcaster) { double("broadcaster") }
   let(:hand_evaluator) { HandEvaluator.new }
   let(:game_evaluator) { GameEvaluator.new(hand_evaluator) }
-  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator) }
+  let(:message_builder) { double("message_builder") }
+  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator, message_builder) }
   let(:action_checker) { ActionChecker.new }
+
+  let(:round_start_msg) { "round starts" }
+  let(:street_start_msg) { "street starts" }
+  let(:ask_msg) { "ask" }
 
   before {
     round_manager.set_finish_callback(finish_callback)
 
     allow(broadcaster).to receive(:notification)
     allow(broadcaster).to receive(:ask)
+    allow(message_builder).to receive(:round_start_message).and_return(round_start_msg)
+    allow(message_builder).to receive(:street_start_message).and_return(street_start_msg)
+    allow(message_builder).to receive(:ask_message).and_return(ask_msg)
   }
 
   describe "player a round with two player" do
@@ -29,8 +37,8 @@ RSpec.describe RoundManager do
     }
 
     it "should notify starts of the round to all players" do
-      expect(broadcaster).to receive(:notification).with("round info")
-      expect(broadcaster).to receive(:notification).with("PREFLOP starts")
+      expect(broadcaster).to receive(:notification).with("round starts")
+      expect(broadcaster).to receive(:notification).with("street starts")
 
       round_manager.start_new_round(table)
     end
@@ -50,7 +58,7 @@ RSpec.describe RoundManager do
     end
 
     it "should not ask blind player in preflop" do
-      expect(broadcaster).to receive(:ask).with(0, "TODO")
+      expect(broadcaster).to receive(:ask).with(0, "ask")
 
       round_manager.start_new_round(table)
     end
@@ -76,7 +84,7 @@ RSpec.describe RoundManager do
 
         it "should forward to flop" do
           expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
-          expect(broadcaster).to receive(:notification).with("FLOP starts")
+          expect(broadcaster).to receive(:notification).with("street starts")
 
           expect {
             round_manager.apply_action(table, 'call', 10, action_checker)
@@ -95,7 +103,7 @@ RSpec.describe RoundManager do
         it "should forward to TURN" do
           round_manager.apply_action(table, 'raise', 10, action_checker)
           expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
-          expect(broadcaster).to receive(:notification).with("TURN starts")
+          expect(broadcaster).to receive(:notification).with("street starts")
 
           expect {
             round_manager.apply_action(table, 'call', 10, action_checker)
@@ -116,7 +124,7 @@ RSpec.describe RoundManager do
         it "should forward to RIVER" do
           round_manager.apply_action(table, 'call', 0, action_checker)
           expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
-          expect(broadcaster).to receive(:notification).with("RIVER starts")
+          expect(broadcaster).to receive(:notification).with("street starts")
 
           expect {
             round_manager.apply_action(table, 'call', 0, action_checker)
@@ -199,7 +207,7 @@ RSpec.describe RoundManager do
           round_manager.start_new_round(table)
           round_manager.apply_action(table, 'call', 10, action_checker)
 
-          expect(broadcaster).to receive(:ask).with(table.dealer_btn, "TODO")
+          expect(broadcaster).to receive(:ask).with(table.dealer_btn, "ask")
 
           expect {
             round_manager.apply_action(table, 'fold', nil, action_checker)

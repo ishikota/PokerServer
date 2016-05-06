@@ -7,11 +7,15 @@ RSpec.describe RoundManager do
   let(:seats) { table.seats }
   let(:broadcaster) { double("broadcaster") }
   let(:game_evaluator) { double("game evaluator") }
-  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator) }
+  let(:message_builder) { double("message_builder") }
+  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator, message_builder) }
 
   before {
     allow(broadcaster).to receive(:ask)
     allow(broadcaster).to receive(:notification)
+    allow(message_builder).to receive(:round_start_message)
+    allow(message_builder).to receive(:street_start_message)
+    allow(message_builder).to receive(:ask_message)
 
     round_manager.set_finish_callback(finish_callback)
   }

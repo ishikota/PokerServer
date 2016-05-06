@@ -4,8 +4,14 @@ RSpec.describe RoundManager do
 
   let(:broadcaster) { double("broadcaster") }
   let(:game_evaluator) { double("game evaluator") }
-  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator) }
+  let(:message_builder) { double("message_builder") }
+  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator, message_builder) }
 
+  before {
+    allow(message_builder).to receive(:round_start_message)
+    allow(message_builder).to receive(:street_start_message)
+    allow(message_builder).to receive(:ask_message)
+  }
 
   describe "#start_new_round" do
     let(:table) { setup_table }
@@ -18,6 +24,14 @@ RSpec.describe RoundManager do
       allow(broadcaster).to receive(:ask)
       allow(broadcaster).to receive(:notification)
     }
+
+    it "should send round_start and street start message" do
+      expect(message_builder).to receive(:round_start_message)
+      expect(message_builder).to receive(:street_start_message)
+      expect(message_builder).to receive(:ask_message)
+
+      round_manager.start_new_round(table)
+    end
 
     it "should collect blind" do
       small_blind = 5  #TODO read blind amount from somewhare

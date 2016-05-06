@@ -5,10 +5,14 @@ RSpec.describe RoundManager do
   let(:finish_callback) { double("dealer.finish_round") }
   let(:broadcaster) { double("broadcaster") }
   let(:game_evaluator) { double("game evaluator") }
-  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator) }
+  let(:message_builder) { double("message_builder") }
+  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator, message_builder) }
 
   before {
     round_manager.set_finish_callback(finish_callback)
+    allow(message_builder).to receive(:round_start_message).and_return("round_msg")
+    allow(message_builder).to receive(:street_start_message).and_return("street_msg")
+    allow(message_builder).to receive(:ask_message).and_return("ask_msg")
   }
 
   describe "#apply_action" do
@@ -177,7 +181,7 @@ RSpec.describe RoundManager do
 
       it "should ask action to him" do
         setup_action_checker(player1, 0, 5)
-        expect(broadcaster).to receive(:ask).with(1, "TODO")
+        expect(broadcaster).to receive(:ask).with(1, "ask_msg")
 
         expect {
           apply_action(round_manager, table, 'call', 5, action_checker)
@@ -216,7 +220,8 @@ RSpec.describe RoundManager do
 
       it "should forward to next street" do
         setup_action_checker(player1, 0, 5)
-        expect(broadcaster).to receive(:notification).with("FLOP starts")
+        expect(message_builder).to receive(:street_start_message)
+        expect(broadcaster).to receive(:notification).with("street_msg")
 
         apply_action(round_manager, table, 'call', 5, action_checker)
       end
