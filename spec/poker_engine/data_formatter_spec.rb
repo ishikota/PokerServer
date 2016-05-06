@@ -179,6 +179,7 @@ RSpec.describe DataFormatter do
       data = formatter.format_action_histories(table)
       histories = data["action_histories"]
       expect(histories.size).to eq 4
+      expect(player1.action_histories.size).to eq 2
       check(histories[0], player1, "RAISE", 10)
       check(histories[1], player2, "FOLD", nil)
       check(histories[2], player3, "RAISE", 20)

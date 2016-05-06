@@ -81,8 +81,10 @@ class DataFormatter
   private
 
     def order_histories(next_player_pos, players)
+      deep_copy = lambda { |ary| ary.map { |e| e } }
+
       ordered_histories = []
-      histories = players.map { |player| player.action_histories }
+      histories = players.map { |player| deep_copy.call(player.action_histories) }
       begin
         history = histories[next_player_pos].shift
         history.merge!( { "player" => format_player(players[next_player_pos]) } ) unless history.nil?
