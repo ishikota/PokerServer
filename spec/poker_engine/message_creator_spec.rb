@@ -58,10 +58,26 @@ RSpec.describe MessageCreator do
 
     it "should create correct message" do
       msg = message_creator.ask_message(action_checler, player_pos=1, round_manager, table)
-      binding.pry
       expect(msg["message_type"]).to eq MessageCreator::Type::ASK_MESSAGE
       expect(msg["hole_card"]).to eq ["C8", "D3"]
       expect(msg["valid_actionis"].size).to eq 3
+      expect(msg["round_state"]).to eq formatter.format_round_state(round_manager, table)
+      expect(msg["action_histories"]).to eq formatter.format_action_histories(table)
+    end
+  end
+
+  describe "game_update_message" do
+    let(:round_manager) { create_round_manager }
+    let(:table) { setup_table_with_players(2, holecard=true) }
+    let(:player_pos) { 1 }
+    let(:action) { "call" }
+    let(:amount) { 10 }
+
+    it "should create correct message" do
+      player = table.seats.players[player_pos]
+      msg = message_creator.game_update_message(player_pos, action, amount, round_manager, table)
+      expect(msg["message_type"]).to eq MessageCreator::Type::GAME_UPDATE_MESSAGE
+      expect(msg["action"]).to eq formatter.format_action(player, action, amount)
       expect(msg["round_state"]).to eq formatter.format_round_state(round_manager, table)
       expect(msg["action_histories"]).to eq formatter.format_action_histories(table)
     end

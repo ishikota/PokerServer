@@ -5,6 +5,7 @@ class MessageCreator
     ROUND_START_MESSAGE = "round_start_message"
     STREET_START_MESSAGE = "street_start_message"
     ASK_MESSAGE = "ask_message"
+    GAME_UPDATE_MESSAGE = "game_update_message"
   end
 
   def initialize(data_formatter)
@@ -49,6 +50,20 @@ class MessageCreator
       "message_type" => Type::ASK_MESSAGE,
       "hole_card" => hole_card,
       "valid_actionis" => valid_actionis,
+      "round_state" => round_state,
+      "action_histories" => action_histories
+    }
+  end
+
+  def game_update_message(player_pos, action, amount, round_manager, table)
+    player = table.seats.players[player_pos]
+    action = @formatter.format_action(player, action, amount)
+    round_state = @formatter.format_round_state(round_manager, table)
+    action_histories = @formatter.format_action_histories(table)
+
+    {
+      "message_type" => Type::GAME_UPDATE_MESSAGE,
+      "action" => action,
       "round_state" => round_state,
       "action_histories" => action_histories
     }
