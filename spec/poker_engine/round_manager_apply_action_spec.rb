@@ -13,6 +13,7 @@ RSpec.describe RoundManager do
     allow(message_builder).to receive(:round_start_message).and_return("round_msg")
     allow(message_builder).to receive(:street_start_message).and_return("street_msg")
     allow(message_builder).to receive(:ask_message).and_return("ask_msg")
+    allow(message_builder).to receive(:game_update_message).and_return("update")
   }
 
   describe "#apply_action" do
@@ -26,10 +27,18 @@ RSpec.describe RoundManager do
 
     before {
       allow(broadcaster).to receive(:ask)
+      allow(broadcaster).to receive(:notification).with("update")
       allow(action_checker).to receive(:illegal?).and_return false
     }
 
     describe "apply passed action to table" do
+
+      it "should notify update to all players" do
+        setup_action_checker(player1, 0, 10)
+        expect(broadcaster).to receive(:notification).with("update")
+
+        apply_action(round_manager, table, 'call', 10, action_checker)
+      end
 
       context "when passed action is CALL" do
 
@@ -220,7 +229,6 @@ RSpec.describe RoundManager do
 
       it "should forward to next street" do
         setup_action_checker(player1, 0, 5)
-        expect(message_builder).to receive(:street_start_message)
         expect(broadcaster).to receive(:notification).with("street_msg")
 
         apply_action(round_manager, table, 'call', 5, action_checker)

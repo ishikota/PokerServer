@@ -15,6 +15,7 @@ RSpec.describe RoundManager do
   let(:round_start_msg) { "round starts" }
   let(:street_start_msg) { "street starts" }
   let(:ask_msg) { "ask" }
+  let(:update_msg) { "update" }
 
   before {
     round_manager.set_finish_callback(finish_callback)
@@ -24,6 +25,7 @@ RSpec.describe RoundManager do
     allow(message_builder).to receive(:round_start_message).and_return(round_start_msg)
     allow(message_builder).to receive(:street_start_message).and_return(street_start_msg)
     allow(message_builder).to receive(:ask_message).and_return(ask_msg)
+    allow(message_builder).to receive(:game_update_message).and_return(update_msg)
   }
 
   describe "player a round with two player" do

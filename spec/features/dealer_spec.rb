@@ -44,7 +44,7 @@ RSpec.describe Dealer do
     allow(message_builder).to receive(:round_start_message).and_return(round_start_msg)
     allow(message_builder).to receive(:street_start_message).and_return(street_start_msg)
     allow(message_builder).to receive(:ask_message).and_return(ask_msg)
-    allow(message_builder).to receive(:update_message).and_return(update_msg)
+    allow(message_builder).to receive(:game_update_message).and_return(update_msg)
     allow(message_builder).to receive(:round_result_message).and_return(round_result_msg)
     allow(message_builder).to receive(:game_result_message).and_return(game_result_msg)
   }

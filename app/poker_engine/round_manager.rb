@@ -48,6 +48,7 @@ class RoundManager
     next_player.pay_info.update_to_allin if action_checker.allin?(next_player, action, bet_amount)
 
     accept_action(next_player, action, bet_amount, table.seats.players, action_checker)
+    notify_update(@next_player, action, bet_amount, table)
 
     if everyone_agree?(table.seats)
       @street += 1
@@ -208,6 +209,11 @@ class RoundManager
 
     def notify_street_start(table)
       notify(@message_builder.street_start_message(self, table))
+    end
+
+    def notify_update(player_pos, action, amount, table)
+      message = @message_builder.game_update_message(player_pos, action, amount, self, table)
+      notify(message)
     end
 
     def send_ask_message(player_pos, round_manager, table)
