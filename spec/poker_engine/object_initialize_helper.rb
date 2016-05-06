@@ -31,9 +31,9 @@ module ObjectInitializeHelper
       return seats
     end
 
-    def setup_table_with_players(player_num)
+    def setup_table_with_players(player_num, holecard=false)
       table = Table.new(cheat_deck)
-      players = setup_players(player_num, hole_card=false)
+      players = setup_players(player_num, holecard=holecard)
       players.each { |player| table.seats.sitdown(player) }
       return table
     end
