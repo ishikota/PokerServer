@@ -10,7 +10,7 @@ class DataFormatter
     hash.delete("hole_card")
     hash.delete("pay_info")
     hash.merge!( { "state" => player.pay_info.status } )
-    hash.merge!( { "hole_card" => player.hole_card.map { |card| card.to_s } } ) if holecard
+    hash.merge!( { "hole_card" => format_cards(player.hole_card) } ) if holecard
     return hash
   end
 
@@ -69,6 +69,14 @@ class DataFormatter
     { "winners" => format_players(winners) }
   end
 
+  def format_round_state(round_manager, table)
+    next_player_pos = round_manager.next_player
+    next_player = table.seats.players[next_player_pos]
+
+    {}.merge!(fetch_round_info(round_manager))
+      .merge!(fetch_table_info(table))
+      .merge!( { "next_player" => format_player(next_player) } )
+  end
 
   private
 
@@ -88,8 +96,25 @@ class DataFormatter
       players.map { |player| format_player(player) }
     end
 
+    def format_cards(cards)
+      cards.map {|c| c.to_s }
+    end
+
     def format_config(config)
       JSON.parse(config.to_json)
+    end
+
+    def fetch_round_info(round_manager)
+      {
+        "street" => RoundManager::STREET_MAP[round_manager.street]
+      }
+    end
+
+    def fetch_table_info(table)
+      {}.merge!( { "dealer_btn" => table.dealer_btn } )
+        .merge!( { "community_card" => format_cards(table.community_card.cards) } )
+        .merge!( { "seats" => format_seats(table.seats) } )
+        .merge!( { "pot" => format_pot(table.seats.players) } )
     end
 
 end

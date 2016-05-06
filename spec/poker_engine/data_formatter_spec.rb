@@ -1,6 +1,8 @@
 require 'rails_helper'
+require 'features/feature_spec_helper'
 
 RSpec.describe DataFormatter do
+  include FeatureSpecHelper
 
   let(:game_evaluator) { GameEvaluator.new(hand_evaluator=nil) }
   let(:formatter) { DataFormatter.new(game_evaluator) }
@@ -214,6 +216,28 @@ RSpec.describe DataFormatter do
     end
   end
 
+  describe "round_state" do
+    let(:round_manager) { setup_round_manager }
+    let(:table) { setup_table(2) }
+
+    before {
+      action_checler = ActionChecker.new
+      round_manager.start_new_round(table)
+      round_manager.apply_action(table, 'call', 10, action_checler)  # forward to FLOP
+    }
+
+    it "should convert round info into hash" do
+      data = formatter.format_round_state(round_manager, table)
+      expect(data["street"]).to eq "FLOP"
+      expect(data["pot"]).to eq formatter.format_pot(table.seats.players)
+      expect(data["seats"]).to eq formatter.format_seats(table.seats)
+      expect(data["community_card"]).to eq ["D3", "D5", "C7"]
+      expect(data["dealer_btn"]).to eq 0
+      expect(data["next_player"]).to eq formatter.format_player(table.seats.players[0])
+    end
+  end
+
+
   private
 
     def setup_player
@@ -233,6 +257,13 @@ RSpec.describe DataFormatter do
       return seats
     end
 
+    def setup_table(player_num)
+      table = Table.new(cheat_deck)
+      players = create_players(player_num)
+      players.each { |player| table.seats.sitdown(player) }
+      return table
+    end
+
     def setup_table_with_action_histories(player_num)
       table = Table.new
       players = create_players(player_num)
@@ -242,6 +273,20 @@ RSpec.describe DataFormatter do
       players[2].add_action_history(PokerPlayer::ACTION::RAISE, 20, 10)
       players[0].add_action_history(PokerPlayer::ACTION::CALL, 20)
       return table
+    end
+
+    def setup_round_manager
+      broadcaster = mock_broadcaster
+      hand_evaluator = HandEvaluator.new
+      game_evaluator = GameEvaluator.new(hand_evaluator)
+      RoundManager.new(broadcaster, game_evaluator)
+    end
+
+    def mock_broadcaster
+      broadcaster = double("broadcaster")
+      allow(broadcaster).to receive(:notification)
+      allow(broadcaster).to receive(:ask)
+      return broadcaster
     end
 
     def create_players(num)
