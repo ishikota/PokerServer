@@ -11,7 +11,7 @@ RSpec.describe MessageCreator do
   let(:message_creator) { MessageCreator.new(formatter) }
 
   describe "game_start_message" do
-    let(:seats) { setup_seats_with_players }
+    let(:seats) { setup_seats_with_players(2) }
     let(:config) { Config.new }
 
     it "should create correct message" do

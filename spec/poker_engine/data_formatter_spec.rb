@@ -26,14 +26,14 @@ RSpec.describe DataFormatter do
 
       it "should include hole card" do
         data = formatter.format_player(player, holecard=true)
-        expect(data["hole_card"]).to eq ["CT", "DA"]
+        expect(data["hole_card"]).to eq ["C9", "D2"]
       end
     end
 
   end
 
   describe "seat" do
-    let(:seats) { setup_seats_with_players }
+    let(:seats) { setup_seats_with_players(2) }
 
     it "should convert seats into hash" do
       data = formatter.format_seats(seats)
@@ -96,7 +96,7 @@ RSpec.describe DataFormatter do
   end
 
   describe "game_information" do
-    let(:seats) { setup_seats_with_players }
+    let(:seats) { setup_seats_with_players(2) }
     let(:config) { Config.new }
 
     it "should convert game_information into hash" do
@@ -125,7 +125,7 @@ RSpec.describe DataFormatter do
   end
 
   describe "action" do
-    let(:player) { setup_seats_with_players.players.first }
+    let(:player) { setup_player }
 
     it "should convert action into hash" do
       data = formatter.format_action(player, 'raise', 20)
@@ -157,10 +157,17 @@ RSpec.describe DataFormatter do
   end
 
   describe "action_history" do
-    let(:table) { setup_table_with_action_histories(3) }
+    let(:table) { setup_table_with_players(3) }
     let(:player1) { table.seats.players[0] }
     let(:player2) { table.seats.players[1] }
     let(:player3) { table.seats.players[2] }
+
+    before {
+      player1.add_action_history(PokerPlayer::ACTION::RAISE, 10, 5)
+      player2.add_action_history(PokerPlayer::ACTION::FOLD)
+      player3.add_action_history(PokerPlayer::ACTION::RAISE, 20, 10)
+      player1.add_action_history(PokerPlayer::ACTION::CALL, 20)
+    }
 
     def check(target, player, action, amount)
       expect(target["player"]).to eq formatter.format_player(player)
@@ -208,7 +215,7 @@ RSpec.describe DataFormatter do
   end
 
   describe "winners" do
-    let(:winners) { create_players(2) }
+    let(:winners) { setup_players(2) }
 
     it "should convert winners into hash" do
       data = formatter.format_winners(winners)
@@ -219,8 +226,8 @@ RSpec.describe DataFormatter do
   end
 
   describe "round_state" do
-    let(:round_manager) { setup_round_manager }
-    let(:table) { setup_table(2) }
+    let(:round_manager) { create_round_manager }
+    let(:table) { setup_table_with_players(2) }
 
     before {
       action_checler = ActionChecker.new
