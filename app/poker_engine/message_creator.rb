@@ -7,6 +7,7 @@ class MessageCreator
     ASK_MESSAGE = "ask_message"
     GAME_UPDATE_MESSAGE = "game_update_message"
     ROUND_RESULT_MESSAGE = "round_result_message"
+    GAME_RESULT_MESSAGE = "game_result_message"
   end
 
   def initialize(data_formatter)
@@ -78,6 +79,11 @@ class MessageCreator
       "message_type" => Type::ROUND_RESULT_MESSAGE,
       "round_state" => round_state
      }.merge!(winners)
+  end
+
+  def game_result_message(seats)
+    { "message_type" => Type::GAME_RESULT_MESSAGE }
+      .merge!(@formatter.format_seats(seats))
   end
 
 end

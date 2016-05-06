@@ -96,5 +96,15 @@ RSpec.describe MessageCreator do
     end
   end
 
+  describe "game_result_message" do
+    let(:seats) { setup_seats_with_players(2) }
+
+    it "should create correcgt message" do
+      msg = message_creator.game_result_message(seats)
+      expect(msg["message_type"]).to eq MessageCreator::Type::GAME_RESULT_MESSAGE
+      expect(msg["seats"]).to eq formatter.format_seats(seats)["seats"]
+    end
+  end
+
 end
 
