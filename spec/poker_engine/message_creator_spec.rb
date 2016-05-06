@@ -33,5 +33,23 @@ RSpec.describe MessageCreator do
     end
   end
 
+  describe "street_start_message" do
+    let(:round_manager) { create_round_manager }
+    let(:table) { setup_table_with_players(2) }
+
+    before {
+      action_checler = ActionChecker.new
+      round_manager.start_new_round(table)
+      round_manager.apply_action(table, 'call', 10, action_checler)  # forward to FLOP
+    }
+
+    it "should create correct message" do
+      msg = message_creator.street_start_message(round_manager, table)
+      expect(msg["message_type"]).to eq MessageCreator::Type::STREET_START_MESSAGE
+      expect(msg["street"]).to eq "FLOP"
+      expect(msg["round_state"]).to eq formatter.format_round_state(round_manager, table)
+    end
+  end
+
 end
 

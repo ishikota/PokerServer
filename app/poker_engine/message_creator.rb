@@ -3,6 +3,7 @@ class MessageCreator
   module Type
     GAME_START_MESSAGE = "game_start_message"
     ROUND_START_MESSAGE = "round_start_message"
+    STREET_START_MESSAGE = "street_start_message"
   end
 
   def initialize(data_formatter)
@@ -25,6 +26,15 @@ class MessageCreator
       "seats" => @formatter.format_seats(seats),
       "hole_card" => hole_card
     }
+  end
+
+  def street_start_message(round_manager, table)
+    street = @formatter.format_street(round_manager.street)
+    round_state = @formatter.format_round_state(round_manager, table)
+    {
+      "message_type" => Type::STREET_START_MESSAGE,
+      "round_state" => round_state
+    }.merge!(street)
   end
 
 end
