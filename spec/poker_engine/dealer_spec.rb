@@ -10,6 +10,7 @@ RSpec.describe "Dealer" do
   let(:round_manager) { double("round manager") }
   let(:action_checker) { double("action checker") }
   let(:player_maker) { double("player_maker") }
+  let(:message_builder) { double("message_builder") }
 
   let(:components_holder) do
     {
@@ -18,14 +19,21 @@ RSpec.describe "Dealer" do
       table: table,
       round_manager: round_manager,
       action_checker: action_checker,
-      player_maker: player_maker
+      player_maker: player_maker,
+      message_builder: message_builder
     }
   end
 
+  let(:game_start_msg) { "game results" }
+  let(:round_result_msg) { "round results" }
+  let(:game_result_msg) { "game results" }
 
   before {
     allow(table).to receive(:seats).and_return(seats)
     allow(round_manager).to receive(:set_finish_callback)
+    allow(message_builder).to receive(:game_start_message).and_return(game_start_msg)
+    allow(message_builder).to receive(:round_result_message).and_return(round_result_msg)
+    allow(message_builder).to receive(:game_result_message).and_return(game_result_msg)
   }
 
   describe "#start_game" do
@@ -51,7 +59,7 @@ RSpec.describe "Dealer" do
     end
 
     it "should send game information to players" do
-      expect(broadcaster).to receive(:notification).with("TODO game info")
+      expect(broadcaster).to receive(:notification).with(game_start_msg)
       dealer.start_game(player_info)
     end
 
@@ -94,7 +102,7 @@ RSpec.describe "Dealer" do
     it "should notify game result" do
       allow(table).to receive(:shift_dealer_btn)
       allow(round_manager).to receive(:start_new_round)
-      expect(broadcaster).to receive(:notification).with("TODO game result")
+      expect(broadcaster).to receive(:notification).with(round_result_msg)
 
       dealer.finish_round_callback.call(winners, accounting_info)
     end
@@ -156,7 +164,7 @@ RSpec.describe "Dealer" do
 
 
         it "should teardown the game and say goodbye to players" do
-          expect(broadcaster).to receive(:notification).with("TODO goodbye")
+          expect(broadcaster).to receive(:notification).with(game_result_msg)
 
           dealer.finish_round_callback.call(winners, accounting_info)
         end
@@ -173,7 +181,7 @@ RSpec.describe "Dealer" do
         }
 
         it "should teardown the game" do
-          expect(broadcaster).to receive(:notification).with("TODO goodbye")
+          expect(broadcaster).to receive(:notification).with(game_result_msg)
 
           dealer.finish_round_callback.call(winners, accounting_info)
         end

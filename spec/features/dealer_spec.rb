@@ -23,7 +23,8 @@ RSpec.describe Dealer do
       table: table,
       round_manager: round_manager,
       action_checker: action_checker,
-      player_maker: player_maker
+      player_maker: player_maker,
+      message_builder: message_builder
     }
   end
 
@@ -76,8 +77,8 @@ RSpec.describe Dealer do
 
     before {
       expect(message_builder).to receive(:round_start_message).with(0, anything).twice
-      expect(broadcaster).to receive(:notification).with("TODO game result").twice
-      expect(broadcaster).to receive(:notification).with("TODO goodbye")
+      expect(broadcaster).to receive(:notification).with(round_result_msg).twice
+      expect(broadcaster).to receive(:notification).with(game_result_msg)
 
       dealer.start_game(create_players_info(2))
     }
@@ -130,7 +131,7 @@ RSpec.describe Dealer do
     end
 
     it "should forward to SHOWDOWN after p1's allin" do
-      expect(broadcaster).to receive(:notification).with("TODO goodbye")
+      expect(broadcaster).to receive(:notification).with(game_result_msg)
 
       dealer.receive_data(1, call_msg(10))
       dealer.receive_data(1, call_msg(0))

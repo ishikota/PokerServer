@@ -7,6 +7,7 @@ class Dealer
     @round_manager = components_holder[:round_manager]
     @action_checker = components_holder[:action_checker]
     @player_maker = components_holder[:player_maker]
+    @message_builder = components_holder[:message_builder]
     @round_count = 1
     @round_manager.set_finish_callback(finish_round_callback)
   end
@@ -14,7 +15,7 @@ class Dealer
   def start_game(player_info)
     players = player_info.map { |info| create_player(info) }
     set_player_to_seat(players)
-    @broadcaster.notification(game_information_message)
+    notify_game_start
     start_round
   end
 
@@ -35,12 +36,12 @@ class Dealer
   end
 
   def teardown_game
-    @broadcaster.notification(goodbye_message)
+    notify_game_result
   end
 
   def finish_round_callback
     lambda { |winners, accounting_info|
-      @broadcaster.notification(game_result_message(@table, winners, accounting_info))
+      notify_round_result(winners)
       teardown_round
     }
   end
@@ -83,16 +84,23 @@ class Dealer
         .each { |player| player.pay_info.update_to_fold }
     end
 
-    def game_information_message
-      "TODO game info"
+    def notify(message)
+      @broadcaster.notification(message)
     end
 
-    def game_result_message(table, winners, accounting_info)
-      "TODO game result"
+    def notify_game_start
+      message = @message_builder.game_start_message(@config, @table.seats)
+      notify(message)
     end
 
-    def goodbye_message
-      "TODO goodbye"
+    def notify_round_result(winners)
+      message = @message_builder.round_result_message(winners, @round_manager, @table)
+      notify(message)
+    end
+
+    def notify_game_result
+      message = @message_builder.game_result_message(@table.seats)
+      notify(message)
     end
 
 end
