@@ -15,8 +15,7 @@ class DataFormatter
   end
 
   def format_seats(seats)
-    players = seats.players.map { |player| format_player(player) }
-    { "seats" => players }
+    { "seats" => format_players(seats.players) }
   end
 
   def format_pot(players)
@@ -36,7 +35,7 @@ class DataFormatter
     hash = {}
     hash.merge!( { "player_num" => seats.players.size } )
     hash.merge!( { "seats" => format_seats(seats) } )
-    hash.merge!( { "rule" => JSON.parse(config.to_json) } )
+    hash.merge!( { "rule" => format_config(config) } )
   end
 
   def format_valid_actions(call_amount, min_bet_amount, max_bet_amount)
@@ -67,7 +66,7 @@ class DataFormatter
   end
 
   def format_winners(winners)
-    { "winners" => winners.map { |player| format_player(player) } }
+    { "winners" => format_players(winners) }
   end
 
 
@@ -87,6 +86,10 @@ class DataFormatter
 
     def format_players(players)
       players.map { |player| format_player(player) }
+    end
+
+    def format_config(config)
+      JSON.parse(config.to_json)
     end
 
 end
