@@ -8,7 +8,7 @@ class RoomChannel < ApplicationCable::Channel
   end
 
   def unsubscribed
-    # Any cleanup needed when channel is unsubscribed
+    get_delegate.exit_room(uuid)
   end
 
   def enter_room(data)
