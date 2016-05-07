@@ -12,18 +12,7 @@ class RoomChannel < ApplicationCable::Channel
   end
 
   def enter_room(data)
-    room = Room.find(data['room_id'])
-    player = Player.find(data['player_id'])
-    player.take_a_seat(room)
-
-    stream_from "room:#{room.id}"
-    stream_from "room:#{room.id}:#{player.id}"
-    ActionCable.server.broadcast "room:#{room.id}", enter_room_message(room, player)
-    ActionCable.server.broadcast "room:#{room.id}:#{player.id}", welcome_message
-
-    if room.reload.filled_to_capacity?
-      ActionCable.server.broadcast "room:#{room.id}", ready_message
-    end
+    get_delegate.enter_room(data)
   end
 
   def exit_room(data)
@@ -45,15 +34,14 @@ class RoomChannel < ApplicationCable::Channel
 
   private
 
-    def welcome_message
-      {}.merge!(phase: "member_wanted")\
-        .merge!(type: "welcome")
+    def get_delegate
+      @delegate || create_delegate
     end
 
-    def enter_room_message(room, player)
-      {}.merge!(phase: "member_wanted")\
-        .merge!(type: "arrival")\
-        .merge!(message: generate_arrival_message(room, player))
+    def create_delegate
+      channel_wrapper = ChannelWrapper.new(self)
+      message_builder = MessageBuildHelper.new
+      @delegate = RoomChannelDelegate.new(channel_wrapper, message_builder)
     end
 
     def exit_room_message(room, player)
