@@ -1,8 +1,10 @@
 class RoomChannelDelegate
+  include RoomChannelDelegateHelper
 
   def initialize(channel_wrapper, message_builder)
     @channel = channel_wrapper
     @message_builder = message_builder
+    @dealer_hash = {}
   end
 
   def enter_room(uuid, data)
@@ -19,7 +21,9 @@ class RoomChannelDelegate
 
     if room.filled_to_capacity?
       @channel.broadcast(room_id=room.id, @message_builder.build_start_poker_message)
-      # TODO create dealer and start the game
+      dealer = Dealer.new(setup_components_holder(room))
+      @dealer_hash.merge!( { room.id => dealer } )
+      dealer.start_game(players_info(room))
     end
   end
 
@@ -44,6 +48,12 @@ class RoomChannelDelegate
     def fetch_player(data)
       player_id = data["player_id"]
       Player.find(player_id)
+    end
+
+    def players_info(room)
+      room.players.reduce([]) { |ary, player|
+        ary << { "name" => player.name }
+      }
     end
 
 end
