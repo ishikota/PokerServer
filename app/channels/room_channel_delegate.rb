@@ -5,10 +5,11 @@ class RoomChannelDelegate
     @message_builder = message_builder
   end
 
-  def enter_room(data)
+  def enter_room(uuid, data)
     room = fetch_room(data)
     player = fetch_player(data)
     player.take_a_seat(room)
+    player.update_attributes(uuid: uuid)
 
     @channel.subscribe(room_id=room.id)
     @channel.subscribe(room_id=room.id, player_id=player.id)

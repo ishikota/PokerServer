@@ -12,7 +12,7 @@ class RoomChannel < ApplicationCable::Channel
   end
 
   def enter_room(data)
-    get_delegate.enter_room(data)
+    get_delegate.enter_room(uuid, data)
   end
 
   def exit_room(data)

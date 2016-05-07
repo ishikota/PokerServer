@@ -18,6 +18,7 @@ RSpec.describe RoomChannelDelegate do
   describe "#enter_room" do
     let(:room) { FactoryGirl.create(:room1) }
     let(:player) { FactoryGirl.create(:player) }
+    let(:uuid) { "455f420f-940c-4ca2-874b-87ca02d44250" }
 
     let(:data) do
       { 'room_id' => room.id, 'player_id' => player.id }
@@ -28,15 +29,19 @@ RSpec.describe RoomChannelDelegate do
       allow(channel_wrapper).to receive(:subscribe)
     }
 
+    it "should attach uuid to player" do
+      expect { delegate.enter_room(uuid, data) }.to change { player.reload.uuid }.to(uuid)
+    end
+
     it "should enter player into room" do
-      expect { delegate.enter_room(data) }.to change { EnterRoomRelationship.count }.by(1)
+      expect { delegate.enter_room(uuid, data) }.to change { EnterRoomRelationship.count }.by(1)
     end
 
     it "should subscribe channel" do
       expect(channel_wrapper).to receive(:subscribe).with(room.id)
       expect(channel_wrapper).to receive(:subscribe).with(room.id, player.id)
 
-      delegate.enter_room(data)
+      delegate.enter_room(uuid, data)
     end
 
     it "should broadcast arrive message" do
@@ -44,7 +49,7 @@ RSpec.describe RoomChannelDelegate do
       expect(channel_wrapper).to receive(:broadcast).with(room.id, player.id, welcome_msg)
       expect(channel_wrapper).not_to receive(:broadcast).with(room.id, start_msg)
 
-      delegate.enter_room(data)
+      delegate.enter_room(uuid, data)
     end
 
     context "when all member is gatherd" do
@@ -57,7 +62,7 @@ RSpec.describe RoomChannelDelegate do
       it "should broadcast start of the game" do
         expect(channel_wrapper).to receive(:broadcast).with(room.id, start_msg)
 
-        delegate.enter_room(data)
+        delegate.enter_room(uuid, data)
       end
 
       it "should create dealer and start the game"
