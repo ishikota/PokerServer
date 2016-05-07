@@ -42,4 +42,20 @@ RSpec.describe MessageBuildHelper do
     end
   end
 
+  describe "#build_member_leave_message" do
+    let(:room) { double("room") }
+    let(:left_player) { double("player") }
+
+    before {
+      allow(left_player).to receive(:name).and_return "hoge"
+    }
+
+    it "should build member leave message" do
+      msg = helper.build_member_leave_message(room, left_player)
+      expect(msg[:phase]).to eq MessageBuildHelper::Phase::MEMBER_WANTED
+      expect(msg[:type]).to eq MessageBuildHelper::Type::MEMBER_LEAVE
+      expect(msg[:message]).to match(/hoge/)
+    end
+  end
+
 end

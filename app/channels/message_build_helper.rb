@@ -7,6 +7,7 @@ class MessageBuildHelper
   module Type
     WELCOME = "welcome"
     MEMBER_ARRIVAL = "arrival"
+    MEMBER_LEAVE = "leave"
     READY = "ready"
   end
 
@@ -28,12 +29,22 @@ class MessageBuildHelper
       .merge(message: start_poker_message)
   end
 
+  def build_member_leave_message(room, player)
+    {}.merge(phase: Phase::MEMBER_WANTED)
+      .merge(type: Type::MEMBER_LEAVE)
+      .merge(message: member_leave_message(room, player))
+  end
+
   private
 
     def member_arrival_message(room, player)
       need_player_num = room.player_num - room.players.size
       "player [#{player.name}] arrived!!\
       #{need_player_num} more players are needed to start the game."
+    end
+
+    def member_leave_message(room, player)
+      "Player [#{player.name} left the room ..."
     end
 
     def start_poker_message

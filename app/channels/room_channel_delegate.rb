@@ -25,7 +25,11 @@ class RoomChannelDelegate
 
   def exit_room(uuid)
     player = Player.find_by_uuid(uuid)
-    @channel.broadcast(room_id=player.current_room.id, @message_builder.build_member_leave_message)
+    room = player.current_room
+    unless room.nil?
+      message = @message_builder.build_member_leave_message(room, player)
+      @channel.broadcast(room_id=player.current_room.id, @message_builder.build_member_leave_message(room, player)) unless room.nil?
+    end
     player.clear_state
   end
 
