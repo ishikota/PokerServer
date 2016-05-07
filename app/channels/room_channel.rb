@@ -38,16 +38,8 @@ class RoomChannel < ApplicationCable::Channel
   def declare_action(data)
     room = Room.find(data['room_id'])
     player = Player.find(data['player_id'])
-    # TODO pass data to PokerEngine
+    # TODO fetch dealer from hash and resume_round with passed data
     ActionCable.server.broadcast "room:#{room.id}:#{player.id}", action_accept_message
-  end
-
-  def ask_action(room, player, data)
-    ActionCable.server.broadcast "room:#{room.id}:#{player.id}", ask_message(data)
-  end
-
-  def notification(room, data)
-    ActionCable.server.broadcast "room:#{room.id}", notification_message(data)
   end
 
 
@@ -74,18 +66,6 @@ class RoomChannel < ApplicationCable::Channel
       {}.merge!(phase: "member_wanted")\
         .merge!(type: "ready")\
         .merge!(message: generate_game_info(room))
-    end
-
-    def ask_message(data)
-      {}.merge!(phase: "play_poker")\
-        .merge!(type: "ask")\
-        .merge!(message: data)
-    end
-
-    def notification_message(data)
-      {}.merge!(phase: "play_poker")\
-        .merge!(type: "notification")\
-        .merge!(message: data)
     end
 
     def action_accept_message
