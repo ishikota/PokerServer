@@ -1,8 +1,8 @@
 class RoomChannelDelegate
-  include MessageBuildHelper
 
-  def initialize(channel_wrapper)
+  def initialize(channel_wrapper, message_builder)
     @channel = channel_wrapper
+    @message_builder = message_builder
   end
 
   def enter_room(data)
@@ -13,8 +13,8 @@ class RoomChannelDelegate
     @channel.subscribe(room_id=room.id)
     @channel.subscribe(room_id=room.id, player_id=player.id)
 
-    @channel.broadcast(room_id=room.id, build_member_arrival_message(room, player))
-    @channel.broadcast(room_id=room.id, player_id=player.id, build_welcome_message)
+    @channel.broadcast(room_id=room.id, @message_builder.build_member_arrival_message(room, player))
+    @channel.broadcast(room_id=room.id, player_id=player.id, @message_builder.build_welcome_message)
 
     if room.filled_to_capacity?
       @channel.broadcast(room_id=room.id, "start poker msg")

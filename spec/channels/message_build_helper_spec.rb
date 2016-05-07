@@ -1,6 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe MessageBuildHelper, :type => :helper do
+RSpec.describe MessageBuildHelper do
+
+  let(:helper) { MessageBuildHelper.new }
 
   describe "#build_welcome_message" do
 

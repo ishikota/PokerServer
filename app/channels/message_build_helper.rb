@@ -1,4 +1,4 @@
-module MessageBuildHelper
+class MessageBuildHelper
 
   module Phase
     MEMBER_WANTED = "member_wanted"
