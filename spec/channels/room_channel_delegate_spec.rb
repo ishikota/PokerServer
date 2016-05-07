@@ -1,6 +1,8 @@
 require 'rails_helper'
+require "#{Rails.root}/app/helpers/message_build_helper"
 
 RSpec.describe RoomChannelDelegate do
+  include MessageBuildHelper
 
   let(:channel_wrapper) { double("channel wrapper") }
   let(:delegate) { RoomChannelDelegate.new(channel_wrapper) }
@@ -8,8 +10,8 @@ RSpec.describe RoomChannelDelegate do
   describe "#enter_room" do
     let(:room) { FactoryGirl.create(:room1) }
     let(:player) { FactoryGirl.create(:player) }
-    let(:arrive_msg) { "arrive msg" }
-    let(:welcome_msg) { "welcome msg" }
+    let(:arrive_msg) { build_member_arrival_message(room, player) }
+    let(:welcome_msg) { build_welcome_message }
     let(:start_msg) { "start poker msg" }
 
     let(:data) do
