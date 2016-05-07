@@ -15,15 +15,6 @@ class RoomChannel < ApplicationCable::Channel
     get_delegate.enter_room(uuid, data)
   end
 
-  def exit_room(data)
-    room = Room.find(data['room_id'])
-    player = Player.find(data['player_id'])
-    player.leave_a_seat(room)
-    room.reload
-
-    ActionCable.server.broadcast "room:#{room.id}", exit_room_message(room, player)
-  end
-
   def declare_action(data)
     room = Room.find(data['room_id'])
     player = Player.find(data['player_id'])
@@ -42,12 +33,6 @@ class RoomChannel < ApplicationCable::Channel
       channel_wrapper = ChannelWrapper.new(self)
       message_builder = MessageBuildHelper.new
       @delegate = RoomChannelDelegate.new(channel_wrapper, message_builder)
-    end
-
-    def exit_room_message(room, player)
-      {}.merge!(phase: "member_wanted")\
-        .merge!(type: "leave")\
-        .merge!(message: generate_leave_message(room, player))
     end
 
     def action_accept_message
