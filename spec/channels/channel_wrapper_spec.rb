@@ -2,7 +2,8 @@ require 'rails_helper'
 
 RSpec.describe ChannelWrapper do
 
-  let(:wrapper) { ChannelWrapper.new }
+  let(:channel) { double("channel") }
+  let(:wrapper) { ChannelWrapper.new(channel) }
 
   describe "#generate_channel" do
 

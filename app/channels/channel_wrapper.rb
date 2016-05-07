@@ -1,11 +1,15 @@
 class ChannelWrapper
 
-  def subscribe(room_id, player_id)
-    channel = generate_channel(room_id, player_id)
-    stream_from channel
+  def initialize(channel)
+    @channel = channel
   end
 
-  def broadcast(room_id, player_id, message)
+  def subscribe(room_id, player_id=nil)
+    channel = generate_channel(room_id, player_id)
+    @channel.stream_from channel
+  end
+
+  def broadcast(room_id, player_id=nil, message)
     channel = generate_channel(room_id, player_id)
     ActionCable.server.broadcast channel, message
   end
