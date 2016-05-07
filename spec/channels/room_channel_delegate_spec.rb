@@ -12,6 +12,7 @@ RSpec.describe RoomChannelDelegate do
   before {
     allow(message_builder).to receive(:build_welcome_message).and_return welcome_msg
     allow(message_builder).to receive(:build_member_arrival_message).and_return arrive_msg
+    allow(message_builder).to receive(:build_start_poker_message).and_return start_msg
   }
 
   describe "#enter_room" do

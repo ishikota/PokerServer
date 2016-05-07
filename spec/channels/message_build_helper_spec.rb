@@ -32,4 +32,14 @@ RSpec.describe MessageBuildHelper do
     end
   end
 
+  describe "#build_start_poker_message" do
+
+    it "should build ready message" do
+      msg = helper.build_start_poker_message
+      expect(msg[:phase]).to eq MessageBuildHelper::Phase::MEMBER_WANTED
+      expect(msg[:type]).to eq MessageBuildHelper::Type::READY
+      expect(msg[:message]).to match(/Let's start poker!!/)
+    end
+  end
+
 end

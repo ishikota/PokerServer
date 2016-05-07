@@ -50,12 +50,6 @@ class RoomChannel < ApplicationCable::Channel
         .merge!(message: generate_leave_message(room, player))
     end
 
-    def ready_message
-      {}.merge!(phase: "member_wanted")\
-        .merge!(type: "ready")\
-        .merge!(message: generate_game_info(room))
-    end
-
     def action_accept_message
       {}.merge!(phase: "player_poker")\
         .merge!(type: "accept")\

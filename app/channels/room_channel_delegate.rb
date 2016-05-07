@@ -17,7 +17,7 @@ class RoomChannelDelegate
     @channel.broadcast(room_id=room.id, player_id=player.id, @message_builder.build_welcome_message)
 
     if room.filled_to_capacity?
-      @channel.broadcast(room_id=room.id, "start poker msg")
+      @channel.broadcast(room_id=room.id, @message_builder.build_start_poker_message)
       # TODO create dealer and start the game
     end
   end
