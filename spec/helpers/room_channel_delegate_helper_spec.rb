@@ -7,7 +7,6 @@ RSpec.describe RoomChannelDelegateHelper, :type => :helper do
 
     it "should setup dealer with proper component" do
       holder = helper.setup_components_holder(room)
-      binding.pry
       expect(holder[:broadcaster]).to be_a Broadcaster
       expect(holder[:config]).to be_a Config
       expect(holder[:table]).to be_a Table
