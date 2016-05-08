@@ -5,6 +5,9 @@ RSpec.describe RoundManager do
   let(:finish_callback) { double("dealer.finish_round") }
   let(:table) { setup_table }
   let(:seats) { table.seats }
+  let(:player1) { table.seats.players[0] }
+  let(:player2) { table.seats.players[1] }
+  let(:player3) { table.seats.players[2] }
   let(:broadcaster) { double("broadcaster") }
   let(:game_evaluator) { double("game evaluator") }
   let(:message_builder) { double("message_builder") }
@@ -27,7 +30,7 @@ RSpec.describe RoundManager do
     }
 
     it "should ask action to player who sits next to blind player" do
-      expect(broadcaster).to receive(:ask).with(2, anything)
+      expect(broadcaster).to receive(:ask).with(player3.uuid, anything)
 
       round_manager.start_street(RoundManager::PREFLOP, table)
       expect(round_manager.next_player).to eq 2
@@ -49,7 +52,7 @@ RSpec.describe RoundManager do
 
     it "should ask action to player who has dealer button"  do
       allow(community_card).to receive(:add)
-      expect(broadcaster).to receive(:ask).with(0, anything)
+      expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
 
       round_manager.start_street(RoundManager::FLOP, table)
       expect(round_manager.next_player).to eq 0
@@ -69,7 +72,7 @@ RSpec.describe RoundManager do
 
     it "should ask action to player who has dealer button" do
       allow(community_card).to receive(:add)
-      expect(broadcaster).to receive(:ask).with(0, anything)
+      expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
 
       round_manager.start_street(RoundManager::TURN, table)
       expect(round_manager.next_player).to eq 0
@@ -89,7 +92,7 @@ RSpec.describe RoundManager do
 
     it "should ask action to player who has dealer button" do
       allow(community_card).to receive(:add)
-      expect(broadcaster).to receive(:ask).with(0, anything)
+      expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
 
       round_manager.start_street(RoundManager::RIVER, table)
       expect(round_manager.next_player).to eq 0
@@ -147,6 +150,7 @@ RSpec.describe RoundManager do
       players =  (1..3).inject([]) do |acc, i|
         player = double("player#{i}")
         pay_info = double("pay info #{i}")
+        allow(player).to receive(:uuid).and_return("uuid-#{i}")
         allow(player).to receive(:active?).and_return(true)
         allow(player).to receive(:clear_action_histories)
         allow(player).to receive(:clear_pay_info)
