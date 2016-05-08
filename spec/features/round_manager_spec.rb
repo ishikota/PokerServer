@@ -30,8 +30,8 @@ RSpec.describe RoundManager do
 
   describe "player a round with two player" do
     let(:table) { Table.new(cheat_deck) }
-    let(:player1) { PokerPlayer.new(name="p1", 100) }
-    let(:player2) { PokerPlayer.new(name="p2", 100) }
+    let(:player1) { PokerPlayer.new(name="p1", uuid="uuid-1", 100) }
+    let(:player2) { PokerPlayer.new(name="p2", uuid="uuid-2", 100) }
 
     before {
       table.seats.sitdown(player1)
@@ -191,9 +191,9 @@ RSpec.describe RoundManager do
 
   describe "play a round with three player" do
     let(:table) { Table.new }
-    let(:player1) { PokerPlayer.new(100) }
-    let(:player2) { PokerPlayer.new(100) }
-    let(:player3) { PokerPlayer.new(100) }
+    let(:player1) { PokerPlayer.new("uuid-1", 100) }
+    let(:player2) { PokerPlayer.new("uuid-2", 100) }
+    let(:player3) { PokerPlayer.new("uuid-3", 100) }
 
     before {
       for player in [player1, player2, player3] do

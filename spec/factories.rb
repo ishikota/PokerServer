@@ -3,6 +3,7 @@ FactoryGirl.define do
   factory :player do
     name "kota"
     credential "ek6_UAvyGkc2Hro5Q5lYOA"
+    uuid "3165ec01-152a-4803-b685-e7f0be8f7bc6"
 
     factory "player1" do
       name "poka taro"
