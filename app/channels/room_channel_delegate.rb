@@ -52,7 +52,7 @@ class RoomChannelDelegate
 
     def players_info(room)
       room.players.reduce([]) { |ary, player|
-        ary << { "name" => player.name }
+        ary << { "name" => player.name, "uuid" => player.uuid }
       }
     end
 

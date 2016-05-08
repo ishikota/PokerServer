@@ -57,6 +57,7 @@ RSpec.describe RoomChannelDelegate do
       let(:someone) { FactoryGirl.create(:player1) }
 
       before {
+        allow_any_instance_of(Dealer).to receive(:start_game)
         EnterRoomRelationship.create(player_id: someone.id, room_id: room.id)
       }
 
