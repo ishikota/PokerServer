@@ -10,10 +10,10 @@ RSpec.describe RoomChannelDelegate do
   let(:arrive_msg) { "arrival msg" }
   let(:start_msg) { "start poker msg" }
   let(:exit_msg) { "exit msg" }
+  let(:acc_msg) { "acc msg" }
 
   let(:room) { FactoryGirl.create(:room1) }
   let(:player) { FactoryGirl.create(:player) }
-  let(:uuid) { "455f420f-940c-4ca2-874b-87ca02d44250" }
 
   before {
     allow(channel_wrapper).to receive(:broadcast)
@@ -23,10 +23,12 @@ RSpec.describe RoomChannelDelegate do
     allow(message_builder).to receive(:build_member_arrival_message).and_return arrive_msg
     allow(message_builder).to receive(:build_start_poker_message).and_return start_msg
     allow(message_builder).to receive(:build_member_leave_message).and_return exit_msg
+    allow(message_builder).to receive(:build_action_accept_message).and_return acc_msg
   }
 
   describe "#enter_room" do
 
+    let(:uuid) { "455f420f-940c-4ca2-874b-87ca02d44250" }
     let(:data) do
       { 'room_id' => room.id, 'player_id' => player.id }
     end
@@ -80,21 +82,56 @@ RSpec.describe RoomChannelDelegate do
 
     before {
       EnterRoomRelationship.create(player_id: player.id, room_id: room.id)
-      player.update_attributes(uuid: uuid)
     }
 
     it "should clear room-player relationship" do
-      expect { delegate.exit_room(uuid) }.to change { EnterRoomRelationship.count }.by(-1)
+      expect { delegate.exit_room(player.uuid) }.to change { EnterRoomRelationship.count }.by(-1)
     end
 
     it "should clear player uuid" do
-      expect { delegate.exit_room(uuid) }.to change { player.reload.uuid }.to(nil)
+      expect { delegate.exit_room(player.uuid) }.to change { player.reload.uuid }.to(nil)
     end
 
     it "should broadcast exit of player" do
       expect(channel_wrapper).to receive(:broadcast).with(room.id, exit_msg)
 
-      delegate.exit_room(uuid)
+      delegate.exit_room(player.uuid)
+    end
+
+  end
+
+  describe "#declare_action" do
+
+   let(:data) do
+     {
+       'room_id' => room.id,
+       'player_id' => player.id,
+       'poker_action' => "fold",
+       'bet_amount' => 0
+     }
+   end
+
+    let(:someone) { FactoryGirl.create(:player1) }
+    let(:dealer) { double("dealer") }
+
+    before "put dealer in dealer_hash" do
+      allow(dealer).to receive(:start_game)
+      allow(dealer).to receive(:receive_data)
+      allow(dealer_maker).to receive(:create).and_return(dealer)
+      delegate.enter_room(player.uuid, data)
+      delegate.enter_room(someone.uuid, data.merge( { "player_id" => someone.id } ))
+    end
+
+    it "should pass action to correct dealer" do
+      expect(dealer).to receive(:receive_data).with(player.uuid, data)
+
+      delegate.declare_action(player.uuid, data)
+    end
+
+    it "should send accept message to player" do
+      expect(channel_wrapper).to receive(:broadcast).with(room.id, player.id, acc_msg)
+
+      delegate.declare_action(player.uuid, data)
     end
 
   end

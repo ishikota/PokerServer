@@ -37,6 +37,16 @@ class RoomChannelDelegate
     player.clear_state
   end
 
+  def declare_action(uuid, data)
+    room = fetch_room(data)
+    player = fetch_player(data)
+    dealer = @dealer_hash[room.id]
+    dealer.receive_data(player.uuid, data)
+    message = @message_builder.build_action_accept_message
+    @channel.broadcast(room_id=room.id, player_id=player.id, message)
+  end
+
+
 
   private
 
