@@ -21,7 +21,7 @@ class RoomChannelDelegate
 
     if room.filled_to_capacity?
       @channel.broadcast(room_id=room.id, @message_builder.build_start_poker_message)
-      dealer = @dealer_maker.create
+      dealer = @dealer_maker.create(room)
       @dealer_hash.merge!( { room.id => dealer } )
       dealer.start_game(players_info(room))
     end

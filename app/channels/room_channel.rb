@@ -16,7 +16,7 @@ class RoomChannel < ApplicationCable::Channel
   end
 
   def declare_action(data)
-    get_delegate.declare_action(data)
+    get_delegate.declare_action(uuid, data)
   end
 
 
@@ -29,7 +29,7 @@ class RoomChannel < ApplicationCable::Channel
     def create_delegate
       channel_wrapper = ChannelWrapper.new(self)
       message_builder = MessageBuildHelper.new
-      dealer_maker = DealerMaler.new
+      dealer_maker = DealerMaker.new
       @delegate = RoomChannelDelegate.new(channel_wrapper, message_builder, dealer_maker)
     end
 
