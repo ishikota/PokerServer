@@ -1,5 +1,4 @@
 class RoomChannelDelegate
-  include RoomChannelDelegateHelper
 
   def initialize(channel_wrapper, message_builder)
     @channel = channel_wrapper

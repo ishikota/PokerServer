@@ -1,4 +1,8 @@
-module RoomChannelDelegateHelper
+class DealerMaker
+
+  def create(room)
+    Dealer.new(setup_components_holder(room))
+  end
 
   def setup_components_holder(room)
     broadcaster = setup_broadcaster(room)

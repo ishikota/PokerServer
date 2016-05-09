@@ -1,6 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe RoomChannelDelegateHelper, :type => :helper do
+RSpec.describe DealerMaker do
+
+  let(:helper) { DealerMaker.new }
 
   describe "setup_components_holder" do
     let(:room) { FactoryGirl.create(:room) }
