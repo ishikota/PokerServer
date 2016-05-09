@@ -32,7 +32,8 @@ class RoomChannel < ApplicationCable::Channel
     def create_delegate
       channel_wrapper = ChannelWrapper.new(self)
       message_builder = MessageBuildHelper.new
-      @delegate = RoomChannelDelegate.new(channel_wrapper, message_builder)
+      dealer_maker = DealerMaler.new
+      @delegate = RoomChannelDelegate.new(channel_wrapper, message_builder, dealer_maker)
     end
 
     def action_accept_message

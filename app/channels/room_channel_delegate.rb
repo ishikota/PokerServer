@@ -1,8 +1,9 @@
 class RoomChannelDelegate
 
-  def initialize(channel_wrapper, message_builder)
+  def initialize(channel_wrapper, message_builder, dealer_maker)
     @channel = channel_wrapper
     @message_builder = message_builder
+    @dealer_maker = dealer_maker
     @dealer_hash = {}
   end
 
@@ -20,7 +21,7 @@ class RoomChannelDelegate
 
     if room.filled_to_capacity?
       @channel.broadcast(room_id=room.id, @message_builder.build_start_poker_message)
-      dealer = Dealer.new(setup_components_holder(room))
+      dealer = @dealer_maker.create
       @dealer_hash.merge!( { room.id => dealer } )
       dealer.start_game(players_info(room))
     end
