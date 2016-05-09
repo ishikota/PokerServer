@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe PokerPlayer do
 
-  let(:player) { PokerPlayer.new(100) }
+  let(:player) { PokerPlayer.new("uuid", 100) }
 
   describe "add_holecard" do
 

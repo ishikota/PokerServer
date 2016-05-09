@@ -70,21 +70,21 @@ RSpec.describe Player, :type => :model do
 
   end
 
-  describe "leave_a_seat" do
+  describe "clear_state" do
     let!(:room) { FactoryGirl.create(:room) }
+    let(:uuid) { "455f420f-940c-4ca2-874b-87ca02d44250" }
 
-    context "when not entering the room" do
-      it "should do nothing" do
-        expect { player.leave_a_seat(room) }.not_to change { EnterRoomRelationship.count }
-      end
+    before {
+      player.update_attributes(uuid: uuid)
+      EnterRoomRelationship.create(room_id: room.id, player_id: player.id)
+    }
+
+    it "should clear room-in state" do
+      expect { player.clear_state }.to change { EnterRoomRelationship.count }.by(-1)
     end
 
-    context "when player was sitting the table" do
-      before { EnterRoomRelationship.create(room_id: room.id, player_id: player.id) }
-
-      it "should destroy EnterRoomRelationship" do
-        expect { player.leave_a_seat(room) }.to change { EnterRoomRelationship.count}.to(0)
-      end
+    it "should clear uuid" do
+      expect { player.clear_state }.to change { player.reload.uuid }.to(nil)
     end
   end
 

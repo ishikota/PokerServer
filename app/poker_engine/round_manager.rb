@@ -41,13 +41,13 @@ class RoundManager
   end
 
   def apply_action(table, action, bet_amount, action_checker)
-    next_player = table.seats.players[@next_player]
+    action_player = table.seats.players[@next_player]
 
     action, bet_amount = action_checker.correct_action(
         table.seats.players, @next_player, action, bet_amount)
-    next_player.pay_info.update_to_allin if action_checker.allin?(next_player, action, bet_amount)
+    action_player.pay_info.update_to_allin if action_checker.allin?(action_player, action, bet_amount)
 
-    accept_action(next_player, action, bet_amount, table.seats.players, action_checker)
+    accept_action(action_player, action, bet_amount, table.seats.players, action_checker)
     notify_update(@next_player, action, bet_amount, table)
 
     if everyone_agree?(table.seats)
@@ -219,7 +219,8 @@ class RoundManager
     def send_ask_message(player_pos, round_manager, table)
       action_checker = ActionChecker.new  #TODO
       message = @message_builder.ask_message(action_checker, player_pos, round_manager, table)
-      ask(player_pos, message)
+      next_player = table.seats.players[player_pos]
+      ask(next_player.uuid, message)
     end
 
 end

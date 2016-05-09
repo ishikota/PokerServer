@@ -30,8 +30,8 @@ RSpec.describe RoundManager do
 
   describe "player a round with two player" do
     let(:table) { Table.new(cheat_deck) }
-    let(:player1) { PokerPlayer.new(name="p1", 100) }
-    let(:player2) { PokerPlayer.new(name="p2", 100) }
+    let(:player1) { PokerPlayer.new(name="p1", uuid="uuid-1", 100) }
+    let(:player2) { PokerPlayer.new(name="p2", uuid="uuid-2", 100) }
 
     before {
       table.seats.sitdown(player1)
@@ -60,7 +60,7 @@ RSpec.describe RoundManager do
     end
 
     it "should not ask blind player in preflop" do
-      expect(broadcaster).to receive(:ask).with(0, "ask")
+      expect(broadcaster).to receive(:ask).with(player1.uuid, "ask")
 
       round_manager.start_new_round(table)
     end
@@ -85,7 +85,7 @@ RSpec.describe RoundManager do
         before { round_manager.start_new_round(table) }
 
         it "should forward to flop" do
-          expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
+          expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
           expect(broadcaster).to receive(:notification).with("street starts")
 
           expect {
@@ -104,7 +104,7 @@ RSpec.describe RoundManager do
 
         it "should forward to TURN" do
           round_manager.apply_action(table, 'raise', 10, action_checker)
-          expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
+          expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
           expect(broadcaster).to receive(:notification).with("street starts")
 
           expect {
@@ -125,7 +125,7 @@ RSpec.describe RoundManager do
 
         it "should forward to RIVER" do
           round_manager.apply_action(table, 'call', 0, action_checker)
-          expect(broadcaster).to receive(:ask).with(table.dealer_btn, anything)
+          expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
           expect(broadcaster).to receive(:notification).with("street starts")
 
           expect {
@@ -191,9 +191,9 @@ RSpec.describe RoundManager do
 
   describe "play a round with three player" do
     let(:table) { Table.new }
-    let(:player1) { PokerPlayer.new(100) }
-    let(:player2) { PokerPlayer.new(100) }
-    let(:player3) { PokerPlayer.new(100) }
+    let(:player1) { PokerPlayer.new("uuid-1", 100) }
+    let(:player2) { PokerPlayer.new("uuid-2", 100) }
+    let(:player3) { PokerPlayer.new("uuid-3", 100) }
 
     before {
       for player in [player1, player2, player3] do
@@ -209,7 +209,7 @@ RSpec.describe RoundManager do
           round_manager.start_new_round(table)
           round_manager.apply_action(table, 'call', 10, action_checker)
 
-          expect(broadcaster).to receive(:ask).with(table.dealer_btn, "ask")
+          expect(broadcaster).to receive(:ask).with(player1.uuid, "ask")
 
           expect {
             round_manager.apply_action(table, 'fold', nil, action_checker)

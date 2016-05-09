@@ -2,16 +2,17 @@ class Broadcaster
 
   def initialize(server, room)
     @server = server
-    @room_id = room.id
+    @room = room
   end
 
 
   def notification(data)
-    @server.broadcast "room:#{@room_id}", notification_message(data)
+    @server.broadcast "room:#{@room.id}", notification_message(data)
   end
 
-  def ask(player_id, data)
-    @server.broadcast "room:#{@room_id}:#{player_id}", ask_message(data)
+  def ask(uuid, data)
+    player = @room.players.find_by_uuid(uuid)
+    @server.broadcast "room:#{@room.id}:#{player.id}", ask_message(data)
   end
 
 

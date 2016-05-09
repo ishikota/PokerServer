@@ -60,7 +60,7 @@ RSpec.describe MessageBuilder do
       msg = message_builder.ask_message(action_checler, player_pos=1, round_manager, table)
       expect(msg["message_type"]).to eq MessageBuilder::Type::ASK_MESSAGE
       expect(msg["hole_card"]).to eq ["C8", "D3"]
-      expect(msg["valid_actionis"].size).to eq 3
+      expect(msg["valid_actions"].size).to eq 3
       expect(msg["round_state"]).to eq formatter.format_round_state(round_manager, table)
       expect(msg["action_histories"]).to eq formatter.format_action_histories(table)
     end

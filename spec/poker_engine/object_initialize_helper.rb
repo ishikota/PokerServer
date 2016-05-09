@@ -1,7 +1,7 @@
 module ObjectInitializeHelper
 
     def create_player_with_pay_info(name, amount, status)
-      player = PokerPlayer.new(name=name, 100)
+      player = PokerPlayer.new(name=name, "uuid-#{name}", 100)
       player.pay_info.update_by_pay(amount)
       if status == PokerPlayer::PayInfo::ALLIN
         player.pay_info.update_to_allin
@@ -12,7 +12,7 @@ module ObjectInitializeHelper
     end
 
     def setup_player(pid=0, holecard=true)
-      player = PokerPlayer.new(name=name(pid), 100)
+      player = PokerPlayer.new(name=name(pid), "uuid-#{pid}", 100)
       player.add_holecard(hole_card(pid)) if holecard
       return player
     end

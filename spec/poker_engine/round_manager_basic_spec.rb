@@ -118,6 +118,7 @@ RSpec.describe RoundManager do
       players =  (1..3).inject([]) do |acc, i|
         player = double("player#{i}")
         pay_info = double("pay info #{i}")
+        allow(player).to receive(:uuid).and_return("uuid-#{i}")
         allow(player).to receive(:active?).and_return(true)
         allow(player).to receive(:clear_action_histories)
         allow(player).to receive(:clear_pay_info)

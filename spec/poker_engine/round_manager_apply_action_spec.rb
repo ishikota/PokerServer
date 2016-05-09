@@ -190,7 +190,7 @@ RSpec.describe RoundManager do
 
       it "should ask action to him" do
         setup_action_checker(player1, 0, 5)
-        expect(broadcaster).to receive(:ask).with(1, "ask_msg")
+        expect(broadcaster).to receive(:ask).with(player2.uuid, "ask_msg")
 
         expect {
           apply_action(round_manager, table, 'call', 5, action_checker)
@@ -280,6 +280,7 @@ RSpec.describe RoundManager do
       players =  (1..3).inject([]) do |acc, i|
         player = double("player#{i}")
         pay_info = double("pay info #{i}")
+        allow(player).to receive(:uuid).and_return "uuid-#{i}"
         allow(player).to receive(:active?).and_return(true)
         allow(player).to receive(:clear_action_histories)
         allow(player).to receive(:clear_pay_info)

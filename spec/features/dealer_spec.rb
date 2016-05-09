@@ -147,7 +147,7 @@ RSpec.describe Dealer do
 
     def create_players_info(size)
       (1..size).inject([]) { |ary, idx|
-        ary << { "name" => "player #{idx}" }
+        ary << { "name" => "player #{idx}", "uuid" => "uuid-#{idx}" }
       }
     end
 

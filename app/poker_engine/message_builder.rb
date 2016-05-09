@@ -44,14 +44,14 @@ class MessageBuilder
   def ask_message(action_checker, player_pos, round_manager, table)
     player = table.seats.players[player_pos]
     hole_card = @formatter.format_player(player, holecard=true)["hole_card"]
-    valid_actionis = action_checker.legal_actions(table.seats.players, player_pos)
+    valid_actions = action_checker.legal_actions(table.seats.players, player_pos)
     round_state = @formatter.format_round_state(round_manager, table)
     action_histories = @formatter.format_action_histories(table)
 
     {
       "message_type" => Type::ASK_MESSAGE,
       "hole_card" => hole_card,
-      "valid_actionis" => valid_actionis,
+      "valid_actions" => valid_actions,
       "round_state" => round_state,
       "action_histories" => action_histories
     }
