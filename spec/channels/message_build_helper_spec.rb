@@ -58,4 +58,13 @@ RSpec.describe MessageBuildHelper do
     end
   end
 
+  describe "#build_action_accept_message" do
+
+    it "should build accept message" do
+      msg = helper.build_action_accept_message
+      expect(msg[:phase]).to eq MessageBuildHelper::Phase::PLAY_POKER
+      expect(msg[:type]).to eq MessageBuildHelper::Type::ACTION_ACCEPT
+    end
+  end
+
 end

@@ -2,6 +2,7 @@ class MessageBuildHelper
 
   module Phase
     MEMBER_WANTED = "member_wanted"
+    PLAY_POKER = "play_poker"
   end
 
   module Type
@@ -9,6 +10,7 @@ class MessageBuildHelper
     MEMBER_ARRIVAL = "arrival"
     MEMBER_LEAVE = "leave"
     READY = "ready"
+    ACTION_ACCEPT = "accept"
   end
 
 
@@ -33,6 +35,11 @@ class MessageBuildHelper
     {}.merge(phase: Phase::MEMBER_WANTED)
       .merge(type: Type::MEMBER_LEAVE)
       .merge(message: member_leave_message(room, player))
+  end
+
+  def build_action_accept_message
+    {}.merge(phase: Phase::PLAY_POKER)
+      .merge(type: Type::ACTION_ACCEPT)
   end
 
   private
