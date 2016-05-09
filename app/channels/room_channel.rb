@@ -16,10 +16,7 @@ class RoomChannel < ApplicationCable::Channel
   end
 
   def declare_action(data)
-    room = Room.find(data['room_id'])
-    player = Player.find(data['player_id'])
-    # TODO fetch dealer from hash and resume_round with passed data
-    ActionCable.server.broadcast "room:#{room.id}:#{player.id}", action_accept_message
+    get_delegate.declare_action(data)
   end
 
 
@@ -34,12 +31,6 @@ class RoomChannel < ApplicationCable::Channel
       message_builder = MessageBuildHelper.new
       dealer_maker = DealerMaler.new
       @delegate = RoomChannelDelegate.new(channel_wrapper, message_builder, dealer_maker)
-    end
-
-    def action_accept_message
-      {}.merge!(phase: "player_poker")\
-        .merge!(type: "accept")\
-        .merge!(type: "action accepted")
     end
 
 end
