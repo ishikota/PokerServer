@@ -8,11 +8,13 @@ FactoryGirl.define do
     factory "player1" do
       name "poka taro"
       credential 'a' * 22
+      uuid "4165ec01-152a-4803-b685-e7f0be8f7bc7"
     end
 
     factory "player2" do
       name "pokako"
       credential 'b' * 22
+      uuid "5165ec01-152a-4803-b685-e7f0be8f7bc8"
     end
 
   end
