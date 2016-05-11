@@ -1,6 +1,7 @@
 class Dealer
+  include DealerSerializer
 
-  def initialize(components_holder)
+  def initialize(components_holder, round_count=1)
     @broadcaster = components_holder[:broadcaster]
     @config = components_holder[:config]
     @table = components_holder[:table]
@@ -8,7 +9,7 @@ class Dealer
     @action_checker = components_holder[:action_checker]
     @player_maker = components_holder[:player_maker]
     @message_builder = components_holder[:message_builder]
-    @round_count = 1
+    @round_count = round_count
     @round_manager.set_finish_callback(finish_round_callback)
   end
 
@@ -47,8 +48,34 @@ class Dealer
     }
   end
 
+  def dump
+    config = Marshal.dump(@config)
+    table = Marshal.dump(@table)
+    build_state_dump(config, table).to_json
+  end
+
+  def load(components_holder, dump)
+    dt = JSON.parse(dump)
+    round_manager = build_round_manager(dt["round_manager"])
+    components_holder.merge!( { "config" => dt["config"] } )
+    components_holder.merge!( { "table" => dt["table"] } )
+    Deler.new(components_holder, dt["round_count"])
+  end
+
   private
 
+   def build_state_dump(table, config)
+     {
+       "config" => config,
+       "table" => table,
+       "round_count" => @round_count,
+       "round_manager" => {
+         "street" => @round_manager.street,
+         "agree_num" => @round_manager.agree_num,
+         "next_player" => @round_manager.next_player
+       }
+     }
+   end
 
     def start_round
       @round_manager.start_new_round(@table)

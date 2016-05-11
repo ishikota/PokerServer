@@ -19,13 +19,17 @@ class RoundManager
     @broadcaster = broadcaster
     @game_evaluator = game_evaluator
     @message_builder = message_builder
-    @street = 0
-    @agree_num = 0
-    @next_player = 0
+    set_state(street=0, agree_num=0, next_player=0)
   end
 
   def set_finish_callback(finish_callback)
     @callback = finish_callback
+  end
+
+  def set_state(street, agree_num, next_player)
+    @street = street
+    @agree_num = agree_num
+    @next_player = next_player
   end
 
   def start_new_round(table)
