@@ -74,6 +74,17 @@ RSpec.describe RoomChannelDelegate do
         delegate.enter_room(uuid, data)
       end
 
+      it "should create new game state" do
+        state = "hogehoge"
+        allow(dealer).to receive(:serialize).and_return state
+        allow(dealer).to receive(:start_game)
+        delegate.enter_room(uuid, data)
+
+        game_state = GameState.find_by_state(state)
+        expect(game_state.state).to eq state
+        expect(room.game_state).to eq game_state
+      end
+
     end
 
   end
@@ -114,10 +125,13 @@ RSpec.describe RoomChannelDelegate do
     let(:someone) { FactoryGirl.create(:player1) }
     let(:dealer) { double("dealer") }
 
-    before "put dealer in dealer_hash" do
+    before "create new game state" do
       allow(dealer).to receive(:start_game)
       allow(dealer).to receive(:receive_data)
+      allow(dealer).to receive(:serialize).and_return "hogehoge"
       allow(dealer_maker).to receive(:create).and_return(dealer)
+      allow(dealer_maker).to receive(:setup_components_holder).and_return "components"
+      allow(Dealer).to receive(:deserialize).with("components", "hogehoge").and_return dealer
       delegate.enter_room(player.uuid, data)
       delegate.enter_room(someone.uuid, data.merge( { "player_id" => someone.id } ))
     end
@@ -133,6 +147,8 @@ RSpec.describe RoomChannelDelegate do
 
       delegate.declare_action(player.uuid, data)
     end
+
+    it "should test if updated game state is saved"
 
   end
 
