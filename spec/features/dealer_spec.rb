@@ -198,7 +198,8 @@ RSpec.describe Dealer do
         dealer7 = Dealer.deserialize(components_holder, dealer6.serialize)
         dealer7.receive_data(1, call_msg(0))
 
-        players = Marshal.load(dealer7.serialize["table"]).seats.players
+        dump = JSON.parse(dealer7.serialize)
+        players = Marshal.load(dump["table"]).seats.players
         expect(players[0].stack).to eq 90
         expect(players[1].stack).to eq 110
       end

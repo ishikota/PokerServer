@@ -4,11 +4,12 @@ module DealerSerializer
   def serialize
     config = Marshal.dump(@config)
     table = Marshal.dump(@table)
-    build_state_dump(table, config)
+    build_state_dump(table, config).to_json
   end
 
   class_methods do
-    def deserialize(components_holder, dump)
+    def deserialize(components_holder, json)
+     dump = JSON.parse(json)
      round_manager = components_holder[:round_manager]
      state = dump["round_manager"]
      street = state["street"]
