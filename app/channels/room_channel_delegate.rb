@@ -40,7 +40,8 @@ class RoomChannelDelegate
   def declare_action(uuid, data)
     room = fetch_room(data)
     player = fetch_player(data)
-    dealer = Dealer.deserialize(@dealer_maker.setup_components_holder, room.game_state.state)
+    dealer = fetch_dealer(room)
+
     dealer.receive_data(player.uuid, data)
     room.game_state.update(state: dealer.serialize)
     message = @message_builder.build_action_accept_message
@@ -59,6 +60,11 @@ class RoomChannelDelegate
     def fetch_player(data)
       player_id = data["player_id"]
       Player.find(player_id)
+    end
+
+    def fetch_dealer(room)
+      components_holder = @dealer_maker.setup_components_holder(room)
+      Dealer.deserialize(components_holder, room.game_state.state)
     end
 
     def players_info(room)

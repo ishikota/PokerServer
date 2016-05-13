@@ -148,8 +148,6 @@ RSpec.describe RoomChannelDelegate do
       delegate.declare_action(player.uuid, data)
     end
 
-    it "should test if updated game state is saved"
-
   end
 
 
