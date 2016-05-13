@@ -27,7 +27,7 @@ RSpec.describe Dealer do
   end
 
   describe "update the game" do
-    let(:action_data) { { "action" => "call", "bet_amount" => 10 } }
+    let(:action_data) { { "poker_action" => "call", "bet_amount" => 10 } }
     let(:data) { setup_data(room, player1).merge!(action_data) }
 
     before {

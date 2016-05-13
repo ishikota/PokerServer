@@ -94,7 +94,7 @@ class Dealer
     end
 
     def fetch_action_from_data(data)
-      action = data["action"]
+      action = data["poker_action"]
       bet_amount = data["bet_amount"]
       [action, bet_amount]
     end

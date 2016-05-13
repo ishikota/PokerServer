@@ -242,7 +242,7 @@ RSpec.describe Dealer do
     end
 
     def base_msg(action, bet_amount)
-      { "action" => action, "bet_amount" => bet_amount }
+      { "poker_action" => action, "bet_amount" => bet_amount }
     end
 
 end
