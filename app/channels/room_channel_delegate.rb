@@ -21,9 +21,9 @@ class RoomChannelDelegate
     if room.filled_to_capacity?
       @channel.broadcast(room_id=room.id, @message_builder.build_start_poker_message)
       dealer = @dealer_maker.create(room)
+      dealer.start_game(players_info(room))
       game_state = GameState.create(state: dealer.serialize)
       GameStateRelationship.create(room_id: room.id, game_state_id: game_state.id)
-      dealer.start_game(players_info(room))
     end
   end
 
