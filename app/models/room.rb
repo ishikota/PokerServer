@@ -1,5 +1,5 @@
 class Room < ApplicationRecord
-  has_one :game_state_relationship
+  has_one :game_state_relationship, dependent: :destroy
   has_one :game_state, through: :game_state_relationship
   has_many :enter_room_relationships, dependent: :destroy
   has_many :players, through: :enter_room_relationships

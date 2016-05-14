@@ -17,5 +17,18 @@ RSpec.describe GameStateRelationship, :type => :model do
     end
   end
 
+  describe "dependncy" do
+
+    before { relation.save }
+
+    it "should be destroyed when state is destroyed" do
+      expect { game_state.destroy }.to change { GameStateRelationship.count }.to eq 0
+    end
+
+    it "should be destroyed when room is destroyed" do
+      expect { room.destroy }.to change { GameStateRelationship.count }.to eq 0
+    end
+  end
+
 end
 
