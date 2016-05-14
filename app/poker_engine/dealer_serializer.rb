@@ -48,14 +48,16 @@ module DealerSerializer
      }
    end
 
-   def round_manager_from_dump(round_manager, dump)
-     state = dump["round_manager"]
-     round_manager.tap { |round_manager|
-       street = state["street"]
-       agree_num = state["agree_num"]
-       next_player = state["next_player"]
-       round_manager.set_state(street, agree_num, next_player)
-       }
+   class_methods do
+     def round_manager_from_dump(round_manager, dump)
+       state = dump["round_manager"]
+       round_manager.tap { |round_manager|
+         street = state["street"]
+         agree_num = state["agree_num"]
+         next_player = state["next_player"]
+         round_manager.set_state(street, agree_num, next_player)
+         }
+     end
    end
 
 end
