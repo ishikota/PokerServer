@@ -67,19 +67,6 @@ class Dealer
 
   private
 
-   def build_state_dump(table, config)
-     {
-       "config" => config,
-       "table" => table,
-       "round_count" => @round_count,
-       "round_manager" => {
-         "street" => @round_manager.street,
-         "agree_num" => @round_manager.agree_num,
-         "next_player" => @round_manager.next_player
-       }
-     }
-   end
-
     def start_round
       @round_manager.start_new_round(@table)
     end
