@@ -35,6 +35,7 @@ class RoomChannelDelegate
       @channel.broadcast(room_id=player.current_room.id, @message_builder.build_member_leave_message(room, player)) unless room.nil?
     end
     player.clear_state
+    room.clear_state if room.players.empty?
   end
 
   def declare_action(uuid, data)

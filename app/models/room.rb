@@ -10,4 +10,9 @@ class Room < ApplicationRecord
   def filled_to_capacity?
     player_num == players.size
   end
+
+  def clear_state
+    game_state.destroy unless game_state.nil?
+  end
+
 end

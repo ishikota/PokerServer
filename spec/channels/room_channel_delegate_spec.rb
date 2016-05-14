@@ -90,9 +90,12 @@ RSpec.describe RoomChannelDelegate do
   end
 
   describe "#exit_room" do
+    let(:room_3p) { FactoryGirl.create(:room) }
+    let(:someone) { FactoryGirl.create(:player1) }
 
     before {
-      EnterRoomRelationship.create(player_id: player.id, room_id: room.id)
+      EnterRoomRelationship.create(player_id: player.id, room_id: room_3p.id)
+      EnterRoomRelationship.create(player_id: someone.id, room_id: room_3p.id)
     }
 
     it "should clear room-player relationship" do
@@ -104,9 +107,23 @@ RSpec.describe RoomChannelDelegate do
     end
 
     it "should broadcast exit of player" do
-      expect(channel_wrapper).to receive(:broadcast).with(room.id, exit_msg)
+      expect(channel_wrapper).to receive(:broadcast).with(room_3p.id, exit_msg)
 
       delegate.exit_room(player.uuid)
+    end
+
+    context "when room becomes vacant" do
+
+      before {
+        state = GameState.create(state: "hoge")
+        GameStateRelationship.create(room_id: room_3p.id, game_state_id: state.id)
+      }
+
+      it "should clear game state" do
+        delegate.exit_room(player.uuid)
+        delegate.exit_room(someone.uuid)
+        expect(room_3p.reload.game_state).to be_nil
+      end
     end
 
   end
