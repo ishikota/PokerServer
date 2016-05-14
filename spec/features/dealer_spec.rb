@@ -36,6 +36,9 @@ RSpec.describe Dealer do
   let(:round_result_msg) { "round results" }
   let(:game_result_msg) { "game results" }
 
+  let(:uuid1) { "uuid-1" }
+  let(:uuid2) { "uuid-2" }
+
   before {
     allow(broadcaster).to receive(:ask)
     allow(broadcaster).to receive(:notification)
@@ -55,16 +58,16 @@ RSpec.describe Dealer do
     before { dealer.start_game(create_players_info(2)) }
 
     it "should finish by player 1 win" do
-      dealer.receive_data(0, call_msg(10))
-      dealer.receive_data(0, raise_msg(10))
-      dealer.receive_data(1, fold_msg)
+      dealer.receive_data(uuid1, call_msg(10))
+      dealer.receive_data(uuid1, raise_msg(10))
+      dealer.receive_data(uuid2, fold_msg)
 
       expect(table.seats.players[0].stack).to eq 110
       expect(table.seats.players[1].stack).to eq 90
     end
 
     it "should finish by player 2 win" do
-      play_a_round(dealer)
+      play_a_round(dealer, dealer_btn=0)
 
       expect(table.seats.players[0].stack).to eq 90
       expect(table.seats.players[1].stack).to eq 110
@@ -86,8 +89,8 @@ RSpec.describe Dealer do
     context "just call both of players untill end" do
 
       it "should finish by player 2 win" do
-        play_a_round(dealer)
-        play_a_round(dealer)
+        play_a_round(dealer, dealer_btn=0)
+        play_a_round(dealer, dealer_btn=1)
 
         expect(table.seats.players[0].stack).to eq 80
         expect(table.seats.players[1].stack).to eq 120
@@ -102,7 +105,7 @@ RSpec.describe Dealer do
         dealer.receive_data(0, raise_msg(10))
         dealer.receive_data(1, fold_msg)
         # second round
-        play_a_round(dealer)
+        play_a_round(dealer, dealer_btn=1)
 
         expect(table.seats.players[0].stack).to eq 100
         expect(table.seats.players[1].stack).to eq 100
@@ -116,14 +119,14 @@ RSpec.describe Dealer do
 
     before "update player's stack to p1.stack=50, p2.stack=150" do
       dealer.start_game(create_players_info(2))
-      dealer.receive_data(0, raise_msg(50))
-      dealer.receive_data(1, call_msg(50))
-      dealer.receive_data(0, call_msg(0))
-      dealer.receive_data(1, call_msg(0))
-      dealer.receive_data(0, call_msg(0))
-      dealer.receive_data(0, call_msg(0))
-      dealer.receive_data(1, call_msg(0))
-      dealer.receive_data(1, call_msg(0))
+      dealer.receive_data(uuid1, raise_msg(50))
+      dealer.receive_data(uuid2, call_msg(50))
+      dealer.receive_data(uuid1, call_msg(0))
+      dealer.receive_data(uuid2, call_msg(0))
+      dealer.receive_data(uuid1, call_msg(0))
+      dealer.receive_data(uuid2, call_msg(0))
+      dealer.receive_data(uuid1, call_msg(0))
+      dealer.receive_data(uuid2, call_msg(0))
 
       # Round 2 : small blind = p2, big blind = p1
       expect(table.seats.players[0].stack).to eq 50 - 10
@@ -133,10 +136,10 @@ RSpec.describe Dealer do
     it "should forward to SHOWDOWN after p1's allin" do
       expect(broadcaster).to receive(:notification).with(game_result_msg)
 
-      dealer.receive_data(1, call_msg(10))
-      dealer.receive_data(1, call_msg(0))
-      dealer.receive_data(0, raise_msg(40))
-      dealer.receive_data(1, call_msg(40))
+      dealer.receive_data(uuid2, call_msg(10))
+      dealer.receive_data(uuid2, call_msg(0))
+      dealer.receive_data(uuid1, raise_msg(40))
+      dealer.receive_data(uuid2, call_msg(40))
 
       expect(table.seats.players[0].stack).to eq 0
       expect(table.seats.players[1].stack).to eq 200
@@ -184,19 +187,19 @@ RSpec.describe Dealer do
 
       specify "serializing does not effect the game result" do
         dealer.start_game(create_players_info(2))
-        dealer.receive_data(0, call_msg(10))
+        dealer.receive_data(uuid1, call_msg(10))
         dealer2 = Dealer.deserialize(components_holder, dealer.serialize)
-        dealer2.receive_data(0, call_msg(0))
+        dealer2.receive_data(uuid1, call_msg(0))
         dealer3 = Dealer.deserialize(components_holder, dealer2.serialize)
-        dealer3.receive_data(1, call_msg(0))
+        dealer3.receive_data(uuid2, call_msg(0))
         dealer4 = Dealer.deserialize(components_holder, dealer3.serialize)
-        dealer4.receive_data(0, call_msg(0))
+        dealer4.receive_data(uuid1, call_msg(0))
         dealer5 = Dealer.deserialize(components_holder, dealer4.serialize)
-        dealer5.receive_data(1, call_msg(0))
+        dealer5.receive_data(uuid2, call_msg(0))
         dealer6 = Dealer.deserialize(components_holder, dealer5.serialize)
-        dealer6.receive_data(0, call_msg(0))
+        dealer6.receive_data(uuid1, call_msg(0))
         dealer7 = Dealer.deserialize(components_holder, dealer6.serialize)
-        dealer7.receive_data(1, call_msg(0))
+        dealer7.receive_data(uuid2, call_msg(0))
 
         dump = JSON.parse(dealer7.serialize)
         players = Marshal.load(dump["table"]).seats.players
@@ -216,17 +219,20 @@ RSpec.describe Dealer do
       }
     end
 
-    def play_a_round(dealer)
-      dealer.receive_data(0, call_msg(10))
+    def play_a_round(dealer, dealer_btn)
+      uuid_first = dealer_btn == 0 ? uuid1 : uuid2
+      uuid_second = dealer_btn == 1 ? uuid1 : uuid2
+
+      dealer.receive_data(uuid_first, call_msg(10))
       # FLOP start
-      dealer.receive_data(0, call_msg(0))
-      dealer.receive_data(1, call_msg(0))
+      dealer.receive_data(uuid_first, call_msg(0))
+      dealer.receive_data(uuid_second, call_msg(0))
       # TURN start
-      dealer.receive_data(0, call_msg(0))
-      dealer.receive_data(1, call_msg(0))
+      dealer.receive_data(uuid_first, call_msg(0))
+      dealer.receive_data(uuid_second, call_msg(0))
       # RIVER start
-      dealer.receive_data(0, call_msg(0))
-      dealer.receive_data(1, call_msg(0))
+      dealer.receive_data(uuid_first, call_msg(0))
+      dealer.receive_data(uuid_second, call_msg(0))
     end
 
     def call_msg(bet_amount)

@@ -71,13 +71,20 @@ RSpec.describe "Dealer" do
   end
 
   describe "#receive_data" do
+    let(:player1) { double("player") }
+    let(:uuid) { "hogeohgeohge" }
+
+    before {
+      allow(seats).to receive(:players).and_return [player1]
+      allow(player1).to receive(:uuid).and_return uuid
+      allow(round_manager).to receive(:next_player).and_return 0
+    }
 
     it "should pass received action to round_manager and resume game" do
-      allow(round_manager).to receive(:next_player).and_return 0
       expect(round_manager).to receive(:apply_action)
           .with(table, "call", 10, action_checker)
 
-      dealer.receive_data(0, { "poker_action" => "call", "bet_amount" => 10 })
+      dealer.receive_data(uuid, { "poker_action" => "call", "bet_amount" => 10 })
     end
 
   end
