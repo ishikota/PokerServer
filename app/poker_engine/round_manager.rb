@@ -197,8 +197,8 @@ class RoundManager
       players.each { |player| player.clear_action_histories }
     end
 
-    def ask(player_pos, message)
-      @broadcaster.ask(player_pos, message)
+    def ask(uuid, message)
+      @broadcaster.ask(uuid, message)
     end
     def notify(message)
       @broadcaster.notification(message)

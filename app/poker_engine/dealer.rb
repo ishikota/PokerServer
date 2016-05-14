@@ -20,8 +20,7 @@ class Dealer
     start_round
   end
 
-  # TODO RoomChannelDelegate passes uuid to player_id. So fix it
-  def receive_data(player_id, data)
+  def receive_data(uuid, data)
     action, bet_amount = fetch_action_from_data(data)
     apply_action(action, bet_amount)
   end
