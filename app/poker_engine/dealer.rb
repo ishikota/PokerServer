@@ -20,10 +20,13 @@ class Dealer
     start_round
   end
 
-  # TODO RoomChannelDelegate passes uuid to player_id. So fix it
-  def receive_data(player_id, data)
-    action, bet_amount = fetch_action_from_data(data)
-    apply_action(action, bet_amount)
+  def receive_data(uuid, data)
+    if message_from_expected_player?(uuid, @table.seats, @round_manager.next_player)
+      action, bet_amount = fetch_action_from_data(data)
+      apply_action(action, bet_amount)
+    else
+      puts "Reject message from unexpected player: message = #{data}"
+    end
   end
 
   def teardown_round
@@ -97,6 +100,11 @@ class Dealer
       action = data["poker_action"]
       bet_amount = data["bet_amount"]
       [action, bet_amount]
+    end
+
+    def message_from_expected_player?(messanger_uuid, seats, next_player_pos)
+      expected_player = seats.players[next_player_pos]
+      expected_player.uuid == messanger_uuid
     end
 
     def played_all_round?

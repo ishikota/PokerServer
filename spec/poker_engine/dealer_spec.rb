@@ -71,12 +71,20 @@ RSpec.describe "Dealer" do
   end
 
   describe "#receive_data" do
+    let(:player1) { double("player") }
+    let(:uuid) { "hogeohgeohge" }
+
+    before {
+      allow(seats).to receive(:players).and_return [player1]
+      allow(player1).to receive(:uuid).and_return uuid
+      allow(round_manager).to receive(:next_player).and_return 0
+    }
 
     it "should pass received action to round_manager and resume game" do
       expect(round_manager).to receive(:apply_action)
           .with(table, "call", 10, action_checker)
 
-      dealer.receive_data(0, { "poker_action" => "call", "bet_amount" => 10 })
+      dealer.receive_data(uuid, { "poker_action" => "call", "bet_amount" => 10 })
     end
 
   end
@@ -187,6 +195,43 @@ RSpec.describe "Dealer" do
         end
       end
 
+    end
+
+  end
+
+  describe "message_from_expected_player" do
+    let(:player1) { double("player1") }
+    let(:uuid) { "hogehogehogehogehogehoge" }
+    let(:data) { { "poker_action" => "fold", "bet_amount" => 0 } }
+
+    before {
+      allow(table).to receive_message_chain('seats.players').and_return [player1, double("dummy")]
+    }
+
+    context "when message comes from next player" do
+
+      before {
+        allow(round_manager).to receive(:next_player).and_return 0
+        allow(player1).to receive(:uuid).and_return uuid
+      }
+
+      it "should apply the message" do
+        expect(round_manager).to receive(:apply_action).with(anything, "fold", 0, anything)
+        dealer.receive_data(uuid, data)
+      end
+    end
+
+    context "when message comes from not next player" do
+
+      before {
+        allow(round_manager).to receive(:next_player).and_return 0
+        allow(player1).to receive(:uuid).and_return "dummy"
+      }
+
+      it "should ignore the message" do
+        expect(round_manager).not_to receive(:apply_action)
+        dealer.receive_data(uuid, data)
+      end
     end
 
   end
