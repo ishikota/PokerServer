@@ -1,11 +1,11 @@
 class Broadcaster
+  attr_accessor :ask_counter  # write for deserialize
 
   def initialize(server, room, ask_counter=0)
     @server = server
     @room = room
     @ask_counter = ask_counter
   end
-
 
   def notification(data)
     @server.broadcast "room:#{@room.id}", notification_message(data)

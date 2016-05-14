@@ -16,6 +16,9 @@ module DealerSerializer
      agree_num = state["agree_num"]
      next_player = state["next_player"]
      round_manager.set_state(street, agree_num, next_player)
+
+     broadcaster = components_holder[:broadcaster]
+     broadcaster.ask_counter = dump["broadcaster"]["ask_counter"]
      config = Marshal.load(dump["config"])
      table = Marshal.load(dump["table"])
 
@@ -23,6 +26,7 @@ module DealerSerializer
         .merge!( { config: config } )
         .merge!( { table: table } )
         .merge!( { round_manager: round_manager } )
+        .merge!( { broadcaster: broadcaster } )
       Dealer.new(components_holder, round_count=dump["round_count"])
     end
   end
@@ -38,6 +42,9 @@ module DealerSerializer
          "street" => @round_manager.street,
          "agree_num" => @round_manager.agree_num,
          "next_player" => @round_manager.next_player
+       },
+       "broadcaster" => {
+         "ask_counter" => @broadcaster.ask_counter
        }
      }
    end
