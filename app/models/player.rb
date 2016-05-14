@@ -1,4 +1,6 @@
 class Player < ApplicationRecord
+  has_one :enter_room_relationship
+  has_one :room, through: :enter_room_relationship
   validates :name, presence: true
   validates :credential, length: { is: 22 }
 
@@ -9,8 +11,7 @@ class Player < ApplicationRecord
 
   # most rescent entered room
   def current_room
-    my_rooms_id = EnterRoomRelationship.where(player_id: id).pluck(:id)
-    Room.where(id: my_rooms_id).order(created_at: :desc).first
+    room
   end
 
   def take_a_seat(room)

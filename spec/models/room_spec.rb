@@ -51,6 +51,14 @@ RSpec.describe Room, :type => :model do
       end
     end
 
+    describe "with game state" do
+      let(:game_state) { FactoryGirl.create(:game_state) }
+      before { GameStateRelationship.create(room_id: room.id, game_state_id: game_state.id) }
+
+      it "should have a game state" do
+        expect(room.game_state).to eq game_state
+      end
+    end
   end
 
   describe "dependency" do

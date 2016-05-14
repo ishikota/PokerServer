@@ -76,7 +76,7 @@ RSpec.describe "Dealer" do
       expect(round_manager).to receive(:apply_action)
           .with(table, "call", 10, action_checker)
 
-      dealer.receive_data(0, { "action" => "call", "bet_amount" => 10 })
+      dealer.receive_data(0, { "poker_action" => "call", "bet_amount" => 10 })
     end
 
   end

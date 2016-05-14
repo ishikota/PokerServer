@@ -143,6 +143,71 @@ RSpec.describe Dealer do
     end
   end
 
+  describe "serialization" do
+    let(:config) { Config.new(initial_stack=100, max_round=1) }
+    let(:room) do
+      double("room").tap { |room|
+        allow(room).to receive(:id)
+      }
+    end
+
+    describe "serialize and deserialize" do
+
+      before do
+        dealer.start_game(create_players_info(2))
+        dealer.receive_data(0, call_msg(10))
+      end
+
+      it "should serialize and deserialize dealer" do
+        components_holder = DealerMaker.new.setup_components_holder(room)
+        orig = JSON.parse(dealer.to_json)
+        copy = JSON.parse(Dealer.deserialize(components_holder, dealer.serialize).to_json)
+
+        expect(copy["round_count"]).to eq orig["round_count"]
+
+        expect(copy["config"]["initial_stack"]).to eq orig["config"]["initial_stack"]
+        expect(copy["config"]["max_round"]).to eq orig["config"]["max_round"]
+        expect(copy["config"]["small_blind_amount"]).to eq orig["config"]["small_blind_amount"]
+
+        expect(copy["table"]["dealer_btn"]).to eq orig["table"]["dealer_btn"]
+        expect(copy["table"]["seats"]).to eq orig["table"]["seats"]
+        expect(copy["table"]["deck"]).to eq orig["table"]["deck"]
+        expect(copy["table"]["community_card"]).to eq orig["table"]["community_card"]
+
+        expect(copy["round_manager"]["street"]).to eq orig["round_manager"]["street"]
+        expect(copy["round_manager"]["agree_num"]).to eq orig["round_manager"]["agree_num"]
+        expect(copy["round_manager"]["next_player"]).to eq orig["round_manager"]["next_player"]
+      end
+    end
+
+    describe "test in simulation" do
+
+      specify "serializing does not effect the game result" do
+        dealer.start_game(create_players_info(2))
+        dealer.receive_data(0, call_msg(10))
+        dealer2 = Dealer.deserialize(components_holder, dealer.serialize)
+        dealer2.receive_data(0, call_msg(0))
+        dealer3 = Dealer.deserialize(components_holder, dealer2.serialize)
+        dealer3.receive_data(1, call_msg(0))
+        dealer4 = Dealer.deserialize(components_holder, dealer3.serialize)
+        dealer4.receive_data(0, call_msg(0))
+        dealer5 = Dealer.deserialize(components_holder, dealer4.serialize)
+        dealer5.receive_data(1, call_msg(0))
+        dealer6 = Dealer.deserialize(components_holder, dealer5.serialize)
+        dealer6.receive_data(0, call_msg(0))
+        dealer7 = Dealer.deserialize(components_holder, dealer6.serialize)
+        dealer7.receive_data(1, call_msg(0))
+
+        dump = JSON.parse(dealer7.serialize)
+        players = Marshal.load(dump["table"]).seats.players
+        expect(players[0].stack).to eq 90
+        expect(players[1].stack).to eq 110
+      end
+    end
+
+  end
+
+
   private
 
     def create_players_info(size)
@@ -177,7 +242,7 @@ RSpec.describe Dealer do
     end
 
     def base_msg(action, bet_amount)
-      { "action" => action, "bet_amount" => bet_amount }
+      { "poker_action" => action, "bet_amount" => bet_amount }
     end
 
 end

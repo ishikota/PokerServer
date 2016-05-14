@@ -37,5 +37,10 @@ FactoryGirl.define do
     end
 
   end
+
+  factory :game_state do
+    state "hogehoge"
+  end
+
 end
 
