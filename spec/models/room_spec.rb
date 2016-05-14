@@ -99,6 +99,22 @@ RSpec.describe Room, :type => :model do
 
     end
 
+    describe "clear_state" do
+
+      before {
+        state1 = GameState.create(state: "hoge")
+        state2 = GameState.create(state: "huga")
+        GameStateRelationship.create(room_id: room.id, game_state_id: state1.id)
+        GameStateRelationship.create(room_id: room.id, game_state_id: state2.id)
+      }
+
+      it "should clear game state" do
+        room.clear_state
+        expect(room.reload.game_state).to be_nil
+        expect(room.reload.game_state_relationship).to be_nil
+      end
+    end
+
   end
 
 end

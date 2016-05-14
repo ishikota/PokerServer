@@ -12,7 +12,9 @@ class Room < ApplicationRecord
   end
 
   def clear_state
-    game_state.destroy unless game_state.nil?
+    state_ids = GameStateRelationship.joins(:game_state)
+        .where(room_id: id).pluck(:game_state_id)
+    GameState.where(id: state_ids).destroy_all
   end
 
 end
