@@ -28,6 +28,7 @@ RSpec.describe Player, :type => :model do
       before { EnterRoomRelationship.create(room_id: room.id, player_id: player.id) }
 
       it "should belong" do
+        expect(player.room).to eq room
         expect(player.current_room).to eq room
       end
     end
