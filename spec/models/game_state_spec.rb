@@ -15,4 +15,16 @@ RSpec.describe GameState, :type => :model do
 
   end
 
+  describe "association" do
+
+    before {
+      GameStateRelationship.create(room_id: room.id, game_state_id: game_state.id)
+    }
+
+    it "should belong to room through GameStateRelationship" do
+      expect(game_state.room).to eq room
+    end
+  end
+
 end
+
