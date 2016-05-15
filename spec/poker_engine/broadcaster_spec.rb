@@ -26,14 +26,22 @@ RSpec.describe Broadcaster do
   end
 
   describe "ask" do
+    let(:channel) { "room:#{room.id}:#{player.id}" }
+    let(:params) {
+      { phase: "play_poker", type: "ask", counter: 0, message: "hoge" }
+    }
 
     it "should broadcast expected message" do
-      channel = "room:#{room.id}:#{player.id}"
-      params = { phase: "play_poker", type: "ask", message: "hoge" }
-
       expect(server).to receive(:broadcast).with(channel, params)
 
       broadcaster.ask(player.uuid, "hoge")
+    end
+
+    it "should increment ask count" do
+      second_params = params.merge( { counter: 1 } )
+      expect(server).to receive(:broadcast).with(channel, params)
+      expect(server).to receive(:broadcast).with(channel, second_params)
+      2.times { broadcaster.ask(player.uuid, "hoge") }
     end
   end
 

@@ -147,6 +147,7 @@ RSpec.describe Dealer do
   end
 
   describe "serialization" do
+    let(:broadcaster) { Broadcaster.new("server", "room", 5) }
     let(:config) { Config.new(initial_stack=100, max_round=1) }
     let(:room) do
       double("room").tap { |room|
@@ -180,6 +181,8 @@ RSpec.describe Dealer do
         expect(copy["round_manager"]["street"]).to eq orig["round_manager"]["street"]
         expect(copy["round_manager"]["agree_num"]).to eq orig["round_manager"]["agree_num"]
         expect(copy["round_manager"]["next_player"]).to eq orig["round_manager"]["next_player"]
+
+        expect(copy["broadcaster"]["ask_counter"]).to eq orig["broadcaster"]["ask_counter"]
       end
     end
 
