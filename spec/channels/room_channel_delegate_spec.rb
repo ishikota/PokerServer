@@ -58,53 +58,6 @@ RSpec.describe RoomChannelDelegate do
       delegate.enter_room(uuid, data)
     end
 
-    context "when all member is gatherd" do
-      let(:someone) { FactoryGirl.create(:player1) }
-      let(:dealer) { double("dealer") }
-      let(:dealer_message) {
-        [] << notification_msg("notify_hoge") << ask_msg(uuid, "ask_fuga")
-      }
-
-      before {
-        allow(dealer_maker).to receive(:create).and_return(dealer)
-        EnterRoomRelationship.create(player_id: someone.id, room_id: room.id)
-      }
-
-      it "should broadcast start of the game" do
-        pending "player order is reversed compared to what we expected"
-        player_info = [ { "name" => player.name, "uuid" => uuid }, { "name" => someone.name, "uuid" => someone.uuid } ]
-        expect(dealer).to receive(:start_game).with(player_info).and_return([])
-        expect(channel_wrapper).to receive(:broadcast).with(room.id, start_msg)
-
-        delegate.enter_room(uuid, data)
-      end
-
-      it "should broadcast message created by dealer" do
-        allow(dealer).to receive(:serialize).and_return "bar"
-        allow(dealer).to receive(:start_game).and_return(dealer_message)
-        expect(channel_wrapper).to receive(:broadcast).with(
-          room.id, { phase: "play_poker", type: "notification", message: "notify_hoge"})
-        expect(channel_wrapper).to receive(:broadcast).with(
-          room.id, player.id, { phase: "play_poker", type: "ask", message: "ask_fuga", counter: 0})
-
-        delegate.enter_room(uuid, data)
-        expect(room.game_state.ask_counter).to eq 1
-      end
-
-      it "should create new game state" do
-        state = "hogehoge"
-        allow(dealer).to receive(:serialize).and_return state
-        allow(dealer).to receive(:start_game).and_return([])
-        delegate.enter_room(uuid, data)
-
-        game_state = GameState.find_by_state(state)
-        expect(game_state.state).to eq state
-        expect(room.game_state).to eq game_state
-        expect(room.game_state.ask_counter).to eq 0
-      end
-
-    end
-
   end
 
   describe "#exit_room" do
@@ -146,6 +99,72 @@ RSpec.describe RoomChannelDelegate do
 
   end
 
+  describe "#connection_check" do
+    let(:someone) { FactoryGirl.create(:player1) }
+    let(:data) do
+      { 'room_id' => room.id, 'player_id' => player.id }
+    end
+
+    before {
+      EnterRoomRelationship.create(room_id: room.id, player_id: player.id)
+    }
+
+    context "when everyone is online but not filled to capaciy" do
+      it "should not start the game" do
+        expect(channel_wrapper).not_to receive(:broadcast)
+
+        delegate.connection_check(player.uuid)
+      end
+    end
+
+    context "when everyone is online and fiiled to capacity" do
+      let(:dealer) { double("dealer") }
+      let(:dealer_message) {
+        [] << notification_msg("notify_hoge") << ask_msg(player.uuid, "ask_fuga")
+      }
+
+      before {
+        allow(dealer).to receive(:serialize).and_return "bar"
+        allow(dealer_maker).to receive(:create).and_return(dealer)
+        someone.update(online: true)
+        EnterRoomRelationship.create(room_id: room.id, player_id: someone.id)
+      }
+
+      it "should broadcast start of the game" do
+        player_info = [
+          { "name" => player.name, "uuid" => player.uuid },
+          { "name" => someone.name, "uuid" => someone.uuid }
+        ]
+        expect(dealer).to receive(:start_game).with(player_info).and_return([])
+        expect(channel_wrapper).to receive(:broadcast).with(room.id, start_msg)
+
+        delegate.connection_check(player.uuid)
+      end
+
+      it "should broadcast message created by dealer" do
+        allow(dealer).to receive(:start_game).and_return(dealer_message)
+        expect(channel_wrapper).to receive(:broadcast).with(
+          room.id, { phase: "play_poker", type: "notification", message: "notify_hoge"})
+        expect(channel_wrapper).to receive(:broadcast).with(
+          room.id, player.id, { phase: "play_poker", type: "ask", message: "ask_fuga", counter: 0})
+
+        delegate.connection_check(player.uuid)
+        expect(room.game_state.ask_counter).to eq 1
+      end
+
+      it "should create new game state" do
+        state = "hogehoge"
+        allow(dealer).to receive(:serialize).and_return state
+        allow(dealer).to receive(:start_game).and_return([])
+        delegate.connection_check(player.uuid)
+
+        game_state = room.reload.game_state
+        expect(game_state.state).to eq state
+        expect(room.game_state.ask_counter).to eq 0
+      end
+    end
+  end
+
   describe "#declare_action" do
 
    let(:data) do
@@ -172,6 +191,8 @@ RSpec.describe RoomChannelDelegate do
       allow(Dealer).to receive(:deserialize).with("components", "hogehoge").and_return dealer
       delegate.enter_room(player.uuid, data)
       delegate.enter_room(someone.uuid, data.merge( { "player_id" => someone.id } ))
+      delegate.connection_check(player.uuid)
+      delegate.connection_check(someone.uuid)
     end
 
     it "should pass action to correct dealer" do

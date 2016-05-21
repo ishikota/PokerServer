@@ -99,6 +99,35 @@ RSpec.describe Room, :type => :model do
 
     end
 
+    describe "everyone_online?" do
+      let(:room) { FactoryGirl.create(:room1) }
+      let!(:player1) { FactoryGirl.create(:player1) }
+      let!(:player2) { FactoryGirl.create(:player2) }
+
+      before {
+        room.players << player1 << player2
+        room.save
+      }
+
+      context "when offline player exists" do
+        it "should return false" do
+          expect(room.everyone_online?).to be_falsy
+        end
+      end
+
+      context "when everyone is online" do
+
+        before {
+          player1.update(online: true)
+          player2.update(online: true)
+        }
+
+        it "should return true" do
+          expect(room.everyone_online?).to be_truthy
+        end
+      end
+    end
+
     describe "clear_state" do
 
       before {

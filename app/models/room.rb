@@ -11,6 +11,10 @@ class Room < ApplicationRecord
     player_num == players.size
   end
 
+  def everyone_online?
+    players.all? { |player| player.online? }
+  end
+
   def clear_state
     state_ids = GameStateRelationship.joins(:game_state)
         .where(room_id: id).pluck(:game_state_id)
