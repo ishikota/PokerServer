@@ -39,6 +39,21 @@ class RoomChannelDelegate
     room.clear_state if room.players.empty?
   end
 
+  def connection_check(uuid)
+    player = Player.find_by_uuid(uuid)
+    room = player.current_room
+    player.update(online: true) unless player.online?
+
+    if room.filled_to_capacity? && room.everyone_online? && room.game_state.nil?
+      @channel.broadcast(room_id=room.id, @message_builder.build_start_poker_message)
+      dealer = @dealer_maker.create(room)
+      msgs = dealer.start_game(players_info(room))
+      game_state = GameState.create(state: dealer.serialize)
+      GameStateRelationship.create(room_id: room.id, game_state_id: game_state.id)
+      broadcast_dealer_message(room.reload, msgs)
+    end
+  end
+
   def declare_action(uuid, data)
     room = fetch_room(data)
     player = fetch_player(data)
