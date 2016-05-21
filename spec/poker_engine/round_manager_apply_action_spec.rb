@@ -1,12 +1,13 @@
 require 'rails_helper'
+require 'poker_engine/round_manager_spec_helper'
 
 RSpec.describe RoundManager do
+  include RoundManagerSpecHelper
 
   let(:finish_callback) { double("dealer.finish_round") }
-  let(:broadcaster) { double("broadcaster") }
   let(:game_evaluator) { double("game evaluator") }
   let(:message_builder) { double("message_builder") }
-  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator, message_builder) }
+  let(:round_manager) { RoundManager.new(game_evaluator, message_builder) }
 
   before {
     round_manager.set_finish_callback(finish_callback)
@@ -26,8 +27,6 @@ RSpec.describe RoundManager do
     let(:action_checker) { double("action checker") }
 
     before {
-      allow(broadcaster).to receive(:ask)
-      allow(broadcaster).to receive(:notification).with("update")
       allow(action_checker).to receive(:illegal?).and_return false
     }
 
@@ -35,9 +34,8 @@ RSpec.describe RoundManager do
 
       it "should notify update to all players" do
         setup_action_checker(player1, 0, 10)
-        expect(broadcaster).to receive(:notification).with("update")
-
-        apply_action(round_manager, table, 'call', 10, action_checker)
+        msgs = apply_action(round_manager, table, 'call', 10, action_checker)
+        expect(msgs).to include notification_msg("update")
       end
 
       context "when passed action is CALL" do
@@ -190,10 +188,9 @@ RSpec.describe RoundManager do
 
       it "should ask action to him" do
         setup_action_checker(player1, 0, 5)
-        expect(broadcaster).to receive(:ask).with(player2.uuid, "ask_msg")
-
         expect {
-          apply_action(round_manager, table, 'call', 5, action_checker)
+          msgs = apply_action(round_manager, table, 'call', 5, action_checker)
+          expect(msgs).to include ask_msg(player2.uuid, "ask_msg")
         }.to change { round_manager.next_player }.by(1)
       end
 
@@ -211,7 +208,6 @@ RSpec.describe RoundManager do
         allow(seats).to receive(:count_active_player).and_return(3)
         allow(table).to receive(:dealer_btn).and_return(0)
         allow(table).to receive(:deck).and_return(deck)
-        allow(broadcaster).to receive(:notification)
 
         round_manager.increment_agree_num
         round_manager.increment_agree_num
@@ -229,9 +225,8 @@ RSpec.describe RoundManager do
 
       it "should forward to next street" do
         setup_action_checker(player1, 0, 5)
-        expect(broadcaster).to receive(:notification).with("street_msg")
-
-        apply_action(round_manager, table, 'call', 5, action_checker)
+        msgs = apply_action(round_manager, table, 'call', 5, action_checker)
+        expect(msgs).to include notification_msg("street_msg")
       end
 
     end

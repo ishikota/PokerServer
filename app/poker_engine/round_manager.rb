@@ -15,8 +15,7 @@ class RoundManager
     SHOWDOWN => "SHOWDOWN"
   }
 
-  def initialize(broadcaster, game_evaluator, message_builder)
-    @broadcaster = broadcaster
+  def initialize(game_evaluator, message_builder)
     @game_evaluator = game_evaluator
     @message_builder = message_builder
     set_state(street=0, agree_num=0, next_player=0)
@@ -40,8 +39,8 @@ class RoundManager
     correct_blind(small_blind=5, table)
     deal_holecard(table.deck, table.seats.players)
 
-    notify_round_start(table)
-    start_street(@street, table)
+    [].concat(notify_round_start(table))
+      .concat(start_street(@street, table))
   end
 
   def apply_action(table, action, bet_amount, action_checker)
@@ -52,15 +51,17 @@ class RoundManager
     action_player.pay_info.update_to_allin if action_checker.allin?(action_player, action, bet_amount)
 
     accept_action(action_player, action, bet_amount, table.seats.players, action_checker)
-    notify_update(@next_player, action, bet_amount, table)
+
+    msgs = []
+    msgs << notify_update(@next_player, action, bet_amount, table)
 
     if everyone_agree?(table.seats)
       @street += 1
       clear_action_histories(table.seats.players)
-      start_street(@street, table)
+      msgs.concat(start_street(@street, table))
     else
       shift_next_player(table.seats)
-      send_ask_message(@next_player, self, table)
+      msgs << send_ask_message(@next_player, self, table)
     end
   end
 
@@ -68,18 +69,19 @@ class RoundManager
   def start_street(street, table)
     @agree_num = 0
     @next_player = table.dealer_btn
-    notify_street_start(table)
+    msgs = []
+    msgs << notify_street_start(table)
 
     if street == PREFLOP
-      preflop(table)
+      msgs << preflop(table)
     elsif street == FLOP
-      flop(table)
+      msgs << flop(table)
     elsif street == TURN
-      turn(table)
+      msgs << turn(table)
     elsif street == RIVER
-      river(table)
+      msgs << river(table)
     elsif street == SHOWDOWN
-      showdown(table)
+      msgs << showdown(table)
     end
   end
 
@@ -197,35 +199,47 @@ class RoundManager
       players.each { |player| player.clear_action_histories }
     end
 
-    def ask(uuid, message)
-      @broadcaster.ask(uuid, message)
-    end
-    def notify(message)
-      @broadcaster.notification(message)
-    end
-
     def notify_round_start(table)
+      msgs = []
       table.seats.players.each_with_index { |player, idx|
         #TODO fix to notify to each person
-        notify(@message_builder.round_start_message(idx, table.seats))
+        msgs << notification_message(@message_builder.round_start_message(idx, table.seats))
       }
+      msgs
     end
 
     def notify_street_start(table)
-      notify(@message_builder.street_start_message(self, table))
+      message = @message_builder.street_start_message(self, table)
+      notification_message(message)
     end
 
     def notify_update(player_pos, action, amount, table)
       message = @message_builder.game_update_message(player_pos, action, amount, self, table)
-      notify(message)
+      notification_message(message)
     end
 
     def send_ask_message(player_pos, round_manager, table)
       action_checker = ActionChecker.new  #TODO
       message = @message_builder.ask_message(action_checker, player_pos, round_manager, table)
       next_player = table.seats.players[player_pos]
-      ask(next_player.uuid, message)
+      ask_message(next_player, message)
     end
+
+    def ask_message(recipient, message)
+      {
+        "type" => "ask",
+        "recipient" => recipient.uuid,
+        "message" => message
+      }
+    end
+
+    def notification_message(message)
+      {
+        "type" => "notification",
+        "message" => message
+      }
+    end
+
 
 end
 
