@@ -5,10 +5,7 @@ class DealerMaker
   end
 
   def setup_components_holder(room)
-    broadcaster = setup_broadcaster(room)
-
-    {}.merge(broadcaster: broadcaster)
-      .merge(config: setup_config)
+    {}.merge(config: setup_config)
       .merge(table: setup_table)
       .merge(round_manager: setup_round_manager)
       .merge(action_checker: setup_action_checker)
@@ -18,10 +15,6 @@ class DealerMaker
 
 
   private
-
-    def setup_broadcaster(room)
-      Broadcaster.new(ActionCable.server, room)
-    end
 
     def setup_config
       Config.new(initial_stack=100, max_round=5)

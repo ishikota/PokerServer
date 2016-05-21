@@ -1,12 +1,13 @@
 require 'rails_helper'
+require 'poker_engine/round_manager_spec_helper'
 
 RSpec.describe "Dealer" do
+  include RoundManagerSpecHelper
 
   let(:dealer) { Dealer.new(components_holder) }
   let(:config) { double("config") }
   let(:table) { double("table") }
   let(:seats) { double("seats") }
-  let(:broadcaster) { double("broadcaster") }
   let(:round_manager) { double("round manager") }
   let(:action_checker) { double("action checker") }
   let(:player_maker) { double("player_maker") }
@@ -14,7 +15,6 @@ RSpec.describe "Dealer" do
 
   let(:components_holder) do
     {
-      broadcaster: broadcaster,
       config: config,
       table: table,
       round_manager: round_manager,
@@ -48,8 +48,7 @@ RSpec.describe "Dealer" do
       allow(seats).to receive(:sitdown)
       allow(config).to receive(:initial_stack).and_return(100)
       allow(player_maker).to receive(:create).and_return(player1, player2)
-      allow(round_manager).to receive(:start_new_round)
-      allow(broadcaster).to receive(:notification)
+      allow(round_manager).to receive(:start_new_round).and_return([])
     }
 
     it "should define player seats position" do
@@ -59,12 +58,12 @@ RSpec.describe "Dealer" do
     end
 
     it "should send game information to players" do
-      expect(broadcaster).to receive(:notification).with(game_start_msg)
-      dealer.start_game(player_info)
+      msgs = dealer.start_game(player_info)
+      expect(msgs).to include notification_msg(game_start_msg)
     end
 
     it "should start first round" do
-      expect(round_manager).to receive(:start_new_round).with(table)
+      expect(round_manager).to receive(:start_new_round).with(table).and_return([])
       dealer.start_game(player_info)
     end
 
@@ -101,7 +100,6 @@ RSpec.describe "Dealer" do
       allow(player2).to receive(:stack).and_return 100
       allow(table).to receive(:community_card).and_return(community_card)
       allow(table).to receive(:shift_dealer_btn)
-      allow(broadcaster).to receive(:notification)
       allow(config).to receive(:max_round).and_return(10)
       allow(seats).to receive(:players).and_return([player1, player2])
       allow(table).to receive(:seats).and_return(seats)
@@ -109,10 +107,10 @@ RSpec.describe "Dealer" do
 
     it "should notify game result" do
       allow(table).to receive(:shift_dealer_btn)
-      allow(round_manager).to receive(:start_new_round)
-      expect(broadcaster).to receive(:notification).with(round_result_msg)
+      allow(round_manager).to receive(:start_new_round).and_return([])
 
-      dealer.finish_round_callback.call(winners, accounting_info)
+      msgs = dealer.finish_round_callback.call(winners, accounting_info)
+      expect(msgs).to include notification_msg(round_result_msg)
     end
 
     describe "#teardown_round" do
@@ -133,7 +131,7 @@ RSpec.describe "Dealer" do
             allow(player3).to receive(:pay_info).and_return(pay_info)
             allow(seats).to receive(:players).and_return(players)
             allow(table).to receive(:seats).and_return(seats)
-            allow(round_manager).to receive(:start_new_round)
+            allow(round_manager).to receive(:start_new_round).and_return([])
           }
 
           it "should change no money player state to FOLDED before round start" do
@@ -145,14 +143,14 @@ RSpec.describe "Dealer" do
         end
 
         it "should shift dealer button position" do
-          allow(round_manager).to receive(:start_new_round)
+          allow(round_manager).to receive(:start_new_round).and_return([])
           expect(table).to receive(:shift_dealer_btn)
 
           dealer.finish_round_callback.call(winners, accounting_info)
         end
 
         it "should start next round" do
-          expect(round_manager).to receive(:start_new_round)
+          expect(round_manager).to receive(:start_new_round).and_return([])
 
           dealer.finish_round_callback.call(winners, accounting_info)
         end
@@ -172,9 +170,8 @@ RSpec.describe "Dealer" do
 
 
         it "should teardown the game and say goodbye to players" do
-          expect(broadcaster).to receive(:notification).with(game_result_msg)
-
-          dealer.finish_round_callback.call(winners, accounting_info)
+          msgs = dealer.finish_round_callback.call(winners, accounting_info)
+          expect(msgs).to include notification_msg(game_result_msg)
         end
       end
 
@@ -189,9 +186,8 @@ RSpec.describe "Dealer" do
         }
 
         it "should teardown the game" do
-          expect(broadcaster).to receive(:notification).with(game_result_msg)
-
-          dealer.finish_round_callback.call(winners, accounting_info)
+          msgs = dealer.finish_round_callback.call(winners, accounting_info)
+          expect(msgs).to include notification_msg(game_result_msg)
         end
       end
 
