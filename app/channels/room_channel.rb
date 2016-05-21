@@ -19,6 +19,10 @@ class RoomChannel < ApplicationCable::Channel
     get_delegate.declare_action(uuid, data)
   end
 
+  def connection_check(data)
+    get_delegate.connection_check(uuid)
+  end
+
 
   private
 
