@@ -83,6 +83,8 @@ class RoundManager
     elsif street == SHOWDOWN
       msgs << showdown(table)
     end
+
+    msgs.flatten
   end
 
   # public for test

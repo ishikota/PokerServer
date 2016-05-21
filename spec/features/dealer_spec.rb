@@ -1,24 +1,24 @@
 require 'rails_helper'
 require 'features/feature_spec_helper'
+require 'poker_engine/round_manager_spec_helper'
 
 RSpec.describe Dealer do
   include FeatureSpecHelper
+  include RoundManagerSpecHelper
 
   let(:finish_callback) { double("finish_callback") }
-  let(:broadcaster) { double("broadcaster") }
   let(:dealer) { Dealer.new(components_holder) }
   let(:config) { Config.new(initial_stack=20, max_round=2) }
   let(:table) { Table.new(cheat_deck) }
   let(:hand_evaluator) { HandEvaluator.new }
   let(:game_evaluator) { GameEvaluator.new(hand_evaluator) }
   let(:message_builder) { double("message_builder") }
-  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator, message_builder) }
+  let(:round_manager) { RoundManager.new(game_evaluator, message_builder) }
   let(:action_checker) { ActionChecker.new }
   let(:player_maker) { PlayerMaker.new }
 
   let(:components_holder) do
     {
-      broadcaster: broadcaster,
       config: config,
       table: table,
       round_manager: round_manager,
@@ -40,8 +40,6 @@ RSpec.describe Dealer do
   let(:uuid2) { "uuid-2" }
 
   before {
-    allow(broadcaster).to receive(:ask)
-    allow(broadcaster).to receive(:notification)
     allow(finish_callback).to receive(:call)
     allow(message_builder).to receive(:game_start_message).and_return(game_start_msg)
     allow(message_builder).to receive(:round_start_message).and_return(round_start_msg)
@@ -80,9 +78,6 @@ RSpec.describe Dealer do
 
     before {
       expect(message_builder).to receive(:round_start_message).with(0, anything).twice
-      expect(broadcaster).to receive(:notification).with(round_result_msg).twice
-      expect(broadcaster).to receive(:notification).with(game_result_msg)
-
       dealer.start_game(create_players_info(2))
     }
 
@@ -101,9 +96,9 @@ RSpec.describe Dealer do
 
       it "should activate folded player in teardown raound" do
         # first round
-        dealer.receive_data(0, call_msg(10))
-        dealer.receive_data(0, raise_msg(10))
-        dealer.receive_data(1, fold_msg)
+        dealer.receive_data(uuid1, call_msg(10))
+        dealer.receive_data(uuid1, raise_msg(10))
+        dealer.receive_data(uuid2, fold_msg)
         # second round
         play_a_round(dealer, dealer_btn=1)
 
@@ -134,20 +129,18 @@ RSpec.describe Dealer do
     end
 
     it "should forward to SHOWDOWN after p1's allin" do
-      expect(broadcaster).to receive(:notification).with(game_result_msg)
-
       dealer.receive_data(uuid2, call_msg(10))
       dealer.receive_data(uuid2, call_msg(0))
       dealer.receive_data(uuid1, raise_msg(40))
-      dealer.receive_data(uuid2, call_msg(40))
+      msgs = dealer.receive_data(uuid2, call_msg(40))
 
       expect(table.seats.players[0].stack).to eq 0
       expect(table.seats.players[1].stack).to eq 200
+      expect(msgs).to include notification_msg(game_result_msg)
     end
   end
 
   describe "serialization" do
-    let(:broadcaster) { Broadcaster.new("server", "room", 5) }
     let(:config) { Config.new(initial_stack=100, max_round=1) }
     let(:room) do
       double("room").tap { |room|
@@ -181,8 +174,6 @@ RSpec.describe Dealer do
         expect(copy["round_manager"]["street"]).to eq orig["round_manager"]["street"]
         expect(copy["round_manager"]["agree_num"]).to eq orig["round_manager"]["agree_num"]
         expect(copy["round_manager"]["next_player"]).to eq orig["round_manager"]["next_player"]
-
-        expect(copy["broadcaster"]["ask_counter"]).to eq orig["broadcaster"]["ask_counter"]
       end
     end
 

@@ -17,7 +17,8 @@ class Dealer
     set_player_to_seat(players)
     msgs = []
     msgs << notify_game_start
-    msgs.concat(start_round)
+    msgs << start_round
+    msgs.flatten
   end
 
   def receive_data(uuid, data)
