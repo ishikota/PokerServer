@@ -5,12 +5,9 @@ class DealerMaker
   end
 
   def setup_components_holder(room)
-    broadcaster = setup_broadcaster(room)
-
-    {}.merge(broadcaster: broadcaster)
-      .merge(config: setup_config)
+    {}.merge(config: setup_config)
       .merge(table: setup_table)
-      .merge(round_manager: setup_round_manager(broadcaster))
+      .merge(round_manager: setup_round_manager)
       .merge(action_checker: setup_action_checker)
       .merge(player_maker: setup_player_maker)
       .merge(message_builder: setup_message_builder)
@@ -18,10 +15,6 @@ class DealerMaker
 
 
   private
-
-    def setup_broadcaster(room)
-      Broadcaster.new(ActionCable.server, room)
-    end
 
     def setup_config
       Config.new(initial_stack=100, max_round=5)
@@ -36,10 +29,10 @@ class DealerMaker
       GameEvaluator.new(hand_evaluator)
     end
 
-    def setup_round_manager(broadcaster)
+    def setup_round_manager
       game_evaluator = setup_game_evaluator
       message_builder = setup_message_builder
-      RoundManager.new(broadcaster, game_evaluator, message_builder)
+      RoundManager.new(game_evaluator, message_builder)
     end
 
     def setup_action_checker

@@ -2,10 +2,9 @@ require 'rails_helper'
 
 RSpec.describe RoundManager do
 
-  let(:broadcaster) { double("broadcaster") }
   let(:game_evaluator) { double("game evaluator") }
   let(:message_builder) { double("message_builder") }
-  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator, message_builder) }
+  let(:round_manager) { RoundManager.new(game_evaluator, message_builder) }
 
   before {
     allow(message_builder).to receive(:round_start_message)
@@ -19,11 +18,6 @@ RSpec.describe RoundManager do
     let(:seats) { table.seats }
     let(:player1) { seats.players[0] }
     let(:player2) { seats.players[1] }
-
-    before {
-      allow(broadcaster).to receive(:ask)
-      allow(broadcaster).to receive(:notification)
-    }
 
     it "should send round_start and street start message" do
       expect(message_builder).to receive(:round_start_message)

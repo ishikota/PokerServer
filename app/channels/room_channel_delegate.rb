@@ -21,9 +21,10 @@ class RoomChannelDelegate
     if room.filled_to_capacity?
       @channel.broadcast(room_id=room.id, @message_builder.build_start_poker_message)
       dealer = @dealer_maker.create(room)
-      dealer.start_game(players_info(room))
+      msgs = dealer.start_game(players_info(room))
       game_state = GameState.create(state: dealer.serialize)
       GameStateRelationship.create(room_id: room.id, game_state_id: game_state.id)
+      broadcast_dealer_message(room, msgs)
     end
   end
 
@@ -43,7 +44,8 @@ class RoomChannelDelegate
     player = fetch_player(data)
     dealer = fetch_dealer(room)
 
-    dealer.receive_data(player.uuid, data)
+    msgs = dealer.receive_data(player.uuid, data)
+    broadcast_dealer_message(room, msgs)
     room.game_state.update(state: dealer.serialize)
     message = @message_builder.build_action_accept_message
     @channel.broadcast(room_id=room.id, player_id=player.id, message)
@@ -72,6 +74,32 @@ class RoomChannelDelegate
       room.players.reduce([]) { |ary, player|
         ary << { "name" => player.name, "uuid" => player.uuid }
       }
+    end
+
+    def broadcast_dealer_message(room, messages)
+      messages.each { |msg|
+        if msg["type"] == "notification"
+          @channel.broadcast(room_id=room.id, notification_message(msg["message"]))
+        elsif msg["type"] == "ask"
+          recipient = Player.find_by_uuid(msg["recipient"])
+          message = ask_message(msg["message"], room.game_state.ask_counter)
+          @channel.broadcast(room_id=room.id, player_id=recipient.id, message)
+          room.game_state.increment!(:ask_counter)
+        end
+      }
+    end
+
+    def notification_message(data)
+      {}.merge!(phase: "play_poker")\
+        .merge!(type: "notification")\
+        .merge!(message: data)
+    end
+
+    def ask_message(data, ask_counter)
+      {}.merge!(phase: "play_poker")\
+        .merge!(type: "ask")\
+        .merge!(message: data)
+        .merge!(counter: ask_counter)
     end
 
 end

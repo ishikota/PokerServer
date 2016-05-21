@@ -1,6 +1,8 @@
 require 'rails_helper'
+require 'poker_engine/round_manager_spec_helper'
 
 RSpec.describe RoundManager do
+  include RoundManagerSpecHelper
 
   let(:finish_callback) { double("dealer.finish_round") }
   let(:table) { setup_table }
@@ -8,14 +10,11 @@ RSpec.describe RoundManager do
   let(:player1) { table.seats.players[0] }
   let(:player2) { table.seats.players[1] }
   let(:player3) { table.seats.players[2] }
-  let(:broadcaster) { double("broadcaster") }
   let(:game_evaluator) { double("game evaluator") }
   let(:message_builder) { double("message_builder") }
-  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator, message_builder) }
+  let(:round_manager) { RoundManager.new(game_evaluator, message_builder) }
 
   before {
-    allow(broadcaster).to receive(:ask)
-    allow(broadcaster).to receive(:notification)
     allow(message_builder).to receive(:round_start_message)
     allow(message_builder).to receive(:street_start_message)
     allow(message_builder).to receive(:ask_message)
@@ -30,9 +29,8 @@ RSpec.describe RoundManager do
     }
 
     it "should ask action to player who sits next to blind player" do
-      expect(broadcaster).to receive(:ask).with(player3.uuid, anything)
-
-      round_manager.start_street(RoundManager::PREFLOP, table)
+      msgs = round_manager.start_street(RoundManager::PREFLOP, table)
+      expect(msgs).to include ask_msg(player3.uuid, anything)
       expect(round_manager.next_player).to eq 2
     end
 
@@ -52,9 +50,9 @@ RSpec.describe RoundManager do
 
     it "should ask action to player who has dealer button"  do
       allow(community_card).to receive(:add)
-      expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
 
-      round_manager.start_street(RoundManager::FLOP, table)
+      msgs = round_manager.start_street(RoundManager::FLOP, table)
+      expect(msgs).to include ask_msg(player1.uuid, anything)
       expect(round_manager.next_player).to eq 0
     end
 
@@ -72,9 +70,9 @@ RSpec.describe RoundManager do
 
     it "should ask action to player who has dealer button" do
       allow(community_card).to receive(:add)
-      expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
 
-      round_manager.start_street(RoundManager::TURN, table)
+      msgs = round_manager.start_street(RoundManager::TURN, table)
+      expect(msgs).to include ask_msg(player1.uuid, anything)
       expect(round_manager.next_player).to eq 0
     end
 
@@ -92,9 +90,9 @@ RSpec.describe RoundManager do
 
     it "should ask action to player who has dealer button" do
       allow(community_card).to receive(:add)
-      expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
 
-      round_manager.start_street(RoundManager::RIVER, table)
+      msgs = round_manager.start_street(RoundManager::RIVER, table)
+      expect(msgs).to include ask_msg(player1.uuid, anything)
       expect(round_manager.next_player).to eq 0
     end
 

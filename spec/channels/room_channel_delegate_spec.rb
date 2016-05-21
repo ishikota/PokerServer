@@ -1,6 +1,8 @@
 require 'rails_helper'
+require 'poker_engine/round_manager_spec_helper'
 
 RSpec.describe RoomChannelDelegate do
+  include RoundManagerSpecHelper
 
   let(:channel_wrapper) { double("channel wrapper") }
   let(:message_builder) { double("message build helper") }
@@ -59,6 +61,9 @@ RSpec.describe RoomChannelDelegate do
     context "when all member is gatherd" do
       let(:someone) { FactoryGirl.create(:player1) }
       let(:dealer) { double("dealer") }
+      let(:dealer_message) {
+        [] << notification_msg("notify_hoge") << ask_msg(uuid, "ask_fuga")
+      }
 
       before {
         allow(dealer_maker).to receive(:create).and_return(dealer)
@@ -68,21 +73,34 @@ RSpec.describe RoomChannelDelegate do
       it "should broadcast start of the game" do
         pending "player order is reversed compared to what we expected"
         player_info = [ { "name" => player.name, "uuid" => uuid }, { "name" => someone.name, "uuid" => someone.uuid } ]
-        expect(dealer).to receive(:start_game).with(player_info)
+        expect(dealer).to receive(:start_game).with(player_info).and_return([])
         expect(channel_wrapper).to receive(:broadcast).with(room.id, start_msg)
 
         delegate.enter_room(uuid, data)
       end
 
+      it "should broadcast message created by dealer" do
+        allow(dealer).to receive(:serialize).and_return "bar"
+        allow(dealer).to receive(:start_game).and_return(dealer_message)
+        expect(channel_wrapper).to receive(:broadcast).with(
+          room.id, { phase: "play_poker", type: "notification", message: "notify_hoge"})
+        expect(channel_wrapper).to receive(:broadcast).with(
+          room.id, player.id, { phase: "play_poker", type: "ask", message: "ask_fuga", counter: 0})
+
+        delegate.enter_room(uuid, data)
+        expect(room.game_state.ask_counter).to eq 1
+      end
+
       it "should create new game state" do
         state = "hogehoge"
         allow(dealer).to receive(:serialize).and_return state
-        allow(dealer).to receive(:start_game)
+        allow(dealer).to receive(:start_game).and_return([])
         delegate.enter_room(uuid, data)
 
         game_state = GameState.find_by_state(state)
         expect(game_state.state).to eq state
         expect(room.game_state).to eq game_state
+        expect(room.game_state.ask_counter).to eq 0
       end
 
     end
@@ -141,10 +159,13 @@ RSpec.describe RoomChannelDelegate do
 
     let(:someone) { FactoryGirl.create(:player1) }
     let(:dealer) { double("dealer") }
+    let(:dealer_message) {
+      [] << notification_msg("notify_hoge") << ask_msg(player.uuid, "ask_fuga")
+    }
 
     before "create new game state" do
-      allow(dealer).to receive(:start_game)
-      allow(dealer).to receive(:receive_data)
+      allow(dealer).to receive(:start_game).and_return([])
+      allow(dealer).to receive(:receive_data).and_return(dealer_message)
       allow(dealer).to receive(:serialize).and_return "hogehoge"
       allow(dealer_maker).to receive(:create).and_return(dealer)
       allow(dealer_maker).to receive(:setup_components_holder).and_return "components"
@@ -165,8 +186,16 @@ RSpec.describe RoomChannelDelegate do
       delegate.declare_action(player.uuid, data)
     end
 
-  end
+    it "should broadcast message created by dealer" do
+      allow(dealer).to receive(:start_game).and_return(dealer_message)
+      expect(channel_wrapper).to receive(:broadcast).with(room.id, { phase: "play_poker", type: "notification", message: "notify_hoge"} )
+      expect(channel_wrapper).to receive(:broadcast).with(room.id, player.id, { phase: "play_poker", type: "ask", message: "ask_fuga", counter: 0})
 
+      delegate.declare_action(player.uuid, data)
+      expect(room.game_state.ask_counter).to eq 1
+    end
+
+  end
 
 end
 

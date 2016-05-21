@@ -9,7 +9,6 @@ RSpec.describe DealerMaker do
 
     it "should setup dealer with proper component" do
       holder = helper.setup_components_holder(room)
-      expect(holder[:broadcaster]).to be_a Broadcaster
       expect(holder[:config]).to be_a Config
       expect(holder[:table]).to be_a Table
       expect(holder[:round_manager]).to be_a RoundManager

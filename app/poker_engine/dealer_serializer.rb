@@ -17,14 +17,10 @@ module DealerSerializer
      round_manager = components_holder[:round_manager]
      round_manager = round_manager_from_dump(round_manager, dump)
 
-     broadcaster = components_holder[:broadcaster]
-     broadcaster.ask_counter = dump["broadcaster"]["ask_counter"]
-
       components_holder
         .merge!( { config: config } )
         .merge!( { table: table } )
         .merge!( { round_manager: round_manager } )
-        .merge!( { broadcaster: broadcaster } )
 
       Dealer.new(components_holder, round_count=dump["round_count"])
     end
@@ -42,9 +38,6 @@ module DealerSerializer
          "agree_num" => @round_manager.agree_num,
          "next_player" => @round_manager.next_player
        },
-       "broadcaster" => {
-         "ask_counter" => @broadcaster.ask_counter
-       }
      }
    end
 

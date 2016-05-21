@@ -2,7 +2,6 @@ class Dealer
   include DealerSerializer
 
   def initialize(components_holder, round_count=1)
-    @broadcaster = components_holder[:broadcaster]
     @config = components_holder[:config]
     @table = components_holder[:table]
     @round_manager = components_holder[:round_manager]
@@ -16,8 +15,10 @@ class Dealer
   def start_game(player_info)
     players = player_info.map { |info| create_player(info) }
     set_player_to_seat(players)
-    notify_game_start
-    start_round
+    msgs = []
+    msgs << notify_game_start
+    msgs << start_round
+    msgs.flatten
   end
 
   def receive_data(uuid, data)
@@ -46,8 +47,10 @@ class Dealer
 
   def finish_round_callback
     lambda { |winners, accounting_info|
-      notify_round_result(winners)
-      teardown_round
+      msgs = []
+      msgs << notify_round_result(winners)
+      msgs << teardown_round
+      msgs.flatten
     }
   end
 
@@ -107,23 +110,26 @@ class Dealer
         .each { |player| player.pay_info.update_to_fold }
     end
 
-    def notify(message)
-      @broadcaster.notification(message)
-    end
-
     def notify_game_start
       message = @message_builder.game_start_message(@config, @table.seats)
-      notify(message)
+      notification_message(message)
     end
 
     def notify_round_result(winners)
       message = @message_builder.round_result_message(winners, @round_manager, @table)
-      notify(message)
+      notification_message(message)
     end
 
     def notify_game_result
       message = @message_builder.game_result_message(@table.seats)
-      notify(message)
+      notification_message(message)
+    end
+
+    def notification_message(message)
+      {
+        "type" => "notification",
+        "message" => message
+      }
     end
 
 end

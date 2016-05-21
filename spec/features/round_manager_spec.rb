@@ -1,30 +1,29 @@
 require 'rails_helper'
 require 'features/feature_spec_helper'
+require 'poker_engine/round_manager_spec_helper'
 
 RSpec.describe RoundManager do
   include FeatureSpecHelper
+  include RoundManagerSpecHelper
 
   let(:finish_callback) { double("finish_callback") }
-  let(:broadcaster) { double("broadcaster") }
   let(:hand_evaluator) { HandEvaluator.new }
   let(:game_evaluator) { GameEvaluator.new(hand_evaluator) }
   let(:message_builder) { double("message_builder") }
-  let(:round_manager) { RoundManager.new(broadcaster, game_evaluator, message_builder) }
+  let(:round_manager) { RoundManager.new(game_evaluator, message_builder) }
   let(:action_checker) { ActionChecker.new }
 
   let(:round_start_msg) { "round starts" }
   let(:street_start_msg) { "street starts" }
-  let(:ask_msg) { "ask" }
+  let(:_ask_msg) { "ask" }
   let(:update_msg) { "update" }
 
   before {
     round_manager.set_finish_callback(finish_callback)
 
-    allow(broadcaster).to receive(:notification)
-    allow(broadcaster).to receive(:ask)
     allow(message_builder).to receive(:round_start_message).and_return(round_start_msg)
     allow(message_builder).to receive(:street_start_message).and_return(street_start_msg)
-    allow(message_builder).to receive(:ask_message).and_return(ask_msg)
+    allow(message_builder).to receive(:ask_message).and_return(_ask_msg)
     allow(message_builder).to receive(:game_update_message).and_return(update_msg)
   }
 
@@ -39,10 +38,9 @@ RSpec.describe RoundManager do
     }
 
     it "should notify starts of the round to all players" do
-      expect(broadcaster).to receive(:notification).with("round starts")
-      expect(broadcaster).to receive(:notification).with("street starts")
-
-      round_manager.start_new_round(table)
+      msgs = round_manager.start_new_round(table)
+      expect(msgs).to include notification_msg("round starts")
+      expect(msgs).to include notification_msg("street starts")
     end
 
     it "should collect blind" do
@@ -60,9 +58,8 @@ RSpec.describe RoundManager do
     end
 
     it "should not ask blind player in preflop" do
-      expect(broadcaster).to receive(:ask).with(player1.uuid, "ask")
-
-      round_manager.start_new_round(table)
+      msgs = round_manager.start_new_round(table)
+      expect(msgs).to include ask_msg(player1.uuid, "ask")
     end
 
     context "when finished in PREFLOP" do
@@ -85,11 +82,10 @@ RSpec.describe RoundManager do
         before { round_manager.start_new_round(table) }
 
         it "should forward to flop" do
-          expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
-          expect(broadcaster).to receive(:notification).with("street starts")
-
           expect {
-            round_manager.apply_action(table, 'call', 10, action_checker)
+            msgs = round_manager.apply_action(table, 'call', 10, action_checker)
+            expect(msgs).to include ask_msg(player1.uuid, anything)
+            expect(msgs).to include notification_msg("street starts")
           }.to change { round_manager.street }.to(RoundManager::FLOP)
           .and change { table.community_card.cards.size }.from(0).to(3)
         end
@@ -104,11 +100,11 @@ RSpec.describe RoundManager do
 
         it "should forward to TURN" do
           round_manager.apply_action(table, 'raise', 10, action_checker)
-          expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
-          expect(broadcaster).to receive(:notification).with("street starts")
 
           expect {
-            round_manager.apply_action(table, 'call', 10, action_checker)
+            msgs = round_manager.apply_action(table, 'call', 10, action_checker)
+            expect(msgs).to include ask_msg(player1.uuid, anything)
+            expect(msgs).to include notification_msg("street starts")
           }.to change { round_manager.street }.to(RoundManager::TURN)
           .and change { table.community_card.cards.size }.from(3).to(4)
         end
@@ -125,11 +121,11 @@ RSpec.describe RoundManager do
 
         it "should forward to RIVER" do
           round_manager.apply_action(table, 'call', 0, action_checker)
-          expect(broadcaster).to receive(:ask).with(player1.uuid, anything)
-          expect(broadcaster).to receive(:notification).with("street starts")
 
           expect {
-            round_manager.apply_action(table, 'call', 0, action_checker)
+            msgs = round_manager.apply_action(table, 'call', 0, action_checker)
+            expect(msgs).to include ask_msg(player1.uuid, anything)
+            expect(msgs).to include notification_msg("street starts")
           }.to change { round_manager.street }.to(RoundManager::RIVER)
           .and change { table.community_card.cards.size }.from(4).to(5)
         end
@@ -209,10 +205,9 @@ RSpec.describe RoundManager do
           round_manager.start_new_round(table)
           round_manager.apply_action(table, 'call', 10, action_checker)
 
-          expect(broadcaster).to receive(:ask).with(player1.uuid, "ask")
-
           expect {
-            round_manager.apply_action(table, 'fold', nil, action_checker)
+            msgs = round_manager.apply_action(table, 'fold', nil, action_checker)
+            expect(msgs).to include ask_msg(player1.uuid, "ask")
           }.to change { round_manager.street }.to(RoundManager::FLOP)
           .and change { table.community_card.cards.size }.from(0).to(3)
         end

@@ -51,21 +51,12 @@ module ObjectInitializeHelper
     end
 
     def create_round_manager
-      broadcaster = mock_broadcaster
       hand_evaluator = HandEvaluator.new
       game_evaluator = GameEvaluator.new(hand_evaluator)
       data_formatter = DataFormatter.new(game_evaluator)
       message_builder = MessageBuilder.new(data_formatter)
-      RoundManager.new(broadcaster, game_evaluator, message_builder)
+      RoundManager.new(game_evaluator, message_builder)
     end
-
-    def mock_broadcaster
-      broadcaster = double("broadcaster")
-      allow(broadcaster).to receive(:notification)
-      allow(broadcaster).to receive(:ask)
-      return broadcaster
-    end
-
 
     def card(suit, rank)
       Card.new(suit, rank)
