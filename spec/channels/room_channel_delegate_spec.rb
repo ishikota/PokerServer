@@ -80,12 +80,15 @@ RSpec.describe RoomChannelDelegate do
       end
 
       it "should broadcast message created by dealer" do
-        allow(dealer).to receive(:serialize).and_return ""
+        allow(dealer).to receive(:serialize).and_return "bar"
         allow(dealer).to receive(:start_game).and_return(dealer_message)
-        expect(channel_wrapper).to receive(:broadcast).with(room.id, "notify_hoge")
-        expect(channel_wrapper).to receive(:broadcast).with(room.id, player.id, "ask_fuga")
+        expect(channel_wrapper).to receive(:broadcast).with(
+          room.id, { phase: "play_poker", type: "notification", message: "notify_hoge"})
+        expect(channel_wrapper).to receive(:broadcast).with(
+          room.id, player.id, { phase: "play_poker", type: "ask", message: "ask_fuga", counter: 0})
 
         delegate.enter_room(uuid, data)
+        expect(room.game_state.ask_counter).to eq 1
       end
 
       it "should create new game state" do
@@ -97,6 +100,7 @@ RSpec.describe RoomChannelDelegate do
         game_state = GameState.find_by_state(state)
         expect(game_state.state).to eq state
         expect(room.game_state).to eq game_state
+        expect(room.game_state.ask_counter).to eq 0
       end
 
     end
@@ -184,10 +188,11 @@ RSpec.describe RoomChannelDelegate do
 
     it "should broadcast message created by dealer" do
       allow(dealer).to receive(:start_game).and_return(dealer_message)
-      expect(channel_wrapper).to receive(:broadcast).with(room.id, "notify_hoge")
-      expect(channel_wrapper).to receive(:broadcast).with(room.id, player.id, "ask_fuga")
+      expect(channel_wrapper).to receive(:broadcast).with(room.id, { phase: "play_poker", type: "notification", message: "notify_hoge"} )
+      expect(channel_wrapper).to receive(:broadcast).with(room.id, player.id, { phase: "play_poker", type: "ask", message: "ask_fuga", counter: 0})
 
       delegate.declare_action(player.uuid, data)
+      expect(room.game_state.ask_counter).to eq 1
     end
 
   end
