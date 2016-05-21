@@ -3,9 +3,11 @@ class Player < ApplicationRecord
   has_one :room, through: :enter_room_relationship
   validates :name, presence: true
   validates :credential, length: { is: 22 }
+  validates :online, inclusion: { in: [true, false] }
 
   def clear_state
     update_attributes(uuid: nil)
+    update_attributes(online: false)
     EnterRoomRelationship.where(player_id: id).destroy_all
   end
 

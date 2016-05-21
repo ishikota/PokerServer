@@ -19,6 +19,12 @@ RSpec.describe Player, :type => :model do
         expect { player.credential = 'a' * 23 }.to change { player.valid? }.to false
       end
     end
+
+    describe "on online" do
+      it "should reject null connection state" do
+        expect { player.online = nil }.to change { player.valid? }.to false
+      end
+    end
   end
 
   describe "association" do
@@ -77,6 +83,7 @@ RSpec.describe Player, :type => :model do
 
     before {
       player.update_attributes(uuid: uuid)
+      player.update_attributes(online: true)
       EnterRoomRelationship.create(room_id: room.id, player_id: player.id)
     }
 
@@ -86,6 +93,10 @@ RSpec.describe Player, :type => :model do
 
     it "should clear uuid" do
       expect { player.clear_state }.to change { player.reload.uuid }.to(nil)
+    end
+
+    it "should clear connection state" do
+      expect { player.clear_state }.to change { player.reload.online? }.to(false)
     end
   end
 
