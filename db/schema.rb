@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160511111138) do
+ActiveRecord::Schema.define(version: 20160521031423) do
 
   create_table "enter_room_relationships", force: :cascade do |t|
     t.integer  "room_id"
@@ -28,7 +28,8 @@ ActiveRecord::Schema.define(version: 20160511111138) do
   end
 
   create_table "game_states", force: :cascade do |t|
-    t.string "state"
+    t.string  "state"
+    t.integer "ask_counter", default: 0, null: false
   end
 
   create_table "players", force: :cascade do |t|
