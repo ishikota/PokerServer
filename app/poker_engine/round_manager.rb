@@ -61,7 +61,7 @@ class RoundManager
       msgs.concat(start_street(@street, table))
     else
       shift_next_player(table.seats)
-      msgs << send_ask_message(@next_player, self, table)
+      msgs << gen_ask_message(@next_player, self, table)
     end
   end
 
@@ -193,7 +193,7 @@ class RoundManager
         @street += 1
         start_street(@street, table)
       else
-        send_ask_message(@next_player, self, table)
+        gen_ask_message(@next_player, self, table)
       end
     end
 
@@ -220,7 +220,7 @@ class RoundManager
       notification_message(message)
     end
 
-    def send_ask_message(player_pos, round_manager, table)
+    def gen_ask_message(player_pos, round_manager, table)
       action_checker = ActionChecker.new  #TODO
       message = @message_builder.ask_message(action_checker, player_pos, round_manager, table)
       next_player = table.seats.players[player_pos]
