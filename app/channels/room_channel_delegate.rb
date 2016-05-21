@@ -17,15 +17,6 @@ class RoomChannelDelegate
 
     @channel.broadcast(room_id=room.id, @message_builder.build_member_arrival_message(room, player))
     @channel.broadcast(room_id=room.id, player_id=player.id, @message_builder.build_welcome_message)
-
-    if room.filled_to_capacity?
-      @channel.broadcast(room_id=room.id, @message_builder.build_start_poker_message)
-      dealer = @dealer_maker.create(room)
-      msgs = dealer.start_game(players_info(room))
-      game_state = GameState.create(state: dealer.serialize)
-      GameStateRelationship.create(room_id: room.id, game_state_id: game_state.id)
-      broadcast_dealer_message(room, msgs)
-    end
   end
 
   def exit_room(uuid)

@@ -11,12 +11,14 @@ RSpec.describe Dealer do
   let(:player1) { FactoryGirl.create(:player1) }
   let(:player2) { FactoryGirl.create(:player2) }
 
-  describe "start the game" do
+  before {
+    delegate.enter_room(player1.uuid, setup_data(room, player1))
+    delegate.enter_room(player2.uuid, setup_data(room, player2))
+    delegate.connection_check(player1.uuid)
+    delegate.connection_check(player2.uuid)
+  }
 
-    before {
-      delegate.enter_room(player1.uuid, setup_data(room, player1))
-      delegate.enter_room(player2.uuid, setup_data(room, player2))
-    }
+  describe "start the game" do
 
     it "should save preflop dealer state" do
       state = JSON.parse(room.game_state.state)
@@ -29,11 +31,6 @@ RSpec.describe Dealer do
   describe "update the game" do
     let(:action_data) { { "poker_action" => "call", "bet_amount" => 10 } }
     let(:data) { setup_data(room, player1).merge!(action_data) }
-
-    before {
-      delegate.enter_room(player1.uuid, setup_data(room, player1))
-      delegate.enter_room(player2.uuid, setup_data(room, player2))
-    }
 
     it "should save updated game state" do
       delegate.declare_action(player1.uuid, data)
