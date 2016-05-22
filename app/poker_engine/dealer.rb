@@ -116,7 +116,7 @@ class Dealer
     end
 
     def notify_round_result(winners)
-      message = @message_builder.round_result_message(winners, @round_manager, @table)
+      message = @message_builder.round_result_message(@round_count, winners, @round_manager, @table)
       notification_message(message)
     end
 

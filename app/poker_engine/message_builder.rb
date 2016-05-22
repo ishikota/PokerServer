@@ -72,12 +72,13 @@ class MessageBuilder
     }
   end
 
-  def round_result_message(winners, round_manager, table)
+  def round_result_message(round_count, winners, round_manager, table)
     winners = @formatter.format_winners(winners)
     round_state = @formatter.format_round_state(round_manager, table)
 
     {
       "message_type" => Type::ROUND_RESULT_MESSAGE,
+      "round_count" => round_count,
       "round_state" => round_state
      }.merge!(winners)
   end

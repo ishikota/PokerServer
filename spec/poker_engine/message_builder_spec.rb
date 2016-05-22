@@ -90,8 +90,9 @@ RSpec.describe MessageBuilder do
     let(:winners) { [table.seats.players.first] }
 
     it "should create correct message" do
-      msg = message_builder.round_result_message(winners, round_manager, table)
+      msg = message_builder.round_result_message(7, winners, round_manager, table)
       expect(msg["message_type"]).to eq MessageBuilder::Type::ROUND_RESULT_MESSAGE
+      expect(msg["round_count"]).to eq 7
       expect(msg["winners"]).to eq formatter.format_winners(winners)["winners"]
       expect(msg["round_state"]).to eq formatter.format_round_state(round_manager, table)
     end
