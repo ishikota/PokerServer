@@ -70,7 +70,9 @@ class RoundManager
     @agree_num = 0
     @next_player = table.dealer_btn
     msgs = []
-    msgs << notify_street_start(table)
+    if table.seats.count_ask_wait_players != 1
+      msgs << notify_street_start(table)
+    end
 
     if street == PREFLOP
       msgs << preflop(table)
@@ -81,7 +83,7 @@ class RoundManager
     elsif street == RIVER
       msgs << river(table)
     elsif street == SHOWDOWN
-      msgs << showdown(table)
+      showdown(table)
     end
 
     msgs.flatten

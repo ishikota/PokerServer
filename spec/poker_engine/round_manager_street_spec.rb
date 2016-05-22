@@ -15,9 +15,9 @@ RSpec.describe RoundManager do
   let(:round_manager) { RoundManager.new(game_evaluator, message_builder) }
 
   before {
-    allow(message_builder).to receive(:round_start_message)
-    allow(message_builder).to receive(:street_start_message)
-    allow(message_builder).to receive(:ask_message)
+    allow(message_builder).to receive(:round_start_message).and_return("round_start")
+    allow(message_builder).to receive(:street_start_message).and_return("street_start")
+    allow(message_builder).to receive(:ask_message).and_return("ask")
 
     round_manager.set_finish_callback(finish_callback)
   }
@@ -132,6 +132,25 @@ RSpec.describe RoundManager do
 
   end
 
+  describe "notification" do
+
+    describe "when only one player is active" do
+
+      before {
+        allow(seats).to receive(:size).and_return(3)
+        allow(seats).to receive(:count_ask_wait_players).and_return 1
+        allow(table.community_card).to receive(:add)
+        allow(finish_callback).to receive(:call)
+        allow(game_evaluator).to receive(:judge).and_return([[], []])
+        allow(table).to receive(:reset)
+      }
+
+      it "should skip start street notification" do
+        msgs = round_manager.start_street(RoundManager::PREFLOP, table)
+        expect(msgs).to be_empty
+      end
+    end
+  end
 
   private
 
