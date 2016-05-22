@@ -232,7 +232,7 @@ RSpec.describe DataFormatter do
 
     before {
       action_checler = ActionChecker.new
-      round_manager.start_new_round(table)
+      round_manager.start_new_round(1, table)
       round_manager.apply_action(table, 'call', 10, action_checler)  # forward to FLOP
     }
 

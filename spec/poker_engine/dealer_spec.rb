@@ -63,7 +63,7 @@ RSpec.describe "Dealer" do
     end
 
     it "should start first round" do
-      expect(round_manager).to receive(:start_new_round).with(table).and_return([])
+      expect(round_manager).to receive(:start_new_round).with(1, table).and_return([])
       dealer.start_game(player_info)
     end
 

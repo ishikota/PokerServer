@@ -38,34 +38,34 @@ RSpec.describe RoundManager do
     }
 
     it "should notify starts of the round to all players" do
-      msgs = round_manager.start_new_round(table)
+      msgs = round_manager.start_new_round(1, table)
       expect(msgs).to include notification_msg("round starts")
       expect(msgs).to include notification_msg("street starts")
     end
 
     it "should collect blind" do
       expect {
-        round_manager.start_new_round(table)
+        round_manager.start_new_round(1, table)
       }.to change { player1.stack }.by(-5)
        .and change { player2.stack }.by(-10)
     end
 
     it "should deal hole card to players" do
       expect {
-        round_manager.start_new_round(table)
+        round_manager.start_new_round(1, table)
       }.to change { player1.hole_card.size }.by(2)
       .and change { player2.hole_card.size }.by(2)
     end
 
     it "should not ask blind player in preflop" do
-      msgs = round_manager.start_new_round(table)
+      msgs = round_manager.start_new_round(1, table)
       expect(msgs).to include ask_msg(player1.uuid, "ask")
     end
 
     context "when finished in PREFLOP" do
 
       before {
-        round_manager.start_new_round(table)
+        round_manager.start_new_round(1, table)
       }
 
       it "should reach showdown without asking and finish round" do
@@ -79,7 +79,7 @@ RSpec.describe RoundManager do
     describe "forward next street" do
 
       describe "PREFLOP to FLOP" do
-        before { round_manager.start_new_round(table) }
+        before { round_manager.start_new_round(1, table) }
 
         it "should forward to flop" do
           expect {
@@ -93,7 +93,7 @@ RSpec.describe RoundManager do
 
       describe "FLOP to TURN" do
         before {
-          round_manager.start_new_round(table)
+          round_manager.start_new_round(1, table)
           round_manager.apply_action(table, 'call', 10, action_checker)
           expect(round_manager.street).to eq RoundManager::FLOP
         }
@@ -112,7 +112,7 @@ RSpec.describe RoundManager do
 
       describe "TURN to RIVER" do
         before {
-          round_manager.start_new_round(table)
+          round_manager.start_new_round(1, table)
           round_manager.apply_action(table, 'call', 10, action_checker)
           round_manager.apply_action(table, 'raise', 10, action_checker)
           round_manager.apply_action(table, 'call', 10, action_checker)
@@ -133,7 +133,7 @@ RSpec.describe RoundManager do
 
       describe "RIVER to SHOWOFF" do
         before {
-          round_manager.start_new_round(table)
+          round_manager.start_new_round(1, table)
           round_manager.apply_action(table, 'call', 10, action_checker)
           round_manager.apply_action(table, 'call', 0, action_checker)
           round_manager.apply_action(table, 'call', 0, action_checker)
@@ -202,7 +202,7 @@ RSpec.describe RoundManager do
       describe "one player call and another is fold" do
 
         it "should forward to FLOP" do
-          round_manager.start_new_round(table)
+          round_manager.start_new_round(1, table)
           round_manager.apply_action(table, 'call', 10, action_checker)
 
           expect {

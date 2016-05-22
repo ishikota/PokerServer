@@ -77,7 +77,7 @@ RSpec.describe Dealer do
     let(:config) { Config.new(initial_stack=100, max_round=2) }
 
     before {
-      expect(message_builder).to receive(:round_start_message).with(0, anything).twice
+      expect(message_builder).to receive(:round_start_message).with(anything, 0, anything).twice
       dealer.start_game(create_players_info(2))
     }
 

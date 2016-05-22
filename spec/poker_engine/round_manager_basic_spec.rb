@@ -24,7 +24,7 @@ RSpec.describe RoundManager do
       expect(message_builder).to receive(:street_start_message)
       expect(message_builder).to receive(:ask_message)
 
-      round_manager.start_new_round(table)
+      round_manager.start_new_round(1, table)
     end
 
     it "should collect blind" do
@@ -34,7 +34,7 @@ RSpec.describe RoundManager do
       expect(player1.pay_info).to receive(:update_by_pay).with(small_blind)
       expect(player2.pay_info).to receive(:update_by_pay).with(small_blind * 2)
 
-      round_manager.start_new_round(table)
+      round_manager.start_new_round(1, table)
     end
 
     it "should deal hole card to players" do
@@ -42,7 +42,7 @@ RSpec.describe RoundManager do
         expect(player).to receive(:add_holecard).with([anything, anything])
       }
 
-      round_manager.start_new_round(table)
+      round_manager.start_new_round(1, table)
     end
 
   end

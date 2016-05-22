@@ -26,8 +26,9 @@ RSpec.describe MessageBuilder do
     let(:seats) { setup_seats_with_players(2) }
 
     it "should create correct message for correct player" do
-      msg = message_builder.round_start_message(player_pos=1, seats)
+      msg = message_builder.round_start_message(7, player_pos=1, seats)
       expect(msg["message_type"]).to eq MessageBuilder::Type::ROUND_START_MESSAGE
+      expect(msg["round_count"]).to eq 7
       expect(msg["seats"]).to eq formatter.format_seats(seats)
       expect(msg["hole_card"]).to eq ["C8", "D3"]
     end
@@ -39,7 +40,7 @@ RSpec.describe MessageBuilder do
 
     before {
       action_checker = ActionChecker.new
-      round_manager.start_new_round(table)
+      round_manager.start_new_round(1, table)
       round_manager.apply_action(table, 'call', 10, action_checker)  # forward to FLOP
     }
 

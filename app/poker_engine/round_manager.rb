@@ -31,7 +31,7 @@ class RoundManager
     @next_player = next_player
   end
 
-  def start_new_round(table)
+  def start_new_round(round_count, table)
     @next_player = table.dealer_btn
     @street = PREFLOP
 
@@ -39,7 +39,7 @@ class RoundManager
     correct_blind(small_blind=5, table)
     deal_holecard(table.deck, table.seats.players)
 
-    [].concat(notify_round_start(table))
+    [].concat(notify_round_start(round_count, table))
       .concat(start_street(@street, table))
   end
 
@@ -212,11 +212,11 @@ class RoundManager
       players.each { |player| player.clear_action_histories }
     end
 
-    def notify_round_start(table)
+    def notify_round_start(round_count, table)
       msgs = []
       table.seats.players.each_with_index { |player, idx|
         #TODO fix to notify to each person
-        msgs << notification_message(@message_builder.round_start_message(idx, table.seats))
+        msgs << notification_message(@message_builder.round_start_message(round_count, idx, table.seats))
       }
       msgs
     end

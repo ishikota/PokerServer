@@ -71,7 +71,7 @@ class Dealer
   private
 
     def start_round
-      @round_manager.start_new_round(@table)
+      @round_manager.start_new_round(@round_count, @table)
     end
 
     def create_player(player_info)
