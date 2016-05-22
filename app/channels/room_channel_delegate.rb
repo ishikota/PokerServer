@@ -86,6 +86,10 @@ class RoomChannelDelegate
       messages.each { |msg|
         if msg["type"] == "broadcast"
           @channel.broadcast(room_id=room.id, notification_message(msg["message"]))
+        elsif msg["type"] == "notification"
+          recipient = Player.find_by_uuid(msg["recipient"])
+          message = notification_message(msg["message"])
+          @channel.broadcast(room_id=room.id, player_id=recipient.id, message)
         elsif msg["type"] == "ask"
           recipient = Player.find_by_uuid(msg["recipient"])
           message = ask_message(msg["message"], room.game_state.ask_counter)

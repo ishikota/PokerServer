@@ -39,7 +39,8 @@ RSpec.describe RoundManager do
 
     it "should notify starts of the round to all players" do
       msgs = round_manager.start_new_round(1, table)
-      expect(msgs).to include broadcast_msg("round starts")
+      expect(msgs).to include notification_msg(player1.uuid, "round starts")
+      expect(msgs).to include notification_msg(player2.uuid, "round starts")
       expect(msgs).to include broadcast_msg("street starts")
     end
 

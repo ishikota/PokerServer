@@ -15,5 +15,13 @@ module RoundManagerSpecHelper
     }
   end
 
+  def notification_msg(recipient, message)
+    {
+      "type" => "notification",
+      "recipient" => recipient,
+      "message" => message
+    }
+  end
+
 end
 

@@ -215,8 +215,8 @@ class RoundManager
     def notify_round_start(round_count, table)
       msgs = []
       table.seats.players.each_with_index { |player, idx|
-        #TODO fix to notify to each person
-        msgs << broadcast_message(@message_builder.round_start_message(round_count, idx, table.seats))
+        message = @message_builder.round_start_message(round_count, idx, table.seats)
+        msgs << notification_message(player, message)
       }
       msgs
     end
@@ -246,13 +246,20 @@ class RoundManager
       }
     end
 
+    def notification_message(recipient, message)
+      {
+        "type" => "notification",
+        "recipient" => recipient.uuid,
+        "message" => message
+      }
+    end
+
     def broadcast_message(message)
       {
         "type" => "broadcast",
         "message" => message
       }
     end
-
 
 end
 
