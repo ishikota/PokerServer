@@ -70,7 +70,9 @@ class RoundManager
     @agree_num = 0
     @next_player = table.dealer_btn
     msgs = []
-    msgs << notify_street_start(table) unless game_is_decided?(table)
+    if table.seats.count_active_player != 1
+      msgs << notify_street_start(table)
+    end
 
     if street == PREFLOP
       msgs << preflop(table)
@@ -81,7 +83,7 @@ class RoundManager
     elsif street == RIVER
       msgs << river(table)
     elsif street == SHOWDOWN
-      showdown(table)
+      msgs << showdown(table)
     end
 
     msgs.flatten
@@ -189,16 +191,12 @@ class RoundManager
     end
 
     def ask_if_needed(table)
-      if game_is_decided?(table)
+      if table.seats.count_ask_wait_players == 1
         @street += 1
         start_street(@street, table)
       else
         gen_ask_message(@next_player, self, table)
       end
-    end
-
-    def game_is_decided?(table)
-      table.seats.count_ask_wait_players == 1
     end
 
     def clear_action_histories(players)

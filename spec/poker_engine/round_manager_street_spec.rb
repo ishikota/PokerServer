@@ -138,16 +138,39 @@ RSpec.describe RoundManager do
 
       before {
         allow(seats).to receive(:size).and_return(3)
-        allow(seats).to receive(:count_ask_wait_players).and_return 1
         allow(table.community_card).to receive(:add)
-        allow(finish_callback).to receive(:call)
+        allow(finish_callback).to receive(:call).and_return "finish_msg"
         allow(game_evaluator).to receive(:judge).and_return([[], []])
         allow(table).to receive(:reset)
       }
 
-      it "should skip start street notification" do
+      subject(:street_start_msgs) do
         msgs = round_manager.start_street(RoundManager::PREFLOP, table)
-        expect(msgs).to be_empty
+        msgs.select { |m| m["message"] == "street_start" }
+      end
+
+      context "by another player's allin" do
+
+        before {
+          allow(seats).to receive(:count_ask_wait_players).and_return 1
+          allow(seats).to receive(:count_active_player).and_return 2
+        }
+
+        it "should not skip start street notification" do
+          expect(street_start_msgs).not_to be_empty
+        end
+      end
+
+      context "by another player's fold" do
+
+        before {
+          allow(seats).to receive(:count_ask_wait_players).and_return 1
+          allow(seats).to receive(:count_active_player).and_return 1
+        }
+
+        it "should skip start street notification" do
+          expect(street_start_msgs).to be_empty
+        end
       end
     end
   end
