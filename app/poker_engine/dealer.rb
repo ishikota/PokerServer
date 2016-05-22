@@ -112,22 +112,22 @@ class Dealer
 
     def notify_game_start
       message = @message_builder.game_start_message(@config, @table.seats)
-      notification_message(message)
+      broadcast_message(message)
     end
 
     def notify_round_result(winners)
       message = @message_builder.round_result_message(@round_count, winners, @round_manager, @table)
-      notification_message(message)
+      broadcast_message(message)
     end
 
     def notify_game_result
       message = @message_builder.game_result_message(@table.seats)
-      notification_message(message)
+      broadcast_message(message)
     end
 
-    def notification_message(message)
+    def broadcast_message(message)
       {
-        "type" => "notification",
+        "type" => "broadcast",
         "message" => message
       }
     end

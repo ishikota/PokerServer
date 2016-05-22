@@ -1,8 +1,8 @@
 module RoundManagerSpecHelper
 
-  def notification_msg(message)
+  def broadcast_msg(message)
     {
-      "type" => "notification",
+      "type" => "broadcast",
       "message" => message
     }
   end

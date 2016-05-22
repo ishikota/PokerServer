@@ -216,19 +216,19 @@ class RoundManager
       msgs = []
       table.seats.players.each_with_index { |player, idx|
         #TODO fix to notify to each person
-        msgs << notification_message(@message_builder.round_start_message(round_count, idx, table.seats))
+        msgs << broadcast_message(@message_builder.round_start_message(round_count, idx, table.seats))
       }
       msgs
     end
 
     def notify_street_start(table)
       message = @message_builder.street_start_message(self, table)
-      notification_message(message)
+      broadcast_message(message)
     end
 
     def notify_update(player_pos, action, amount, table)
       message = @message_builder.game_update_message(player_pos, action, amount, self, table)
-      notification_message(message)
+      broadcast_message(message)
     end
 
     def gen_ask_message(player_pos, round_manager, table)
@@ -246,9 +246,9 @@ class RoundManager
       }
     end
 
-    def notification_message(message)
+    def broadcast_message(message)
       {
-        "type" => "notification",
+        "type" => "broadcast",
         "message" => message
       }
     end

@@ -59,7 +59,7 @@ RSpec.describe "Dealer" do
 
     it "should send game information to players" do
       msgs = dealer.start_game(player_info)
-      expect(msgs).to include notification_msg(game_start_msg)
+      expect(msgs).to include broadcast_msg(game_start_msg)
     end
 
     it "should start first round" do
@@ -110,7 +110,7 @@ RSpec.describe "Dealer" do
       allow(round_manager).to receive(:start_new_round).and_return([])
 
       msgs = dealer.finish_round_callback.call(winners, accounting_info)
-      expect(msgs).to include notification_msg(round_result_msg)
+      expect(msgs).to include broadcast_msg(round_result_msg)
     end
 
     describe "#teardown_round" do
@@ -171,7 +171,7 @@ RSpec.describe "Dealer" do
 
         it "should teardown the game and say goodbye to players" do
           msgs = dealer.finish_round_callback.call(winners, accounting_info)
-          expect(msgs).to include notification_msg(game_result_msg)
+          expect(msgs).to include broadcast_msg(game_result_msg)
         end
       end
 
@@ -187,7 +187,7 @@ RSpec.describe "Dealer" do
 
         it "should teardown the game" do
           msgs = dealer.finish_round_callback.call(winners, accounting_info)
-          expect(msgs).to include notification_msg(game_result_msg)
+          expect(msgs).to include broadcast_msg(game_result_msg)
         end
       end
 

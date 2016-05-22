@@ -35,7 +35,7 @@ RSpec.describe RoundManager do
       it "should notify update to all players" do
         setup_action_checker(player1, 0, 10)
         msgs = apply_action(round_manager, table, 'call', 10, action_checker)
-        expect(msgs).to include notification_msg("update")
+        expect(msgs).to include broadcast_msg("update")
       end
 
       context "when passed action is CALL" do
@@ -226,7 +226,7 @@ RSpec.describe RoundManager do
       it "should forward to next street" do
         setup_action_checker(player1, 0, 5)
         msgs = apply_action(round_manager, table, 'call', 5, action_checker)
-        expect(msgs).to include notification_msg("street_msg")
+        expect(msgs).to include broadcast_msg("street_msg")
       end
 
     end

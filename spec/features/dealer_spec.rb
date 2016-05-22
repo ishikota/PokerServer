@@ -136,7 +136,7 @@ RSpec.describe Dealer do
 
       expect(table.seats.players[0].stack).to eq 0
       expect(table.seats.players[1].stack).to eq 200
-      expect(msgs).to include notification_msg(game_result_msg)
+      expect(msgs).to include broadcast_msg(game_result_msg)
     end
   end
 

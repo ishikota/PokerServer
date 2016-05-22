@@ -120,7 +120,7 @@ RSpec.describe RoomChannelDelegate do
     context "when everyone is online and fiiled to capacity" do
       let(:dealer) { double("dealer") }
       let(:dealer_message) {
-        [] << notification_msg("notify_hoge") << ask_msg(player.uuid, "ask_fuga")
+        [] << broadcast_msg("notify_hoge") << ask_msg(player.uuid, "ask_fuga")
       }
 
       before {
@@ -179,7 +179,7 @@ RSpec.describe RoomChannelDelegate do
     let(:someone) { FactoryGirl.create(:player1) }
     let(:dealer) { double("dealer") }
     let(:dealer_message) {
-      [] << notification_msg("notify_hoge") << ask_msg(player.uuid, "ask_fuga")
+      [] << broadcast_msg("notify_hoge") << ask_msg(player.uuid, "ask_fuga")
     }
 
     before "create new game state" do
