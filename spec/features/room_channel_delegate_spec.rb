@@ -40,6 +40,40 @@ RSpec.describe Dealer do
     end
   end
 
+  describe "street start message" do
+    let(:action_data) { { "poker_action" => "call", "bet_amount" => 10 } }
+    let(:data) { setup_data(room, player1).merge!(action_data) }
+
+    let(:poker_msg) do
+      {
+        phase: "play_poker",
+        type: "notification",
+        message: flop_msg
+      }
+    end
+
+    let(:flop_msg) do
+      {
+        "message_type"=>"street_start_message",
+        "round_state"=> {
+          "street"=>"FLOP",
+          "community_card"=>[anything, anything, anything],
+          "dealer_btn" => anything,
+          "seats" => anything,
+          "pot" => anything,
+          "next_player"=> anything
+        },
+        "street"=>"FLOP"
+      }
+    end
+
+
+    it "should be sent after street setup is done" do
+      expect(channel).to receive(:broadcast).with(room.id, poker_msg)
+      delegate.declare_action(player1.uuid, data)
+    end
+  end
+
   private
 
     def setup_data(room, player)

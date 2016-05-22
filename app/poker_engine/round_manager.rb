@@ -70,9 +70,6 @@ class RoundManager
     @agree_num = 0
     @next_player = table.dealer_btn
     msgs = []
-    if table.seats.count_active_player != 1
-      msgs << notify_street_start(table)
-    end
 
     if street == PREFLOP
       msgs << preflop(table)
@@ -114,24 +111,31 @@ class RoundManager
     def preflop(table)
       2.times { shift_next_player(table.seats) }
       @agree_num = 1  # big blind already agreed
-      ask_if_needed(table)
+      send_street_message(table)
     end
 
     def flop(table)
       table.deck.draw_cards(3).each { |card|
         table.community_card.add(card)
       }
-      ask_if_needed(table)
+      send_street_message(table)
     end
 
     def turn(table)
       table.community_card.add(table.deck.draw_card)
-      ask_if_needed(table)
+      send_street_message(table)
     end
 
     def river(table)
       table.community_card.add(table.deck.draw_card)
-      ask_if_needed(table)
+      send_street_message(table)
+    end
+
+    def send_street_message(table)
+      msgs = []
+      msgs << notify_street_start_if_needed(table)  # maybe nil
+      msgs << ask_if_needed(table)
+      msgs.compact
     end
 
     def showdown(table)
@@ -198,6 +202,11 @@ class RoundManager
         gen_ask_message(@next_player, self, table)
       end
     end
+
+    def notify_street_start_if_needed(table)
+      notify_street_start(table) if table.seats.count_active_player != 1
+    end
+
 
     def clear_action_histories(players)
       players.each { |player| player.clear_action_histories }
